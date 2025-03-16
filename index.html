@@ -42,7 +42,8 @@
                                     <option value="ROS">6-letnie (ROS)</option>
                                     <option value="ROD">12-letnie (ROD)</option>
                                 </select>
-                                <div class="sub-info" id="opisObligacji"></div>
+                                <!-- Usunięto opis pod wyborem rodzaju obligacji -->
+                                <div class="sub-info"></div>
                             </div>
                             <div class="form-group">
                                 <label for="inflacja" class="form-label">Inflacja</label>
@@ -617,7 +618,6 @@
 
     function updateOpisObligacji() {
         const typ = document.getElementById("typObligacji").value;
-        document.getElementById("opisObligacji").textContent = opisyObligacji[typ] || "";
         document.getElementById("obligacjeOpis").textContent = opisyObligacji[typ] || "";
     }
 
@@ -764,7 +764,7 @@
             data: {
                 labels: ['Kapitał', 'Odsetki', 'Podatek Belki'],
                 datasets: [{
-                    data: [kwota, odsetkiCalkowite, podatekCalkowite],
+                    data: [kwota, odsetkiCalkowite, podatekCalkowity],
                     backgroundColor: ['#28a745', '#007bff', '#dc3545'],
                     borderWidth: 1,
                     hoverOffset: 8,
@@ -891,7 +891,15 @@
         document.getElementById("resultSection").style.display = "block";
     }
 
-    document.getElementById("obliczBtn").addEventListener("click", obliczObligacje);
+    // Poprawka: Upewniamy się, że przycisk "Oblicz" jest poprawnie podpięty
+    document.addEventListener('DOMContentLoaded', function() {
+        const obliczBtn = document.getElementById("obliczBtn");
+        if (obliczBtn) {
+            obliczBtn.addEventListener("click", obliczObligacje);
+        } else {
+            console.error("Przycisk 'Oblicz' nie został znaleziony w dokumencie.");
+        }
+    });
 
     function removePolishChars(text) {
         const polishToLatin = {
