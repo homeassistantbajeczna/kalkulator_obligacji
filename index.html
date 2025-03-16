@@ -136,10 +136,8 @@
                                     <th>Skumulowane odsetki</th>
                                     <th>Opłata za wykup</th>
                                     <th>Podatek Belki</th>
-                                    <th>Zysk</th>
+                                    <th>Zysk netto</th>
                                     <th>Inflacja roczna</th>
-                                    <th>Inflacja na cykl</th>
-                                    <th>Skumulowana inflacja</th>
                                     <th>Kwota po zakończeniu cyklu</th>
                                 </tr>
                             </thead>
@@ -419,8 +417,8 @@
     }
     .harmonogram table {
         margin-bottom: 0;
-        table-layout: fixed;
-        width: 120%; /* Rozszerzono tabelę */
+        table-layout: auto; /* Dynamiczne dopasowanie kolumn */
+        width: 100%; /* Dopasowanie do kontenera */
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
@@ -430,23 +428,27 @@
     .harmonogram th {
         background: linear-gradient(90deg, #C2B280, #b0a070);
         color: #000000;
-        padding: 12px; /* Zwiększono padding */
+        padding: 12px;
         text-align: center;
         vertical-align: middle;
         font-weight: 500;
         border-bottom: 2px solid #ddd;
-        white-space: nowrap; /* Zapobiega zawijaniu tekstu */
-        min-width: 100px; /* Minimalna szerokość dla nagłówków */
+        white-space: nowrap;
+        min-width: 120px; /* Minimalna szerokość dla nagłówków */
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .harmonogram td {
-        padding: 10px; /* Zwiększono padding */
+        padding: 10px;
         text-align: center;
         font-weight: 400;
         border-bottom: 1px solid #eee;
         background-color: #f9f9f9;
         color: #000000;
-        white-space: nowrap; /* Zapobiega zawijaniu tekstu */
-        min-width: 100px; /* Minimalna szerokość dla komórek */
+        white-space: nowrap;
+        min-width: 120px; /* Minimalna szerokość dla komórek */
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .btn-toggle {
         cursor: pointer;
@@ -520,7 +522,7 @@
     .chart-container-line {
         margin-top: 20px;
         width: 100%;
-        height: 300px;
+        height: 400px; /* Zwiększono dla lepszej czytelności */
     }
     .chart-line {
         width: 100%;
@@ -667,8 +669,6 @@
         let odsetkiCalkowite = 0;
         let zyskNetto = 0;
         let harmonogram = [];
-        let oprocentowanieRoczne = config.oprocentowanie / 100;
-        let skumulowanaInflacja = 0;
         let skumulowaneOdsetki = 0;
 
         for (let i = 1; i <= miesiace; i++) {
@@ -677,15 +677,15 @@
             if (config.zmienne) {
                 if (config.indeksowaneInflacja) {
                     if (i <= 12) {
-                        oprocentowanieMiesieczne = oprocentowanieRoczne / 12;
+                        oprocentowanieMiesieczne = config.oprocentowanie / 100 / 12;
                     } else {
                         oprocentowanieMiesieczne = (inflacja + config.marza / 100) / 12;
                     }
                 } else {
-                    oprocentowanieMiesieczne = (i === 1 ? oprocentowanieRoczne : (oprocentowanieRoczne + config.marza / 100)) / 12;
+                    oprocentowanieMiesieczne = (i === 1 ? config.oprocentowanie / 100 : (config.oprocentowanie / 100 + config.marza / 100)) / 12;
                 }
             } else {
-                oprocentowanieMiesieczne = oprocentowanieRoczne / 12;
+                oprocentowanieMiesieczne = config.oprocentowanie / 100 / 12;
             }
 
             let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
@@ -699,11 +699,6 @@
                 kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
             }
 
-            // Obliczenia inflacji
-            let inflacjaRoczna = inflacja; // Przyjmujemy stałą inflację roczną (4,2% jak w przykładzie)
-            let inflacjaNaCykl = inflacjaRoczna / 12;
-            skumulowanaInflacja += inflacjaNaCykl;
-
             // Opłata za wykup (stała 30 PLN, jak w przykładzie)
             let oplataZaWykup = 30;
 
@@ -716,9 +711,7 @@
                 oplataZaWykup: oplataZaWykup.toFixed(2),
                 podatek: podatekMiesiac.toFixed(2),
                 zyskNetto: odsetkiNettoMiesiac.toFixed(2),
-                inflacjaRoczna: (inflacjaRoczna * 100).toFixed(2) + "%",
-                inflacjaNaCykl: (inflacjaNaCykl * 100).toFixed(2) + "%",
-                skumulowanaInflacja: (skumulowanaInflacja * 100).toFixed(2) + "%",
+                inflacjaRoczna: (inflacja * 100).toFixed(2) + "%",
                 kwotaPoZakonczeniuCyklu: kapital.toFixed(2)
             });
         }
@@ -825,8 +818,6 @@
                     <td>${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
                     <td>${parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
                     <td>${wiersz.inflacjaRoczna}</td>
-                    <td>${wiersz.inflacjaNaCykl}</td>
-                    <td>${wiersz.skumulowanaInflacja}</td>
                     <td>${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
                 </tr>
             `;
@@ -842,9 +833,10 @@
                         label: 'Zainwestowana kwota',
                         data: harmonogram.map(() => kwota),
                         borderColor: '#000000',
-                        backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
                         fill: false,
-                        tension: 0
+                        tension: 0,
+                        borderWidth: 2
                     },
                     {
                         label: 'Kwota po zakończeniu cyklu',
@@ -852,7 +844,8 @@
                         borderColor: '#28a745',
                         backgroundColor: 'rgba(40, 167, 69, 0.2)',
                         fill: true,
-                        tension: 0.1
+                        tension: 0.1,
+                        borderWidth: 2
                     }
                 ]
             },
@@ -863,27 +856,35 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Okres (lata)'
-                        }
+                            text: 'Okres (lata)',
+                            font: { size: 14 }
+                        },
+                        ticks: { font: { size: 12 } }
                     },
                     y: {
                         title: {
                             display: true,
-                            text: 'Wartość (PLN)'
+                            text: 'Wartość (PLN)',
+                            font: { size: 14 }
                         },
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 500,
+                            font: { size: 12 }
+                        }
                     }
                 },
                 plugins: {
                     legend: {
                         display: true,
-                        position: 'top'
+                        position: 'top',
+                        labels: { font: { size: 12 } }
                     },
                     tooltip: {
                         enabled: true,
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleFont: { size: 10 },
-                        bodyFont: { size: 8 }
+                        titleFont: { size: 12 },
+                        bodyFont: { size: 10 }
                     }
                 }
             }
@@ -957,8 +958,6 @@
                 row.podatek + ' PLN',
                 row.zyskNetto + ' PLN',
                 row.inflacjaRoczna,
-                row.inflacjaNaCykl,
-                row.skumulowanaInflacja,
                 row.kwotaPoZakonczeniuCyklu + ' PLN'
             ]);
 
@@ -972,10 +971,8 @@
                     removePolishChars('Skumulowane odsetki'),
                     removePolishChars('Opłata za wykup'),
                     removePolishChars('Podatek Belki'),
-                    removePolishChars('Zysk'),
+                    removePolishChars('Zysk netto'),
                     removePolishChars('Inflacja roczna'),
-                    removePolishChars('Inflacja na cykl'),
-                    removePolishChars('Skumulowana inflacja'),
                     removePolishChars('Kwota po zakończeniu cyklu')
                 ]],
                 body: tableData,
@@ -992,9 +989,7 @@
                     6: { cellWidth: 25 }, 
                     7: { cellWidth: 25 }, 
                     8: { cellWidth: 25 }, 
-                    9: { cellWidth: 25 }, 
-                    10: { cellWidth: 30 }, 
-                    11: { cellWidth: 30 }
+                    9: { cellWidth: 30 }
                 }
             });
         }
