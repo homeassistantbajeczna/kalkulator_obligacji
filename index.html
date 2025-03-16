@@ -413,40 +413,38 @@
     }
     .harmonogram {
         margin-top: 20px;
-        font-size: 0.65em;
+        font-size: 0.6em; /* Zmniejszono rozmiar czcionki */
     }
     .harmonogram table {
-        margin-bottom: 0;
-        table-layout: auto; /* Dynamiczne dopasowanie kolumn */
-        width: 100%; /* Dopasowanie do kontenera */
+        margin: 0 auto; /* Wyśrodkowanie tabeli */
+        max-width: 100%; /* Zapobiega wychodzeniu poza kontener */
+        table-layout: auto; /* Kolumny dostosowują się do zawartości */
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Zmniejszono cień */
     }
     .harmonogram th {
         background: linear-gradient(90deg, #C2B280, #b0a070);
         color: #000000;
-        padding: 12px;
+        padding: 8px; /* Zmniejszono padding */
         text-align: center;
         vertical-align: middle;
         font-weight: 500;
         border-bottom: 2px solid #ddd;
         white-space: nowrap;
-        min-width: 120px; /* Minimalna szerokość dla nagłówków */
         overflow: hidden;
         text-overflow: ellipsis;
     }
     .harmonogram td {
-        padding: 10px;
+        padding: 6px; /* Zmniejszono padding */
         text-align: center;
         font-weight: 400;
         border-bottom: 1px solid #eee;
         background-color: #f9f9f9;
         color: #000000;
         white-space: nowrap;
-        min-width: 120px; /* Minimalna szerokość dla komórek */
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -483,6 +481,7 @@
     }
     #harmonogramContent {
         display: block;
+        overflow-x: auto; /* Dodano przewijanie poziome */
     }
     .form-container {
         display: flex;
@@ -522,7 +521,7 @@
     .chart-container-line {
         margin-top: 20px;
         width: 100%;
-        height: 400px; /* Zwiększono dla lepszej czytelności */
+        height: 400px;
     }
     .chart-line {
         width: 100%;
