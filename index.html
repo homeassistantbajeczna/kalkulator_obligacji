@@ -351,9 +351,6 @@
         transition: opacity 0.3s ease;
         font-size: 0.7em;
     }
-    .chart-legend .legend-item:hover .legend-text {
-        opacity: 0;
-    }
     .summary-footer {
         display: flex;
         justify-content: center;
@@ -723,6 +720,7 @@
 
                 if (config.kapitalizacja) {
                     kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
+                    console.log("Kapitalizacja dla miesiąca " + i + ": kapitał = " + kapital.toFixed(2));
                 }
 
                 harmonogram.push({
@@ -738,6 +736,7 @@
 
         harmonogramData = harmonogram;
 
+        // Ustawianie wartości w paskach
         document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })}`;
         document.querySelector('.result-wrapper .legend-item[data-index="0"] .color-box').setAttribute('data-tooltip', `Kapitał: ${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
 
@@ -751,8 +750,8 @@
         document.getElementById("okresInwestycji").textContent = miesiace;
         document.querySelector('.result-wrapper .highlight.yellow').setAttribute('data-hover', `${miesiace} miesięcy`);
 
-        document.getElementById("zyskNetto").textContent = `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
-        document.querySelector('.result-wrapper .highlight.green').setAttribute('data-hover', `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
+        document.getElementById("zyskNetto").textContent = `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.querySelector('.result-wrapper .highlight.green').setAttribute('data-hover', `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
 
         if (chart) chart.destroy();
         if (chartLine) chartLine.destroy();
@@ -793,9 +792,14 @@
                 const index = parseInt(this.getAttribute('data-index'));
                 chart.setActiveElements([{ datasetIndex: 0, index: index }]);
                 chart.update();
-                document.querySelectorAll(`#legendKapital, #legendOdsetki, #legendPodatek`).forEach(legend => {
-                    legend.style.opacity = 0;
-                });
+
+                // Ukryj tylko etykietę dla bieżącego elementu
+                const currentLegend = document.querySelector(`#legend${['Kapital', 'Odsetki', 'Podatek'][index]}`);
+                if (currentLegend) {
+                    currentLegend.style.opacity = 0;
+                }
+
+                // Zaktualizuj wartość w pasku dla bieżącego elementu
                 const valueElements = document.querySelectorAll('#valueKapital, #valueOdsetki, #valuePodatek');
                 valueElements.forEach((value, idx) => {
                     if (idx === index) {
@@ -803,12 +807,19 @@
                     }
                 });
             });
+
             item.addEventListener('mouseleave', function() {
+                const index = parseInt(this.getAttribute('data-index'));
                 chart.setActiveElements([]);
                 chart.update();
-                document.querySelectorAll(`#legendKapital, #legendOdsetki, #legendPodatek`).forEach(legend => {
-                    legend.style.opacity = 1;
-                });
+
+                // Przywróć widoczność etykiety dla bieżącego elementu
+                const currentLegend = document.querySelector(`#legend${['Kapital', 'Odsetki', 'Podatek'][index]}`);
+                if (currentLegend) {
+                    currentLegend.style.opacity = 1;
+                }
+
+                // Przywróć wartości w paskach
                 document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })}`;
                 document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -936,7 +947,7 @@
         yOffset += 6;
         doc.text(removePolishChars(`Okres inwestycji: ${okres} miesiecy`), 10, yOffset);
         yOffset += 6;
-        doc.text(removePolishChars(`Zysk netto: ${zysk}`), 10, yOffset);
+        doc.text(removePolishChars(`Zysk netto: ${zysk} zł`), 10, yOffset);
         yOffset += 10;
 
         if (harmonogramData.length > 0 && jsPDF.prototype.autoTable) {
