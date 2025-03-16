@@ -19,7 +19,6 @@
             <h4>Kalkulator Obligacji Skarbu Państwa</h4>
             <div class="form-container">
                 <div class="form-wrapper">
-                    <h5>Twoje Obligacje</h5>
                     <form id="obligacjeForm">
                         <div class="form-row">
                             <div class="form-group">
@@ -29,7 +28,7 @@
                                     <span class="input-group-text">zł</span>
                                 </div>
                                 <input type="range" class="form-range" id="kwotaRange" min="100" max="10000000" step="100" value="1000">
-                                <div class="sub-info"></div>
+                                <div class="sub-info" id="iloscObligacji">Ilość obligacji: 10 (1 obligacja = 100 zł)</div>
                             </div>
                             <div class="form-group">
                                 <label for="typObligacji" class="form-label">Typ obligacji</label>
@@ -40,11 +39,13 @@
                                     <option value="TOS">3-letnie (TOS)</option>
                                     <option value="COI">4-letnie (COI)</option>
                                     <option value="EDO">10-letnie (EDO)</option>
+                                    <option value="ROS">6-letnie (ROS)</option>
+                                    <option value="ROD">12-letnie (ROD)</option>
                                 </select>
                                 <div class="sub-info"></div>
                             </div>
                             <div class="form-group">
-                                <label for="inflacja" class="form-label">Przewidywana inflacja</label>
+                                <label for="inflacja" class="form-label">Inflacja</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" id="inflacja" min="-50" max="50" step="0.1" value="5">
                                     <span class="input-group-text">%</span>
@@ -77,6 +78,19 @@
             <div class="form-row">
                 <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">Oblicz</button>
             </div>
+            <div class="obligacje-opis">
+                <p>* Opisy obligacji:</p>
+                <ul>
+                    <li><strong>OTS (3-miesięczne):</strong> Stałe oprocentowanie 3,00%, idealne na krótkoterminowe inwestycje.</li>
+                    <li><strong>ROR (1-roczne):</strong> Oprocentowanie zmienne, w pierwszym roku 5,75%, kolejne oparte na stopie NBP.</li>
+                    <li><strong>DOR (2-letnie):</strong> Oprocentowanie zmienne, 5,90% w pierwszym roku, kolejne NBP + 0,15%.</li>
+                    <li><strong>TOS (3-letnie):</strong> Stałe oprocentowanie 5,95%, przeznaczone dla stabilnych inwestycji.</li>
+                    <li><strong>COI (4-letnie):</strong> Indeksowane inflacją, 6,30% w pierwszym roku, kolejne inflacja + 0,75%, dla ochrony przed wzrostem cen.</li>
+                    <li><strong>EDO (10-letnie):</strong> Indeksowane inflacją, 6,55% w pierwszym roku, kolejne inflacja + 2,00%, długoterminowa ochrona kapitału.</li>
+                    <li><strong>ROS (6-letnie):</strong> Indeksowane inflacją, 6,40% w pierwszym roku, kolejne inflacja + 1,50%, dla średnioterminowych inwestorów.</li>
+                    <li><strong>ROD (12-letnie):</strong> Indeksowane inflacją, 6,70% w pierwszym roku, kolejne inflacja + 2,50%, dla długoterminowych strategii.</li>
+                </ul>
+            </div>
         </div>
     </div>
     <div class="result-section" id="resultSection">
@@ -97,25 +111,38 @@
                             <div class="color-box" style="background-color: #28a745;" data-tooltip="Kapitał: -">
                                 <span class="value" id="valueKapital">-</span>
                             </div>
-                            <span class="legend-text">Kapitał</span>
+                            <span class="legend-text" id="legendKapital">Kapitał</span>
                         </div>
                         <div class="legend-item" data-index="1">
                             <div class="color-box" style="background-color: #007bff;" data-tooltip="Odsetki: -">
                                 <span class="value" id="valueOdsetki">-</span>
                             </div>
-                            <span class="legend-text">Odsetki</span>
+                            <span class="legend-text" id="legendOdsetki">Odsetki</span>
                         </div>
                         <div class="legend-item" data-index="2">
                             <div class="color-box" style="background-color: #dc3545;" data-tooltip="Podatek Belki: -">
                                 <span class="value" id="valuePodatek">-</span>
                             </div>
-                            <span class="legend-text">Podatek Belki</span>
+                            <span class="legend-text" id="legendPodatek">Podatek Belki</span>
                         </div>
                     </div>
                 </div>
                 <div class="summary-footer">
                     <span class="highlight yellow" data-hover="3 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span> mc-y</span>
-                    <span class="highlight red" data-hover="">Zysk netto: <span id="zyskNetto">-</span> zł</span>
+                    <span class="highlight green" data-hover="">Zysk netto: <span id="zyskNetto">-</span> zł</span>
+                </div>
+                <div class="chart-container-total">
+                    <div class="chart">
+                        <canvas id="obligacjeChartTotal"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item" data-index="0">
+                            <div class="color-box" style="background-color: #28a745;" data-tooltip="Całkowita inwestycja: -">
+                                <span class="value" id="valueTotal">-</span>
+                            </div>
+                            <span class="legend-text" id="legendTotal">Całkowita inwestycja</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,7 +169,7 @@
         </div>
     </div>
 </div>
-  <style>
+    <style>
     body {
         background-color: #f5f6f5;
         font-family: 'Montserrat', sans-serif;
@@ -240,11 +267,25 @@
         margin-top: 2px;
         text-align: left;
     }
+    .obligacje-opis {
+        margin-top: 20px;
+        font-size: 0.6em;
+        color: #333333;
+        text-align: center;
+    }
+    .obligacje-opis ul {
+        list-style: none;
+        padding-left: 0;
+    }
+    .obligacje-opis li {
+        margin-bottom: 5px;
+    }
     .result-section {
         display: none;
         padding: 10px;
         max-width: 1200px;
         margin: 0 auto;
+        background: #FFFFFF;
     }
     .result-header {
         text-align: center;
@@ -257,7 +298,7 @@
         font-weight: 700;
         display: inline-block;
     }
-    .chart-container {
+    .chart-container, .chart-container-total {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -330,6 +371,9 @@
         transition: opacity 0.3s ease;
         font-size: 0.7em;
     }
+    .chart-legend .legend-item:hover .legend-text {
+        opacity: 0;
+    }
     .summary-footer {
         display: flex;
         justify-content: center;
@@ -364,9 +408,26 @@
         justify-content: center;
         align-items: center;
     }
-    .highlight.red {
-        background-color: #f8d7da;
-        color: #dc3545;
+    .highlight.green {
+        background-color: #28a745;
+        color: #ffffff;
+    }
+    .highlight.green:hover {
+        color: transparent;
+    }
+    .highlight.green:hover::after {
+        content: attr(data-hover);
+        font-weight: bold;
+        font-size: 1.1em;
+        color: #ffffff;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     .harmonogram {
         margin-top: 20px;
@@ -443,12 +504,6 @@
         flex: 1;
         max-width: 400px;
     }
-    .form-wrapper h5 {
-        font-size: 1em;
-        text-align: center;
-        margin-bottom: 10px;
-        color: #333333;
-    }
     .result-container {
         display: flex;
         gap: 20px;
@@ -474,12 +529,15 @@
         margin-bottom: 10px;
         color: #333333;
     }
+    .chart-container-total {
+        margin-top: 20px;
+    }
 </style>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <script>
-    let chart;
+    let chart, chartTotal;
     let harmonogramData = [];
 
     const { jsPDF } = window.jspdf || {};
@@ -495,17 +553,21 @@
         "DOR": { okres: 24, oprocentowanie: 5.90, zmienne: true, marza: 0.15 },
         "TOS": { okres: 36, oprocentowanie: 5.95, zmienne: false },
         "COI": { okres: 48, oprocentowanie: 6.30, zmienne: true, marza: 0.75, indeksowaneInflacja: true },
-        "EDO": { okres: 120, oprocentowanie: 6.55, zmienne: true, marza: 2.00, indeksowaneInflacja: true }
+        "EDO": { okres: 120, oprocentowanie: 6.55, zmienne: true, marza: 2.00, indeksowaneInflacja: true },
+        "ROS": { okres: 72, oprocentowanie: 6.40, zmienne: true, marza: 1.50, indeksowaneInflacja: true },
+        "ROD": { okres: 144, oprocentowanie: 6.70, zmienne: true, marza: 2.50, indeksowaneInflacja: true }
     };
 
     document.getElementById("kwotaRange").addEventListener("input", function() {
         const kwotaInput = document.getElementById("kwota");
         kwotaInput.value = this.value;
+        updateIloscObligacji();
     });
 
     document.getElementById("kwota").addEventListener("input", function() {
         const kwotaRange = document.getElementById("kwotaRange");
         kwotaRange.value = this.value;
+        updateIloscObligacji();
     });
 
     document.getElementById("inflacjaRange").addEventListener("input", function() {
@@ -526,6 +588,12 @@
         updateLata();
         updateOprocentowanieInfo();
     });
+
+    function updateIloscObligacji() {
+        const kwota = parseFloat(document.getElementById("kwota").value) || 0;
+        const ilosc = Math.floor(kwota / 100);
+        document.getElementById("iloscObligacji").textContent = `Ilość obligacji: ${ilosc} (1 obligacja = 100 zł)`;
+    }
 
     function updateLata() {
         const miesiace = parseInt(document.getElementById("okres").value) || 0;
@@ -549,6 +617,7 @@
         document.getElementById("oprocentowanieInfo").textContent = info;
     }
 
+    updateIloscObligacji();
     updateLata();
     updateOprocentowanieInfo();
 
@@ -590,7 +659,6 @@
 
         if (config.zmienne) {
             if (config.indeksowaneInflacja) {
-                // Dla obligacji indeksowanych inflacją (COI, EDO)
                 for (let i = 1; i <= miesiace; i++) {
                     let oprocentowanieMiesieczne;
                     if (i <= 12) {
@@ -607,13 +675,12 @@
                     harmonogram.push({
                         okres: i,
                         odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                        podatek: podatekMiesiac.toFixed(2),
+                        podatek: (podatekMiesiac).toFixed(2),
                         odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
                         zyskCalkowity: zyskNetto.toFixed(2)
                     });
                 }
             } else {
-                // Dla obligacji zmiennych (ROR, DOR) - zakładamy stałą stopę referencyjną
                 for (let i = 1; i <= miesiace; i++) {
                     let oprocentowanieMiesieczne = (i === 1 ? oprocentowanieRoczne : (oprocentowanieRoczne + config.marza / 100)) / 12;
                     let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
@@ -625,14 +692,13 @@
                     harmonogram.push({
                         okres: i,
                         odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                        podatek: podatekMiesiac.toFixed(2),
+                        podatek: (podatekMiesiac).toFixed(2),
                         odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
                         zyskCalkowity: zyskNetto.toFixed(2)
                     });
                 }
             }
         } else {
-            // Dla obligacji stałych (OTS, TOS)
             for (let i = 1; i <= miesiace; i++) {
                 let oprocentowanieMiesieczne = oprocentowanieRoczne / 12;
                 let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
@@ -644,7 +710,7 @@
                 harmonogram.push({
                     okres: i,
                     odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                    podatek: podatekMiesiac.toFixed(2),
+                    podatek: (podatekMiesiac).toFixed(2),
                     odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
                     zyskCalkowity: zyskNetto.toFixed(2)
                 });
@@ -660,16 +726,17 @@
         document.querySelector('.result-wrapper .legend-item[data-index="1"] .color-box').setAttribute('data-tooltip', `Odsetki: ${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
 
         const podatekCalkowity = odsetkiCalkowite * podatekBelki;
-        document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
-        document.querySelector('.result-wrapper .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek Belki: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
+        document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
+        document.querySelector('.result-wrapper .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek Belki: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
         document.getElementById("okresInwestycji").textContent = miesiace;
         document.querySelector('.result-wrapper .highlight.yellow').setAttribute('data-hover', `${miesiace} miesięcy`);
 
         document.getElementById("zyskNetto").textContent = `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
-        document.querySelector('.result-wrapper .highlight.red').setAttribute('data-hover', `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
+        document.querySelector('.result-wrapper .highlight.green').setAttribute('data-hover', `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
 
         if (chart) chart.destroy();
+        if (chartTotal) chartTotal.destroy();
 
         const ctx = document.getElementById("obligacjeChart").getContext("2d");
         chart = new Chart(ctx, {
@@ -702,15 +769,55 @@
             }
         });
 
+        const ctxTotal = document.getElementById("obligacjeChartTotal").getContext("2d");
+        chartTotal = new Chart(ctxTotal, {
+            type: 'doughnut',
+            data: {
+                labels: ['Całkowita inwestycja'],
+                datasets: [{
+                    data: [kwota + zyskNetto],
+                    backgroundColor: ['#28a745'],
+                    borderWidth: 1,
+                    hoverOffset: 8,
+                    hoverBackgroundColor: ['#28a745']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 10 },
+                        bodyFont: { size: 8 }
+                    }
+                },
+                onHover: (event, chartElement) => {
+                    event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                }
+            }
+        });
+
+        document.getElementById("valueTotal").textContent = `${(kwota + zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
+        document.querySelector('.result-wrapper .legend-item[data-index="0"] .color-box').setAttribute('data-tooltip', `Całkowita inwestycja: ${(kwota + zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
+
         document.querySelectorAll('.result-wrapper .legend-item').forEach(item => {
             item.addEventListener('mouseenter', function() {
                 const index = parseInt(this.getAttribute('data-index'));
                 chart.setActiveElements([{ datasetIndex: 0, index: index }]);
                 chart.update();
+                document.querySelectorAll(`#legendKapital, #legendOdsetki, #legendPodatek`).forEach(legend => {
+                    legend.style.opacity = 0;
+                });
             });
             item.addEventListener('mouseleave', function() {
                 chart.setActiveElements([]);
                 chart.update();
+                document.querySelectorAll(`#legendKapital, #legendOdsetki, #legendPodatek`).forEach(legend => {
+                    legend.style.opacity = 1;
+                });
             });
         });
 
@@ -771,7 +878,7 @@
         yOffset += 6;
         doc.text(removePolishChars(`Okres inwestycji: ${okres} miesiecy`), 10, yOffset);
         yOffset += 6;
-        doc.text(removePolishChars(`Zysk netto: ${zysk} zl`), 10, yOffset);
+        doc.text(removePolishChars(`Zysk netto: ${zysk}`), 10, yOffset);
         yOffset += 10;
 
         if (harmonogramData.length > 0 && jsPDF.prototype.autoTable) {
