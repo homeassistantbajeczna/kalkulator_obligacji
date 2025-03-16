@@ -129,16 +129,16 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th title="Rok">Rok</th>
-                                    <th title="Kwota do wykupu">Kwota wykupu</th>
-                                    <th title="Oprocentowanie na cykl">Oproc. cykl</th>
-                                    <th title="Odsetki">Odsetki</th>
-                                    <th title="Odsetki skumulowane">Odsetki skum.</th>
-                                    <th title="Opłata za wykup">Opłata wyk.</th>
-                                    <th title="Podatek Belki">Podatek</th>
-                                    <th title="Zysk netto">Zysk netto</th>
-                                    <th title="Inflacja roczna">Inflacja</th>
-                                    <th title="Kwota po zakończeniu cyklu">Kwota po cykl.</th>
+                                    <th>Rok</th>
+                                    <th>Kwota wykupu</th>
+                                    <th>Oproc. cykl</th>
+                                    <th>Odsetki</th>
+                                    <th>Odsetki skum.</th>
+                                    <th>Opłata wyk.</th>
+                                    <th>Podatek</th>
+                                    <th>Zysk netto</th>
+                                    <th>Inflacja</th>
+                                    <th>Kwota po cykl.</th>
                                 </tr>
                             </thead>
                             <tbody id="harmonogramTabela"></tbody>
@@ -417,8 +417,8 @@
     }
     .harmonogram table {
         margin: 0 auto;
-        width: 100%;
-        table-layout: auto;
+        width: 100%; /* Tabela rozciąga się na całą szerokość kontenera */
+        table-layout: auto; /* Kolumny dostosowują się do zawartości */
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
@@ -436,7 +436,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        word-break: break-all;
+        word-break: break-all; /* Zwijanie słów w nagłówkach */
     }
     .harmonogram td {
         padding: 6px;
@@ -510,7 +510,7 @@
     }
     .result-wrapper {
         flex: 1;
-        max-width: 1000px; /* Zwiększono szerokość */
+        max-width: 1000px; /* Zwiększono szerokość, aby tabela mogła się rozciągnąć */
     }
     .result-wrapper h5 {
         font-size: 1em;
@@ -980,15 +980,15 @@
                 headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0] },
                 columnStyles: { 
                     0: { cellWidth: 15 }, 
-                    1: { cellWidth: 30 }, 
-                    2: { cellWidth: 25 }, 
-                    3: { cellWidth: 25 }, 
-                    4: { cellWidth: 30 }, 
-                    5: { cellWidth: 25 }, 
-                    6: { cellWidth: 25 }, 
-                    7: { cellWidth: 25 }, 
-                    8: { cellWidth: 25 }, 
-                    9: { cellWidth: 30 }
+                    1: { cellWidth: 25 }, 
+                    2: { cellWidth: 20 }, 
+                    3: { cellWidth: 20 }, 
+                    4: { cellWidth: 25 }, 
+                    5: { cellWidth: 20 }, 
+                    6: { cellWidth: 20 }, 
+                    7: { cellWidth: 20 }, 
+                    8: { cellWidth: 20 }, 
+                    9: { cellWidth: 25 }
                 }
             });
         }
