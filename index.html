@@ -42,7 +42,6 @@
                                     <option value="ROS">6-letnie (ROS)</option>
                                     <option value="ROD">12-letnie (ROD)</option>
                                 </select>
-                                <!-- Usunięto opis pod wyborem rodzaju obligacji -->
                                 <div class="sub-info"></div>
                             </div>
                             <div class="form-group">
@@ -112,7 +111,7 @@
                             <div class="color-box" style="background-color: #dc3545;" data-tooltip="">
                                 <span class="value" id="valuePodatek">-</span>
                             </div>
-                            <span class="legend-text" id="legendPodatek">Podatek Belki</span>
+                            <span class="legend-text" id="legendPodatek">Podatek</span>
                         </div>
                     </div>
                 </div>
@@ -132,7 +131,7 @@
                                 <tr>
                                     <th>Okres</th>
                                     <th>Odsetki brutto</th>
-                                    <th>Podatek Belki</th>
+                                    <th>Podatek</th>
                                     <th>Odsetki netto</th>
                                     <th>Całkowity zysk netto</th>
                                 </tr>
@@ -684,7 +683,7 @@
                     harmonogram.push({
                         okres: i,
                         odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                        podatek: (podatekMiesiac).toFixed(2),
+                        podatek: podatekMiesiac.toFixed(2),
                         odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
                         zyskCalkowity: zyskNetto.toFixed(2),
                         kapital: kapital.toFixed(2)
@@ -706,7 +705,7 @@
                     harmonogram.push({
                         okres: i,
                         odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                        podatek: (podatekMiesiac).toFixed(2),
+                        podatek: podatekMiesiac.toFixed(2),
                         odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
                         zyskCalkowity: zyskNetto.toFixed(2),
                         kapital: kapital.toFixed(2)
@@ -729,7 +728,7 @@
                 harmonogram.push({
                     okres: i,
                     odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                    podatek: (podatekMiesiac).toFixed(2),
+                    podatek: podatekMiesiac.toFixed(2),
                     odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
                     zyskCalkowity: zyskNetto.toFixed(2),
                     kapital: kapital.toFixed(2)
@@ -742,18 +741,18 @@
         document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })}`;
         document.querySelector('.result-wrapper .legend-item[data-index="0"] .color-box').setAttribute('data-tooltip', `Kapitał: ${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
 
-        document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2 })}`;
-        document.querySelector('.result-wrapper .legend-item[data-index="1"] .color-box').setAttribute('data-tooltip', `Odsetki: ${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
+        document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.querySelector('.result-wrapper .legend-item[data-index="1"] .color-box').setAttribute('data-tooltip', `Odsetki: ${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
         const podatekCalkowity = odsetkiCalkowite * podatekBelki;
         document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        document.querySelector('.result-wrapper .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek Belki: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
+        document.querySelector('.result-wrapper .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
         document.getElementById("okresInwestycji").textContent = miesiace;
         document.querySelector('.result-wrapper .highlight.yellow').setAttribute('data-hover', `${miesiace} miesięcy`);
 
-        document.getElementById("zyskNetto").textContent = `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
-        document.querySelector('.result-wrapper .highlight.green').setAttribute('data-hover', `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
+        document.getElementById("zyskNetto").textContent = `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
+        document.querySelector('.result-wrapper .highlight.green').setAttribute('data-hover', `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
         if (chart) chart.destroy();
         if (chartLine) chartLine.destroy();
@@ -762,7 +761,7 @@
         chart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Kapitał', 'Odsetki', 'Podatek Belki'],
+                labels: ['Kapitał', 'Odsetki', 'Podatek'],
                 datasets: [{
                     data: [kwota, odsetkiCalkowite, podatekCalkowity],
                     backgroundColor: ['#28a745', '#007bff', '#dc3545'],
@@ -800,7 +799,7 @@
                 const valueElements = document.querySelectorAll('#valueKapital, #valueOdsetki, #valuePodatek');
                 valueElements.forEach((value, idx) => {
                     if (idx === index) {
-                        value.textContent = `${['Kapitał', 'Odsetki', 'Podatek Belki'][idx]}: ${value.textContent} zł`;
+                        value.textContent = `${['Kapitał', 'Odsetki', 'Podatek'][idx]}: ${value.textContent} zł`;
                     }
                 });
             });
@@ -811,7 +810,7 @@
                     legend.style.opacity = 1;
                 });
                 document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })}`;
-                document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2 })}`;
+                document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             });
         });
@@ -891,7 +890,6 @@
         document.getElementById("resultSection").style.display = "block";
     }
 
-    // Poprawka: Upewniamy się, że przycisk "Oblicz" jest poprawnie podpięty
     document.addEventListener('DOMContentLoaded', function() {
         const obliczBtn = document.getElementById("obliczBtn");
         if (obliczBtn) {
@@ -959,7 +957,7 @@
                 head: [[
                     removePolishChars('Okres'),
                     removePolishChars('Odsetki brutto'),
-                    removePolishChars('Podatek Belki'),
+                    removePolishChars('Podatek'),
                     removePolishChars('Odsetki netto'),
                     removePolishChars('Calkowity zysk netto')
                 ]],
