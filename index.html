@@ -129,11 +129,18 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Okres</th>
-                                    <th>Odsetki brutto</th>
-                                    <th>Podatek</th>
-                                    <th>Odsetki netto</th>
-                                    <th>Całkowity zysk netto</th>
+                                    <th>Rok</th>
+                                    <th>Kwota do wykupu</th>
+                                    <th>Oprocentowanie na cykl</th>
+                                    <th>Odsetki</th>
+                                    <th>Skumulowane odsetki</th>
+                                    <th>Opłata za wykup</th>
+                                    <th>Podatek Belki</th>
+                                    <th>Zysk</th>
+                                    <th>Inflacja roczna</th>
+                                    <th>Inflacja na cykl</th>
+                                    <th>Skumulowana inflacja</th>
+                                    <th>Kwota po zakończeniu cyklu</th>
                                 </tr>
                             </thead>
                             <tbody id="harmonogramTabela"></tbody>
@@ -413,7 +420,7 @@
     .harmonogram table {
         margin-bottom: 0;
         table-layout: fixed;
-        width: 100%;
+        width: 120%; /* Rozszerzono tabelę */
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
@@ -423,21 +430,23 @@
     .harmonogram th {
         background: linear-gradient(90deg, #C2B280, #b0a070);
         color: #000000;
-        padding: 10px; /* Zwiększono padding */
+        padding: 12px; /* Zwiększono padding */
         text-align: center;
         vertical-align: middle;
         font-weight: 500;
         border-bottom: 2px solid #ddd;
         white-space: nowrap; /* Zapobiega zawijaniu tekstu */
+        min-width: 100px; /* Minimalna szerokość dla nagłówków */
     }
     .harmonogram td {
-        padding: 8px; /* Zwiększono padding */
+        padding: 10px; /* Zwiększono padding */
         text-align: center;
         font-weight: 400;
         border-bottom: 1px solid #eee;
         background-color: #f9f9f9;
         color: #000000;
         white-space: nowrap; /* Zapobiega zawijaniu tekstu */
+        min-width: 100px; /* Minimalna szerokość dla komórek */
     }
     .btn-toggle {
         cursor: pointer;
@@ -457,7 +466,7 @@
         display: block;
     }
     .btn-primary:hover, .btn-secondary:hover {
-        background-color:.
+        background-color: #b0a070;
         border-color: #b0a070;
         color: #000000;
     }
@@ -659,81 +668,59 @@
         let zyskNetto = 0;
         let harmonogram = [];
         let oprocentowanieRoczne = config.oprocentowanie / 100;
+        let skumulowanaInflacja = 0;
+        let skumulowaneOdsetki = 0;
 
-        if (config.zmienne) {
-            if (config.indeksowaneInflacja) {
-                for (let i = 1; i <= miesiace; i++) {
-                    let oprocentowanieMiesieczne;
+        for (let i = 1; i <= miesiace; i++) {
+            let rok = Math.ceil(i / 12);
+            let oprocentowanieMiesieczne;
+            if (config.zmienne) {
+                if (config.indeksowaneInflacja) {
                     if (i <= 12) {
                         oprocentowanieMiesieczne = oprocentowanieRoczne / 12;
                     } else {
                         oprocentowanieMiesieczne = (inflacja + config.marza / 100) / 12;
                     }
-                    let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
-                    let podatekMiesiac = odsetkiMiesiac * podatekBelki;
-                    let odsetkiNettoMiesiac = odsetkiMiesiac - podatekMiesiac;
-                    odsetkiCalkowite += odsetkiMiesiac;
-                    zyskNetto += odsetkiNettoMiesiac;
-
-                    if (config.kapitalizacja) {
-                        kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
-                    }
-
-                    harmonogram.push({
-                        okres: i,
-                        odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                        podatek: podatekMiesiac.toFixed(2),
-                        odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
-                        zyskCalkowity: zyskNetto.toFixed(2),
-                        kapital: kapital.toFixed(2)
-                    });
+                } else {
+                    oprocentowanieMiesieczne = (i === 1 ? oprocentowanieRoczne : (oprocentowanieRoczne + config.marza / 100)) / 12;
                 }
             } else {
-                for (let i = 1; i <= miesiace; i++) {
-                    let oprocentowanieMiesieczne = (i === 1 ? oprocentowanieRoczne : (oprocentowanieRoczne + config.marza / 100)) / 12;
-                    let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
-                    let podatekMiesiac = odsetkiMiesiac * podatekBelki;
-                    let odsetkiNettoMiesiac = odsetkiMiesiac - podatekMiesiac;
-                    odsetkiCalkowite += odsetkiMiesiac;
-                    zyskNetto += odsetkiNettoMiesiac;
-
-                    if (config.kapitalizacja) {
-                        kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
-                    }
-
-                    harmonogram.push({
-                        okres: i,
-                        odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                        podatek: podatekMiesiac.toFixed(2),
-                        odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
-                        zyskCalkowity: zyskNetto.toFixed(2),
-                        kapital: kapital.toFixed(2)
-                    });
-                }
+                oprocentowanieMiesieczne = oprocentowanieRoczne / 12;
             }
-        } else {
-            for (let i = 1; i <= miesiace; i++) {
-                let oprocentowanieMiesieczne = oprocentowanieRoczne / 12;
-                let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
-                let podatekMiesiac = odsetkiMiesiac * podatekBelki;
-                let odsetkiNettoMiesiac = odsetkiMiesiac - podatekMiesiac;
-                odsetkiCalkowite += odsetkiMiesiac;
-                zyskNetto += odsetkiNettoMiesiac;
 
-                if (config.kapitalizacja) {
-                    kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
-                    console.log("Kapitalizacja dla miesiąca " + i + ": kapitał = " + kapital.toFixed(2));
-                }
+            let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
+            let podatekMiesiac = odsetkiMiesiac * podatekBelki;
+            let odsetkiNettoMiesiac = odsetkiMiesiac - podatekMiesiac;
+            odsetkiCalkowite += odsetkiMiesiac;
+            skumulowaneOdsetki += odsetkiMiesiac;
+            zyskNetto += odsetkiNettoMiesiac;
 
-                harmonogram.push({
-                    okres: i,
-                    odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                    podatek: podatekMiesiac.toFixed(2),
-                    odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
-                    zyskCalkowity: zyskNetto.toFixed(2),
-                    kapital: kapital.toFixed(2)
-                });
+            if (config.kapitalizacja) {
+                kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
             }
+
+            // Obliczenia inflacji
+            let inflacjaRoczna = inflacja; // Przyjmujemy stałą inflację roczną (4,2% jak w przykładzie)
+            let inflacjaNaCykl = inflacjaRoczna / 12;
+            skumulowanaInflacja += inflacjaNaCykl;
+
+            // Opłata za wykup (stała 30 PLN, jak w przykładzie)
+            let oplataZaWykup = 30;
+
+            harmonogram.push({
+                rok: rok,
+                kwotaDoWykupu: kwota.toFixed(2),
+                oprocentowanieNaCykl: (oprocentowanieMiesieczne * 12 * 100).toFixed(2) + "%",
+                odsetkiBrutto: odsetkiMiesiac.toFixed(2),
+                skumulowaneOdsetki: skumulowaneOdsetki.toFixed(2),
+                oplataZaWykup: oplataZaWykup.toFixed(2),
+                podatek: podatekMiesiac.toFixed(2),
+                zyskNetto: odsetkiNettoMiesiac.toFixed(2),
+                inflacjaRoczna: (inflacjaRoczna * 100).toFixed(2) + "%",
+                inflacjaNaCykl: (inflacjaNaCykl * 100).toFixed(2) + "%",
+                skumulowanaInflacja: (skumulowanaInflacja * 100).toFixed(2) + "%",
+                kwotaPoZakonczeniuCyklu: kapital.toFixed(2)
+            });
         }
 
         harmonogramData = harmonogram;
@@ -795,13 +782,11 @@
                 chart.setActiveElements([{ datasetIndex: 0, index: index }]);
                 chart.update();
 
-                // Ukryj tylko etykietę dla bieżącego elementu
                 const currentLegend = document.querySelector(`#legend${['Kapital', 'Odsetki', 'Podatek'][index]}`);
                 if (currentLegend) {
                     currentLegend.style.opacity = 0;
                 }
 
-                // Zaktualizuj wartość w pasku dla bieżącego elementu (już zawiera "zł")
                 const valueElements = document.querySelectorAll('#valueKapital, #valueOdsetki, #valuePodatek');
                 valueElements.forEach((value, idx) => {
                     if (idx === index) {
@@ -815,13 +800,11 @@
                 chart.setActiveElements([]);
                 chart.update();
 
-                // Przywróć widoczność etykiety dla bieżącego elementu
                 const currentLegend = document.querySelector(`#legend${['Kapital', 'Odsetki', 'Podatek'][index]}`);
                 if (currentLegend) {
                     currentLegend.style.opacity = 1;
                 }
 
-                // Przywróć wartości w paskach (z "zł")
                 document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
                 document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
                 document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
@@ -833,11 +816,18 @@
         harmonogram.forEach(wiersz => {
             tabela.innerHTML += `
                 <tr>
-                    <td>${wiersz.okres}</td>
-                    <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
-                    <td>${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
-                    <td>${parseFloat(wiersz.odsetkiNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
-                    <td>${parseFloat(wiersz.zyskCalkowity).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${wiersz.rok}</td>
+                    <td>${parseFloat(wiersz.kwotaDoWykupu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
+                    <td>${wiersz.oprocentowanieNaCykl}</td>
+                    <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
+                    <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
+                    <td>${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
+                    <td>${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
+                    <td>${parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
+                    <td>${wiersz.inflacjaRoczna}</td>
+                    <td>${wiersz.inflacjaNaCykl}</td>
+                    <td>${wiersz.skumulowanaInflacja}</td>
+                    <td>${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
                 </tr>
             `;
         });
@@ -846,21 +836,21 @@
         chartLine = new Chart(ctxLine, {
             type: 'line',
             data: {
-                labels: harmonogram.map(wiersz => wiersz.okres),
+                labels: harmonogram.map(wiersz => `Rok ${wiersz.rok}`),
                 datasets: [
                     {
-                        label: 'Całkowity zysk netto',
-                        data: harmonogram.map(wiersz => parseFloat(wiersz.zyskCalkowity)),
-                        borderColor: '#28a745',
-                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                        fill: true,
-                        tension: 0.1
+                        label: 'Zainwestowana kwota',
+                        data: harmonogram.map(() => kwota),
+                        borderColor: '#000000',
+                        backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                        fill: false,
+                        tension: 0
                     },
                     {
-                        label: 'Kapitał z odsetkami',
-                        data: harmonogram.map(wiersz => parseFloat(wiersz.kapital)),
-                        borderColor: '#007bff',
-                        backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                        label: 'Kwota po zakończeniu cyklu',
+                        data: harmonogram.map(wiersz => parseFloat(wiersz.kwotaPoZakonczeniuCyklu)),
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
                         fill: true,
                         tension: 0.1
                     }
@@ -873,13 +863,13 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Okres (miesiące)'
+                            text: 'Okres (lata)'
                         }
                     },
                     y: {
                         title: {
                             display: true,
-                            text: 'Wartość (zł)'
+                            text: 'Wartość (PLN)'
                         },
                         beginAtZero: true
                     }
@@ -958,32 +948,53 @@
             yOffset += 6;
 
             const tableData = harmonogramData.map(row => [
-                row.okres,
-                row.odsetkiBrutto + ' zł',
-                row.podatek + ' zł',
-                row.odsetkiNetto + ' zł',
-                row.zyskCalkowity + ' zł'
+                row.rok,
+                row.kwotaDoWykupu + ' PLN',
+                row.oprocentowanieNaCykl,
+                row.odsetkiBrutto + ' PLN',
+                row.skumulowaneOdsetki + ' PLN',
+                row.oplataZaWykup + ' PLN',
+                row.podatek + ' PLN',
+                row.zyskNetto + ' PLN',
+                row.inflacjaRoczna,
+                row.inflacjaNaCykl,
+                row.skumulowanaInflacja,
+                row.kwotaPoZakonczeniuCyklu + ' PLN'
             ]);
 
             doc.autoTable({
                 startY: yOffset,
                 head: [[
-                    removePolishChars('Okres'),
-                    removePolishChars('Odsetki brutto'),
-                    removePolishChars('Podatek'),
-                    removePolishChars('Odsetki netto'),
-                    removePolishChars('Calkowity zysk netto')
+                    removePolishChars('Rok'),
+                    removePolishChars('Kwota do wykupu'),
+                    removePolishChars('Oprocentowanie na cykl'),
+                    removePolishChars('Odsetki'),
+                    removePolishChars('Skumulowane odsetki'),
+                    removePolishChars('Opłata za wykup'),
+                    removePolishChars('Podatek Belki'),
+                    removePolishChars('Zysk'),
+                    removePolishChars('Inflacja roczna'),
+                    removePolishChars('Inflacja na cykl'),
+                    removePolishChars('Skumulowana inflacja'),
+                    removePolishChars('Kwota po zakończeniu cyklu')
                 ]],
                 body: tableData,
                 theme: 'grid',
                 styles: { font: "helvetica", fontSize: 8, cellPadding: 4, overflow: 'linebreak' },
                 headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0] },
                 columnStyles: { 
-                    0: { cellWidth: 25 }, 
-                    1: { cellWidth: 40 }, 
-                    2: { cellWidth: 40 }, 
-                    3: { cellWidth: 40 }, 
-                    4: { cellWidth: 50 } 
+                    0: { cellWidth: 15 }, 
+                    1: { cellWidth: 30 }, 
+                    2: { cellWidth: 30 }, 
+                    3: { cellWidth: 25 }, 
+                    4: { cellWidth: 30 }, 
+                    5: { cellWidth: 25 }, 
+                    6: { cellWidth: 25 }, 
+                    7: { cellWidth: 25 }, 
+                    8: { cellWidth: 25 }, 
+                    9: { cellWidth: 25 }, 
+                    10: { cellWidth: 30 }, 
+                    11: { cellWidth: 30 }
                 }
             });
         }
