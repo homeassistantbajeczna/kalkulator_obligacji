@@ -130,15 +130,15 @@
                             <thead>
                                 <tr>
                                     <th>Rok</th>
-                                    <th>Kwota do wykupu</th>
-                                    <th>Oprocentowanie na cykl</th>
+                                    <th>Kwota wykupu</th>
+                                    <th>Oproc. cykl</th>
                                     <th>Odsetki</th>
-                                    <th>Skumulowane odsetki</th>
-                                    <th>Opłata za wykup</th>
-                                    <th>Podatek Belki</th>
+                                    <th>Odsetki skum.</th>
+                                    <th>Opłata wyk.</th>
+                                    <th>Podatek</th>
                                     <th>Zysk netto</th>
-                                    <th>Inflacja roczna</th>
-                                    <th>Kwota po zakończeniu cyklu</th>
+                                    <th>Inflacja</th>
+                                    <th>Kwota po cykl.</th>
                                 </tr>
                             </thead>
                             <tbody id="harmonogramTabela"></tbody>
@@ -413,22 +413,24 @@
     }
     .harmonogram {
         margin-top: 20px;
-        font-size: 0.6em; /* Zmniejszono rozmiar czcionki */
+        font-size: 0.6em;
     }
     .harmonogram table {
-        margin: 0 auto; /* Wyśrodkowanie tabeli */
-        max-width: 100%; /* Zapobiega wychodzeniu poza kontener */
-        table-layout: auto; /* Kolumny dostosowują się do zawartości */
+        margin: 0 auto;
+        width: 100%;
+        max-width: 100%;
+        display: block;
+        table-layout: auto;
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Zmniejszono cień */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     .harmonogram th {
         background: linear-gradient(90deg, #C2B280, #b0a070);
         color: #000000;
-        padding: 8px; /* Zmniejszono padding */
+        padding: 8px;
         text-align: center;
         vertical-align: middle;
         font-weight: 500;
@@ -436,9 +438,10 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        word-break: break-all; /* Zwijanie słów w nagłówkach */
     }
     .harmonogram td {
-        padding: 6px; /* Zmniejszono padding */
+        padding: 6px;
         text-align: center;
         font-weight: 400;
         border-bottom: 1px solid #eee;
@@ -481,7 +484,6 @@
     }
     #harmonogramContent {
         display: block;
-        overflow-x: auto; /* Dodano przewijanie poziome */
     }
     .form-container {
         display: flex;
@@ -964,15 +966,15 @@
                 startY: yOffset,
                 head: [[
                     removePolishChars('Rok'),
-                    removePolishChars('Kwota do wykupu'),
-                    removePolishChars('Oprocentowanie na cykl'),
+                    removePolishChars('Kwota wykupu'),
+                    removePolishChars('Oproc. cykl'),
                     removePolishChars('Odsetki'),
-                    removePolishChars('Skumulowane odsetki'),
-                    removePolishChars('Opłata za wykup'),
-                    removePolishChars('Podatek Belki'),
+                    removePolishChars('Odsetki skum.'),
+                    removePolishChars('Opłata wyk.'),
+                    removePolishChars('Podatek'),
                     removePolishChars('Zysk netto'),
-                    removePolishChars('Inflacja roczna'),
-                    removePolishChars('Kwota po zakończeniu cyklu')
+                    removePolishChars('Inflacja'),
+                    removePolishChars('Kwota po cykl.')
                 ]],
                 body: tableData,
                 theme: 'grid',
@@ -980,15 +982,15 @@
                 headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0] },
                 columnStyles: { 
                     0: { cellWidth: 15 }, 
-                    1: { cellWidth: 30 }, 
-                    2: { cellWidth: 30 }, 
-                    3: { cellWidth: 25 }, 
-                    4: { cellWidth: 30 }, 
-                    5: { cellWidth: 25 }, 
-                    6: { cellWidth: 25 }, 
-                    7: { cellWidth: 25 }, 
-                    8: { cellWidth: 25 }, 
-                    9: { cellWidth: 30 }
+                    1: { cellWidth: 25 }, 
+                    2: { cellWidth: 20 }, 
+                    3: { cellWidth: 20 }, 
+                    4: { cellWidth: 25 }, 
+                    5: { cellWidth: 20 }, 
+                    6: { cellWidth: 20 }, 
+                    7: { cellWidth: 20 }, 
+                    8: { cellWidth: 20 }, 
+                    9: { cellWidth: 25 }
                 }
             });
         }
