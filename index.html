@@ -24,41 +24,30 @@
                             <div class="form-group">
                                 <label for="kwota" class="form-label">Kwota inwestycji</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" id="kwota" min="100" max="5000000" step="100" value="10000">
+                                    <input type="number" class="form-control" id="kwota" min="100" max="5000000" step="100" value="1000">
                                     <span class="input-group-text">zł</span>
                                 </div>
-                                <input type="range" class="form-range" id="kwotaRange" min="100" max="5000000" step="100" value="10000">
-                                <div class="sub-info" id="iloscObligacji">Ilość obligacji: 100</div>
+                                <input type="range" class="form-range" id="kwotaRange" min="100" max="5000000" step="100" value="1000">
+                                <div class="sub-info" id="iloscObligacji">Ilość obligacji: 10</div>
                             </div>
                             <div class="form-group">
                                 <label for="typObligacji" class="form-label">Typ obligacji</label>
                                 <select class="form-control" id="typObligacji">
-                                    <option value="OTS" selected>3-miesięczne (OTS)</option>
+                                    <option value="OTS">3-miesięczne (OTS)</option>
                                     <option value="ROR">1-roczne (ROR)</option>
                                     <option value="DOR">2-letnie (DOR)</option>
                                     <option value="TOS">3-letnie (TOS)</option>
                                     <option value="COI">4-letnie (COI)</option>
                                     <option value="EDO">10-letnie (EDO)</option>
                                     <option value="ROS">6-letnie (ROS)</option>
-                                    <option value="ROD">12-letnie (ROD)</option>
+                                    <option value="ROD" selected>12-letnie (ROD)</option>
                                 </select>
                                 <div class="sub-info"></div>
                             </div>
                             <div class="form-group">
-                                <label for="inflacja" class="form-label">Inflacja</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="inflacja" min="0" max="50" step="0.1" value="4.9">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <input type="range" class="form-range" id="inflacjaRange" min="0" max="50" step="0.1" value="4.9">
-                                <div class="sub-info"></div>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
                                 <label for="okres" class="form-label">Okres inwestycji</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" id="okres" min="3" max="144" step="1" value="3" readonly>
+                                    <input type="number" class="form-control" id="okres" min="3" max="144" step="1" value="144" readonly>
                                     <span class="input-group-text">mc-y</span>
                                 </div>
                                 <div class="sub-info" id="lata"></div>
@@ -66,7 +55,7 @@
                             <div class="form-group">
                                 <label for="oprocentowanie" class="form-label">Oprocentowanie</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" id="oprocentowanie" min="0.1" max="25" step="0.1" value="3" readonly>
+                                    <input type="number" class="form-control" id="oprocentowanie" min="0.1" max="25" step="0.1" value="6.7" readonly>
                                     <span class="input-group-text">%</span>
                                 </div>
                                 <div class="sub-info" id="oprocentowanieInfo"></div>
@@ -116,7 +105,7 @@
                     </div>
                 </div>
                 <div class="summary-footer">
-                    <span class="highlight yellow" data-hover="3 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span> mc-y</span>
+                    <span class="highlight yellow" data-hover="144 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span> mc-y</span>
                     <span class="highlight green" data-hover="">Zysk netto: <span id="zyskNetto">-</span> zł</span>
                 </div>
             </div>
@@ -129,11 +118,14 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Okres</th>
-                                    <th>Odsetki brutto</th>
+                                    <th>Rok</th>
+                                    <th>Kwota do wykupu</th>
+                                    <th>Oprocentowanie na cykl</th>
+                                    <th>Odsetki</th>
+                                    <th>Skumulowane odsetki</th>
+                                    <th>Opłata za wykup</th>
                                     <th>Podatek</th>
-                                    <th>Odsetki netto</th>
-                                    <th>Całkowity zysk netto</th>
+                                    <th>Skumulowana kwota po zakończeniu cyklu</th>
                                 </tr>
                             </thead>
                             <tbody id="harmonogramTabela"></tbody>
@@ -141,7 +133,7 @@
                     </div>
                 </div>
                 <div class="chart-container-line">
-                    <div class="chart-line">
+                    <div classintreści>
                         <canvas id="obligacjeChartLine"></canvas>
                     </div>
                 </div>
@@ -535,10 +527,10 @@
         "ROR": { okres: 12, oprocentowanie: 5.75, zmienne: true, marza: 0.00, kapitalizacja: false },
         "DOR": { okres: 24, oprocentowanie: 5.90, zmienne: true, marza: 0.15, kapitalizacja: false },
         "TOS": { okres: 36, oprocentowanie: 5.95, zmienne: false, kapitalizacja: true },
-        "COI": { okres: 48, oprocentowanie: 6.30, zmienne: true, marza: 0.75, indeksowaneInflacja: true, kapitalizacja: false },
-        "EDO": { okres: 120, oprocentowanie: 6.55, zmienne: true, marza: 2.00, indeksowaneInflacja: true, kapitalizacja: true },
-        "ROS": { okres: 72, oprocentowanie: 6.40, zmienne: true, marza: 1.50, indeksowaneInflacja: true, kapitalizacja: true },
-        "ROD": { okres: 144, oprocentowanie: 6.70, zmienne: true, marza: 2.50, indeksowaneInflacja: true, kapitalizacja: true }
+        "COI": { okres: 48, oprocentowanie: 6.30, zmienne: true, marza: 0.75, kapitalizacja: false },
+        "EDO": { okres: 120, oprocentowanie: 6.55, zmienne: true, marza: 2.00, kapitalizacja: true },
+        "ROS": { okres: 72, oprocentowanie: 6.40, zmienne: true, marza: 1.50, kapitalizacja: true },
+        "ROD": { okres: 144, oprocentowanie: 6.70, zmienne: true, marza: 2.50, kapitalizacja: true }
     };
 
     const opisyObligacji = {
@@ -546,10 +538,10 @@
         "ROR": "* ROR (1-roczne): Oprocentowanie zmienne, w pierwszym roku 5,75%, kolejne oparte na stopie NBP.",
         "DOR": "* DOR (2-letnie): Oprocentowanie zmienne, 5,90% w pierwszym roku, kolejne NBP + 0,15%.",
         "TOS": "* TOS (3-letnie): Stałe oprocentowanie 5,95%, przeznaczone dla stabilnych inwestycji z kapitalizacją odsetek.",
-        "COI": "* COI (4-letnie): Indeksowane inflacją, 6,30% w pierwszym roku, kolejne inflacja + 0,75%, dla ochrony przed wzrostem cen.",
-        "EDO": "* EDO (10-letnie): Indeksowane inflacją, 6,55% w pierwszym roku, kolejne inflacja + 2,00%, długoterminowa ochrona kapitału z kapitalizacją.",
-        "ROS": "* ROS (6-letnie): Indeksowane inflacją, 6,40% w pierwszym roku, kolejne inflacja + 1,50%, dla średnioterminowych inwestorów z kapitalizacją.",
-        "ROD": "* ROD (12-letnie): Indeksowane inflacją, 6,70% w pierwszym roku, kolejne inflacja + 2,50%, dla długoterminowych strategii z kapitalizacją."
+        "COI": "* COI (4-letnie): 6,30% w pierwszym roku, dla ochrony przed wzrostem cen.",
+        "EDO": "* EDO (10-letnie): 6,55% w pierwszym roku, długoterminowa ochrona kapitału z kapitalizacją.",
+        "ROS": "* ROS (6-letnie): 6,40% w pierwszym roku, dla średnioterminowych inwestorów z kapitalizacją.",
+        "ROD": "* ROD (12-letnie): 6,70% w pierwszym roku, dla długoterminowych strategii z kapitalizacją."
     };
 
     document.getElementById("kwotaRange").addEventListener("input", function() {
@@ -562,16 +554,6 @@
         const kwotaRange = document.getElementById("kwotaRange");
         kwotaRange.value = this.value;
         updateIloscObligacji();
-    });
-
-    document.getElementById("inflacjaRange").addEventListener("input", function() {
-        const inflacjaInput = document.getElementById("inflacja");
-        inflacjaInput.value = this.value;
-    });
-
-    document.getElementById("inflacja").addEventListener("input", function() {
-        const inflacjaRange = document.getElementById("inflacjaRange");
-        inflacjaRange.value = this.value;
     });
 
     document.getElementById("typObligacji").addEventListener("change", function() {
@@ -601,11 +583,7 @@
         const config = obligacjeConfig[typ];
         let info = "";
         if (config.zmienne) {
-            if (config.indeksowaneInflacja) {
-                info = `Pierwszy rok: ${config.oprocentowanie}%, kolejne: inflacja + ${config.marza}%`;
-            } else {
-                info = `Pierwszy miesiąc: ${config.oprocentowanie}%, kolejne: stopa NBP + ${config.marza}%`;
-            }
+            info = `Pierwszy rok: ${config.oprocentowanie}%, kolejne: ${config.oprocentowanie}%`;
         } else {
             info = `Stałe: ${config.oprocentowanie}%`;
         }
@@ -644,7 +622,6 @@
         const typ = document.getElementById("typObligacji").value;
         const config = obligacjeConfig[typ];
         const miesiace = config.okres;
-        const inflacja = parseFloat(document.getElementById("inflacja").value) / 100 || 0;
         const podatekBelki = 0.19;
 
         if (kwota < 100 || miesiace <= 0) {
@@ -658,100 +635,54 @@
         let harmonogram = [];
         let oprocentowanieRoczne = config.oprocentowanie / 100;
 
-        if (config.zmienne) {
-            if (config.indeksowaneInflacja) {
-                for (let i = 1; i <= miesiace; i++) {
-                    let oprocentowanieMiesieczne;
-                    if (i <= 12) {
-                        oprocentowanieMiesieczne = oprocentowanieRoczne / 12;
-                    } else {
-                        oprocentowanieMiesieczne = (inflacja + config.marza / 100) / 12;
-                    }
-                    let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
-                    let podatekMiesiac = odsetkiMiesiac * podatekBelki;
-                    let odsetkiNettoMiesiac = odsetkiMiesiac - podatekMiesiac;
-                    odsetkiCalkowite += odsetkiMiesiac;
-                    zyskNetto += odsetkiNettoMiesiac;
+        // Obliczenia podzielone na lata (12 miesięcy = 1 rok)
+        const lata = miesiace / 12;
+        for (let rok = 1; rok <= lata; rok++) {
+            let kwotaRoczna = kapital;
+            let oprocentowanieRoczne = config.oprocentowanie / 100;
+            let odsetkiRok = kwotaRoczna * oprocentowanieRoczne;
+            let skumulowaneOdsetki = odsetkiCalkowite + odsetkiRok;
+            let oplataZaWykup = (rok < lata) ? 30 : 0; // Opłata za wykup (30 zł w każdym roku poza ostatnim)
+            let podatekRok = odsetkiRok * podatekBelki;
+            let zyskNettoRok = odsetkiRok - podatekRok - oplataZaWykup;
 
-                    if (config.kapitalizacja) {
-                        kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
-                    }
+            odsetkiCalkowite += odsetkiRok;
+            zyskNetto += zyskNettoRok;
 
-                    harmonogram.push({
-                        okres: i,
-                        odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                        podatek: podatekMiesiac.toFixed(2),
-                        odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
-                        zyskCalkowity: zyskNetto.toFixed(2),
-                        kapital: kapital.toFixed(2)
-                    });
-                }
-            } else {
-                for (let i = 1; i <= miesiace; i++) {
-                    let oprocentowanieMiesieczne = (i === 1 ? oprocentowanieRoczne : (oprocentowanieRoczne + config.marza / 100)) / 12;
-                    let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
-                    let podatekMiesiac = odsetkiMiesiac * podatekBelki;
-                    let odsetkiNettoMiesiac = odsetkiMiesiac - podatekMiesiac;
-                    odsetkiCalkowite += odsetkiMiesiac;
-                    zyskNetto += odsetkiNettoMiesiac;
-
-                    if (config.kapitalizacja) {
-                        kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
-                    }
-
-                    harmonogram.push({
-                        okres: i,
-                        odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                        podatek: podatekMiesiac.toFixed(2),
-                        odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
-                        zyskCalkowity: zyskNetto.toFixed(2),
-                        kapital: kapital.toFixed(2)
-                    });
-                }
+            if (config.kapitalizacja) {
+                kapital += odsetkiRok - podatekRok - oplataZaWykup; // Kapitalizacja po uwzględnieniu podatku i opłaty
             }
-        } else {
-            for (let i = 1; i <= miesiace; i++) {
-                let oprocentowanieMiesieczne = oprocentowanieRoczne / 12;
-                let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
-                let podatekMiesiac = odsetkiMiesiac * podatekBelki;
-                let odsetkiNettoMiesiac = odsetkiMiesiac - podatekMiesiac;
-                odsetkiCalkowite += odsetkiMiesiac;
-                zyskNetto += odsetkiNettoMiesiac;
 
-                if (config.kapitalizacja) {
-                    kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
-                    console.log("Kapitalizacja dla miesiąca " + i + ": kapitał = " + kapital.toFixed(2));
-                }
-
-                harmonogram.push({
-                    okres: i,
-                    odsetkiBrutto: odsetkiMiesiac.toFixed(2),
-                    podatek: podatekMiesiac.toFixed(2),
-                    odsetkiNetto: odsetkiNettoMiesiac.toFixed(2),
-                    zyskCalkowity: zyskNetto.toFixed(2),
-                    kapital: kapital.toFixed(2)
-                });
-            }
+            harmonogram.push({
+                rok: rok,
+                kwotaDoWykupu: (kwotaRoczna + odsetkiRok).toFixed(2),
+                oprocentowanie: config.oprocentowanie.toFixed(1),
+                odsetki: odsetkiRok.toFixed(2),
+                skumulowaneOdsetki: skumulowaneOdsetki.toFixed(2),
+                oplataZaWykup: oplataZaWykup.toFixed(2),
+                podatek: podatekRok.toFixed(2),
+                kapital: kapital.toFixed(2)
+            });
         }
 
         harmonogramData = harmonogram;
 
         // Ustawianie wartości w paskach
-        document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })}`;
+        document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
         document.querySelector('.result-wrapper .legend-item[data-index="0"] .color-box').setAttribute('data-tooltip', `Kapitał: ${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
 
-        document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         document.querySelector('.result-wrapper .legend-item[data-index="1"] .color-box').setAttribute('data-tooltip', `Odsetki: ${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
         const podatekCalkowity = odsetkiCalkowite * podatekBelki;
-        document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         document.querySelector('.result-wrapper .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
         document.getElementById("okresInwestycji").textContent = miesiace;
         document.querySelector('.result-wrapper .highlight.yellow').setAttribute('data-hover', `${miesiace} miesięcy`);
 
         document.getElementById("zyskNetto").textContent = `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        document.querySelector('.result-wrapper .highlight.green').setAttribute('data-hover', `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+        document.querySelector('.result-wrapper .highlight.green').setAttribute('data-hover', `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
         if (chart) chart.destroy();
         if (chartLine) chartLine.destroy();
@@ -793,19 +724,10 @@
                 chart.setActiveElements([{ datasetIndex: 0, index: index }]);
                 chart.update();
 
-                // Ukryj tylko etykietę dla bieżącego elementu
                 const currentLegend = document.querySelector(`#legend${['Kapital', 'Odsetki', 'Podatek'][index]}`);
                 if (currentLegend) {
                     currentLegend.style.opacity = 0;
                 }
-
-                // Zaktualizuj wartość w pasku dla bieżącego elementu
-                const valueElements = document.querySelectorAll('#valueKapital, #valueOdsetki, #valuePodatek');
-                valueElements.forEach((value, idx) => {
-                    if (idx === index) {
-                        value.textContent = `${['Kapitał', 'Odsetki', 'Podatek'][idx]}: ${value.textContent} zł`;
-                    }
-                });
             });
 
             item.addEventListener('mouseleave', function() {
@@ -813,16 +735,10 @@
                 chart.setActiveElements([]);
                 chart.update();
 
-                // Przywróć widoczność etykiety dla bieżącego elementu
                 const currentLegend = document.querySelector(`#legend${['Kapital', 'Odsetki', 'Podatek'][index]}`);
                 if (currentLegend) {
                     currentLegend.style.opacity = 1;
                 }
-
-                // Przywróć wartości w paskach
-                document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })}`;
-                document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             });
         });
 
@@ -831,11 +747,14 @@
         harmonogram.forEach(wiersz => {
             tabela.innerHTML += `
                 <tr>
-                    <td>${wiersz.okres}</td>
-                    <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })}</td>
-                    <td>${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })}</td>
-                    <td>${parseFloat(wiersz.odsetkiNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })}</td>
-                    <td>${parseFloat(wiersz.zyskCalkowity).toLocaleString('pl-PL', { minimumFractionDigits: 2 })}</td>
+                    <td>${wiersz.rok}</td>
+                    <td>${parseFloat(wiersz.kwotaDoWykupu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${wiersz.oprocentowanie}%</td>
+                    <td>${parseFloat(wiersz.odsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${parseFloat(wiersz.kapital).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                 </tr>
             `;
         });
@@ -844,22 +763,23 @@
         chartLine = new Chart(ctxLine, {
             type: 'line',
             data: {
-                labels: harmonogram.map(wiersz => wiersz.okres),
+                labels: harmonogram.map(wiersz => wiersz.rok),
                 datasets: [
                     {
-                        label: 'Całkowity zysk netto',
-                        data: harmonogram.map(wiersz => parseFloat(wiersz.zyskCalkowity)),
-                        borderColor: '#28a745',
-                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                        fill: true,
+                        label: 'Zainwestowana kwota',
+                        data: Array(lata).fill(kwota),
+                        borderColor: '#000000',
+                        borderDash: [5, 5],
+                        backgroundColor: 'rgba(0, 0, 0, 0)',
+                        fill: false,
                         tension: 0.1
                     },
                     {
                         label: 'Kapitał z odsetkami',
                         data: harmonogram.map(wiersz => parseFloat(wiersz.kapital)),
-                        borderColor: '#007bff',
-                        backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                        fill: true,
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                        fill: false,
                         tension: 0.1
                     }
                 ]
@@ -871,7 +791,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Okres (miesiące)'
+                            text: 'Rok'
                         }
                     },
                     y: {
@@ -892,6 +812,22 @@
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
                         titleFont: { size: 10 },
                         bodyFont: { size: 8 }
+                    },
+                    datalabels: {
+                        display: true,
+                        align: 'top',
+                        formatter: (value) => {
+                            return value.toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + ' zł';
+                        },
+                        font: {
+                            size: 10
+                        },
+                        color: '#000'
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 5
                     }
                 }
             }
@@ -956,27 +892,33 @@
             yOffset += 6;
 
             const tableData = harmonogramData.map(row => [
-                row.okres,
-                row.odsetkiBrutto,
+                row.rok,
+                row.kwotaDoWykupu,
+                row.oprocentowanie,
+                row.odsetki,
+                row.skumulowaneOdsetki,
+                row.oplataZaWykup,
                 row.podatek,
-                row.odsetkiNetto,
-                row.zyskCalkowity
+                row.kapital
             ]);
 
             doc.autoTable({
                 startY: yOffset,
                 head: [[
-                    removePolishChars('Okres'),
-                    removePolishChars('Odsetki brutto'),
+                    removePolishChars('Rok'),
+                    removePolishChars('Kwota do wykupu'),
+                    removePolishChars('Oprocentowanie na cykl'),
+                    removePolishChars('Odsetki'),
+                    removePolishChars('Skumulowane odsetki'),
+                    removePolishChars('Opłata za wykup'),
                     removePolishChars('Podatek'),
-                    removePolishChars('Odsetki netto'),
-                    removePolishChars('Calkowity zysk netto')
+                    removePolishChars('Skumulowana kwota po zakończeniu cyklu')
                 ]],
                 body: tableData,
                 theme: 'grid',
                 styles: { font: "helvetica", fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
                 headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 30 }, 2: { cellWidth: 30 }, 3: { cellWidth: 30 }, 4: { cellWidth: 40 } }
+                columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 30 }, 2: { cellWidth: 30 }, 3: { cellWidth: 30 }, 4: { cellWidth: 30 }, 5: { cellWidth: 30 }, 6: { cellWidth: 30 }, 7: { cellWidth: 40 } }
             });
         }
 
