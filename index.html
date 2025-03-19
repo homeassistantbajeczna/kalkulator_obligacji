@@ -412,24 +412,25 @@
     }
     .harmonogram {
         margin-top: 20px;
-        font-size: 0.8em; /* Zwiększono rozmiar czcionki */
+        font-size: 0.8em;
     }
     .harmonogram table {
         margin: 0 auto;
         width: 100%;
-        max-width: 1000px; /* Zwiększono maksymalną szerokość tabeli */
+        max-width: 1000px;
         display: block;
-        table-layout: auto;
+        table-layout: fixed; /* Zmieniono na fixed, aby kolumny były równomiernie rozłożone */
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
         overflow: hidden;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(90deg, #C2B280, #b0a070); /* Dodano tło gradientowe dla całej tabeli */
     }
     .harmonogram th {
         background: linear-gradient(90deg, #C2B280, #b0a070);
         color: #000000;
-        padding: 12px; /* Zwiększono padding */
+        padding: 12px;
         text-align: center;
         vertical-align: middle;
         font-weight: 500;
@@ -439,7 +440,7 @@
         text-overflow: ellipsis;
     }
     .harmonogram td {
-        padding: 10px; /* Zwiększono padding */
+        padding: 10px;
         text-align: center;
         font-weight: 400;
         border-bottom: 1px solid #eee;
@@ -510,7 +511,7 @@
     }
     .result-wrapper {
         flex: 1;
-        max-width: 1000px; /* Zwiększono maksymalną szerokość kontenera harmonogramu */
+        max-width: 1000px;
     }
     .result-wrapper h5 {
         font-size: 1em;
