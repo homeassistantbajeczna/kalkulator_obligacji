@@ -732,7 +732,7 @@
             // Liczba miesięcy w cyklu (12 dla obligacji rocznych, 1 dla miesięcznych)
             let miesiecyWCyklu = ["OTS", "ROR", "DOR"].includes(typ) ? 1 : 12;
 
-            // Obliczenie odsetek za cały cykl (miesiąc lub rok)
+            // Obliczenie odsetek za cały cykl (miesiąc lub rok) na podstawie aktualnego kapitału
             let odsetkiCykl = kapital * oprocentowanieMiesieczne * miesiecyWCyklu;
             let podatekCykl = odsetkiCykl * podatekBelki;
             let odsetkiNettoCykl = odsetkiCykl - podatekCykl;
@@ -742,18 +742,21 @@
             zyskNetto += odsetkiNettoCykl;
             skumulowanaKwota += odsetkiNettoCykl;
 
+            // Aktualizacja kapitału dla obligacji z kapitalizacją
+            let kwotaDoWykupu = kwota; // Domyślnie początkowa kwota
             if (config.kapitalizacja) {
-                kapital += odsetkiNettoCykl;
+                kapital += odsetkiNettoCykl; // Kapitalizacja: dodajemy odsetki netto do kapitału
+                kwotaDoWykupu = kapital; // Kwota wykupu to aktualny kapitał (z odsetkami netto)
             }
 
             let oplataZaWykup = 0;
             if (i < liczbaCykli) {
-                oplataZaWykup = kwota * config.oplataWykup;
+                oplataZaWykup = kwota * config.oplataWykup; // Opłata liczona od początkowej kwoty
             }
 
             harmonogram.push({
                 okres: okresWiersz,
-                kwotaDoWykupu: kwota.toFixed(2),
+                kwotaDoWykupu: kwotaDoWykupu.toFixed(2), // Zaktualizowana kwota wykupu
                 oprocentowanieNaCykl: (oprocentowanieRoczne * 100).toFixed(2) + "%",
                 odsetkiBrutto: odsetkiCykl.toFixed(2),
                 skumulowaneOdsetki: skumulowaneOdsetki.toFixed(2),
