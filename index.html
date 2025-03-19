@@ -699,51 +699,67 @@
         let skumulowaneOdsetki = 0;
         let skumulowanaKwota = kwota;
 
-        for (let i = 1; i <= miesiace; i++) {
-            let okresWiersz = ["OTS", "ROR", "DOR"].includes(typ) ? i : Math.ceil(i / 12);
+        // Określenie liczby cykli (wierszy) w harmonogramie
+        let liczbaCykli;
+        if (["OTS", "ROR", "DOR"].includes(typ)) {
+            liczbaCykli = miesiace; // Dla OTS, ROR, DOR: 1 wiersz na miesiąc
+        } else {
+            liczbaCykli = miesiace / 12; // Dla TOS, COI, EDO, ROS, ROD: 1 wiersz na rok
+        }
 
-            let oprocentowanieMiesieczne;
-            if (config.zmienne) {
-                if (config.indeksowaneInflacja) {
-                    if (i <= 12) {
-                        oprocentowanieMiesieczne = config.oprocentowanie / 100 / 12;
-                    } else {
-                        oprocentowanieMiesieczne = (inflacja + config.marza / 100) / 12;
-                    }
+        for (let i = 1; i <= liczbaCykli; i++) {
+            let okresWiersz = i; // Numer wiersza (miesiąc lub rok)
+
+            let oprocentowanieRoczne;
+            if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+                // Oprocentowanie dla obligacji indeksowanych inflacją
+                if (i === 1) {
+                    oprocentowanieRoczne = config.oprocentowanie / 100; // Pierwszy rok: stałe oprocentowanie
                 } else {
-                    oprocentowanieMiesieczne = (i === 1 ? config.oprocentowanie / 100 : (config.oprocentowanie / 100 + config.marza / 100)) / 12;
+                    oprocentowanieRoczne = (inflacja + config.marza / 100); // Kolejne lata: inflacja + marża
                 }
+            } else if (config.zmienne) {
+                // Oprocentowanie dla ROR, DOR (zmienne, oparte na stopie NBP)
+                oprocentowanieRoczne = (i === 1 ? config.oprocentowanie / 100 : (config.oprocentowanie / 100 + config.marza / 100));
             } else {
-                oprocentowanieMiesieczne = config.oprocentowanie / 100 / 12;
+                // Oprocentowanie dla OTS, TOS (stałe)
+                oprocentowanieRoczne = config.oprocentowanie / 100;
             }
 
-            let odsetkiMiesiac = kapital * oprocentowanieMiesieczne;
-            let podatekMiesiac = odsetkiMiesiac * podatekBelki;
-            let odsetkiNettoMiesiac = odsetkiMiesiac - podatekMiesiac;
-            odsetkiCalkowite += odsetkiMiesiac;
-            skumulowaneOdsetki += odsetkiMiesiac;
-            zyskNetto += odsetkiNettoMiesiac;
+            // Obliczenie oprocentowania miesięcznego
+            let oprocentowanieMiesieczne = oprocentowanieRoczne / 12;
 
-            skumulowanaKwota += odsetkiNettoMiesiac;
+            // Liczba miesięcy w cyklu (12 dla obligacji rocznych, 1 dla miesięcznych)
+            let miesiecyWCyklu = ["OTS", "ROR", "DOR"].includes(typ) ? 1 : 12;
+
+            // Obliczenie odsetek za cały cykl (miesiąc lub rok)
+            let odsetkiCykl = kapital * oprocentowanieMiesieczne * miesiecyWCyklu;
+            let podatekCykl = odsetkiCykl * podatekBelki;
+            let odsetkiNettoCykl = odsetkiCykl - podatekCykl;
+
+            odsetkiCalkowite += odsetkiCykl;
+            skumulowaneOdsetki += odsetkiCykl;
+            zyskNetto += odsetkiNettoCykl;
+            skumulowanaKwota += odsetkiNettoCykl;
 
             if (config.kapitalizacja) {
-                kapital += odsetkiNettoMiesiac;
+                kapital += odsetkiNettoCykl;
             }
 
             let oplataZaWykup = 0;
-            if (i < miesiace) {
+            if (i < liczbaCykli) {
                 oplataZaWykup = kwota * config.oplataWykup;
             }
 
             harmonogram.push({
                 okres: okresWiersz,
                 kwotaDoWykupu: kwota.toFixed(2),
-                oprocentowanieNaCykl: (oprocentowanieMiesieczne * 12 * 100).toFixed(2) + "%",
-                odsetkiBrutto: odsetkiMiesiac.toFixed(2),
+                oprocentowanieNaCykl: (oprocentowanieRoczne * 100).toFixed(2) + "%",
+                odsetkiBrutto: odsetkiCykl.toFixed(2),
                 skumulowaneOdsetki: skumulowaneOdsetki.toFixed(2),
                 oplataZaWykup: oplataZaWykup.toFixed(2),
-                podatek: podatekMiesiac.toFixed(2),
-                zyskNetto: odsetkiNettoMiesiac.toFixed(2),
+                podatek: podatekCykl.toFixed(2),
+                zyskNetto: odsetkiNettoCykl.toFixed(2),
                 inflacjaRoczna: (inflacja * 100).toFixed(2) + "%",
                 kwotaPoZakonczeniuCyklu: skumulowanaKwota.toFixed(2)
             });
