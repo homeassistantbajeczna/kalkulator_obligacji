@@ -694,10 +694,9 @@
 
         let kapital = kwota;
         let odsetkiCalkowite = 0;
-        let zyskNetto = 0;
+        let zyskNettoCalkowity = 0;
         let harmonogram = [];
         let skumulowaneOdsetki = 0;
-        let skumulowanaKwota = kwota;
 
         // Określenie liczby cykli (wierszy) w harmonogramie
         let liczbaCykli;
@@ -735,12 +734,13 @@
             // Obliczenie odsetek za cały cykl (miesiąc lub rok) na podstawie aktualnego kapitału
             let odsetkiCykl = kapital * oprocentowanieMiesieczne * miesiecyWCyklu;
 
-            // Podatek Belki liczony tylko w ostatnim cyklu
-            let podatekCykl = 0;
-            let odsetkiNettoCykl = odsetkiCykl; // Domyślnie odsetki brutto, bo podatek jeszcze nie jest odliczany
+            // Podatek Belki liczony w każdym cyklu
+            let podatekCykl = odsetkiCykl * podatekBelki;
+            let odsetkiNettoCykl = odsetkiCykl - podatekCykl;
 
             odsetkiCalkowite += odsetkiCykl;
             skumulowaneOdsetki += odsetkiCykl;
+            zyskNettoCalkowity += odsetkiNettoCykl;
 
             // Aktualizacja kapitału dla obligacji z kapitalizacją
             let wartoscInwestycji = kwota; // Domyślnie początkowa kwota
@@ -749,33 +749,15 @@
                 wartoscInwestycji = kapital; // Wartość inwestycji to aktualny kapitał (z odsetkami brutto)
             }
 
-            // Obliczenie podatku i zysku netto w ostatnim cyklu
-            if (i === liczbaCykli) {
-                if (config.kapitalizacja) {
-                    // Dla obligacji z kapitalizacją podatek liczony od wszystkich skumulowanych odsetek
-                    podatekCykl = skumulowaneOdsetki * podatekBelki;
-                    zyskNetto = skumulowaneOdsetki - podatekCykl;
-                    odsetkiNettoCykl = zyskNetto; // Zysk netto w ostatnim cyklu
-                    skumulowanaKwota = kwota + zyskNetto; // Końcowa kwota po odliczeniu podatku
-                } else {
-                    // Dla obligacji bez kapitalizacji podatek liczony w każdym cyklu
-                    podatekCykl = odsetkiCykl * podatekBelki;
-                    odsetkiNettoCykl = odsetkiCykl - podatekCykl;
-                    zyskNetto += odsetkiNettoCykl;
-                    skumulowanaKwota += odsetkiNettoCykl;
-                }
+            // Obliczenie kwoty po cyklu (po zerwaniu obligacji)
+            let kwotaPoCyklu;
+            if (config.kapitalizacja) {
+                // Dla obligacji z kapitalizacją: wartość inwestycji pomniejszona o podatek od skumulowanych odsetek
+                let podatekSkumulowany = skumulowaneOdsetki * podatekBelki;
+                kwotaPoCyklu = wartoscInwestycji - podatekSkumulowany;
             } else {
-                if (config.kapitalizacja) {
-                    // W cyklach pośrednich zysk netto to odsetki brutto (podatek jeszcze nie odliczony)
-                    zyskNetto += odsetkiCykl;
-                    skumulowanaKwota += odsetkiCykl;
-                } else {
-                    // Dla obligacji bez kapitalizacji podatek liczony w każdym cyklu
-                    podatekCykl = odsetkiCykl * podatekBelki;
-                    odsetkiNettoCykl = odsetkiCykl - podatekCykl;
-                    zyskNetto += odsetkiNettoCykl;
-                    skumulowanaKwota += odsetkiNettoCykl;
-                }
+                // Dla obligacji bez kapitalizacji: kwota początkowa + skumulowany zysk netto
+                kwotaPoCyklu = kwota + zyskNettoCalkowity;
             }
 
             let oplataZaWykup = 0;
@@ -785,7 +767,7 @@
 
             harmonogram.push({
                 okres: okresWiersz,
-                wartoscInwestycji: wartoscInwestycji.toFixed(2), // Zaktualizowana wartość inwestycji
+                wartoscInwestycji: wartoscInwestycji.toFixed(2), // Wartość inwestycji (z odsetkami brutto)
                 oprocentowanieNaCykl: (oprocentowanieRoczne * 100).toFixed(2) + "%",
                 odsetkiBrutto: odsetkiCykl.toFixed(2),
                 skumulowaneOdsetki: skumulowaneOdsetki.toFixed(2),
@@ -793,7 +775,7 @@
                 podatek: podatekCykl.toFixed(2),
                 zyskNetto: odsetkiNettoCykl.toFixed(2),
                 inflacjaRoczna: (inflacja * 100).toFixed(2) + "%",
-                kwotaPoZakonczeniuCyklu: skumulowanaKwota.toFixed(2)
+                kwotaPoZakonczeniuCyklu: kwotaPoCyklu.toFixed(2)
             });
         }
 
@@ -805,15 +787,15 @@
         document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         document.querySelector('.result-wrapper .legend-item[data-index="1"] .color-box').setAttribute('data-tooltip', `Odsetki: ${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
-        const podatekCalkowity = config.kapitalizacja ? (skumulowaneOdsetki * podatekBelki) : (odsetkiCalkowite * podatekBelki);
+        const podatekCalkowity = odsetkiCalkowite * podatekBelki;
         document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         document.querySelector('.result-wrapper .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
         document.getElementById("okresInwestycji").textContent = miesiace;
         document.querySelector('.result-wrapper .highlight.yellow').setAttribute('data-hover', `${miesiace} miesięcy`);
 
-        document.getElementById("zyskNetto").textContent = `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        document.querySelector('.result-wrapper .highlight.green').setAttribute('data-hover', `${zyskNetto.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
+        document.getElementById("zyskNetto").textContent = `${zyskNettoCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.querySelector('.result-wrapper .highlight.green').setAttribute('data-hover', `${zyskNettoCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
         if (chart) chart.destroy();
         if (chartLine) chartLine.destroy();
