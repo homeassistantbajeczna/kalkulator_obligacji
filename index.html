@@ -34,8 +34,8 @@
                                 <label for="typObligacji" class="form-label">Typ obligacji</label>
                                 <select class="form-control" id="typObligacji">
                                     <option value="OTS" selected>3-miesięczne (OTS)</option>
-                                    <option value="ROR">1-roczne (ROR)</option>
-                                    <option value="DOR">2-letnie (DOR)</option>
+                                    <option value="ROR">12-miesięczne (ROR)</option>
+                                    <option value="DOR">24-miesięczne (DOR)</option>
                                     <option value="TOS">3-letnie (TOS)</option>
                                     <option value="COI">4-letnie (COI)</option>
                                     <option value="EDO">10-letnie (EDO)</option>
@@ -83,7 +83,7 @@
     </div>
     <div class="result-section" id="resultSection">
         <div class="result-header">
-            <h4>Podsumowanie wyników</h4>
+            <h4 id="resultHeader">Podsumowanie wyników</h4>
             <button id="generatePdfBtn" class="btn btn-primary btn-sm">Generuj PDF</button>
         </div>
         <button class="btn btn-secondary mb-3" onclick="showForm()">Powrót do edycji</button>
@@ -561,13 +561,24 @@
 
     const opisyObligacji = {
         "OTS": "* OTS (3-miesięczne): Stałe oprocentowanie 3,00%, idealne na krótkoterminowe inwestycje.",
-        "ROR": "* ROR (1-roczne): Oprocentowanie zmienne, w pierwszym roku 5,75%, kolejne oparte na stopie NBP.",
-        "DOR": "* DOR (2-letnie): Oprocentowanie zmienne, 5,90% w pierwszym roku, kolejne NBP + 0,15%.",
+        "ROR": "* ROR (12-miesięczne): Oprocentowanie zmienne, w pierwszym roku 5,75%, kolejne oparte na stopie NBP.",
+        "DOR": "* DOR (24-miesięczne): Oprocentowanie zmienne, 5,90% w pierwszym roku, kolejne NBP + 0,15%.",
         "TOS": "* TOS (3-letnie): Stałe oprocentowanie 5,95%, przeznaczone dla stabilnych inwestycji z kapitalizacją odsetek.",
         "COI": "* COI (4-letnie): Indeksowane inflacją, 6,30% w pierwszym roku, kolejne inflacja + 0,75%, dla ochrony przed wzrostem cen.",
         "EDO": "* EDO (10-letnie): Indeksowane inflacją, 6,55% w pierwszym roku, kolejne inflacja + 2,00%, długoterminowa ochrona kapitału z kapitalizacją.",
         "ROS": "* ROS (6-letnie): Indeksowane inflacją, 6,40% w pierwszym roku, kolejne inflacja + 1,50%, dla średnioterminowych inwestorów z kapitalizacją.",
         "ROD": "* ROD (12-letnie): Indeksowane inflacją, 6,70% w pierwszym roku, kolejne inflacja + 2,50%, dla długoterminowych strategii z kapitalizacją."
+    };
+
+    const nazwyObligacji = {
+        "OTS": "3-miesięcznych (OTS)",
+        "ROR": "12-miesięcznych (ROR)",
+        "DOR": "24-miesięcznych (DOR)",
+        "TOS": "3-letnich (TOS)",
+        "COI": "4-letnich (COI)",
+        "EDO": "10-letnich (EDO)",
+        "ROS": "6-letnich (ROS)",
+        "ROD": "12-letnich (ROD)"
     };
 
     document.getElementById("kwotaRange").addEventListener("input", function() {
@@ -670,6 +681,9 @@
             return;
         }
 
+        // Ustawienie dynamicznego nagłówka w podsumowaniu wyników
+        document.getElementById("resultHeader").textContent = `Wynik inwestycji dla obligacji ${nazwyObligacji[typ]}`;
+
         // Ustawienie nagłówka pierwszej kolumny (Rok/Miesiąc) w zależności od typu obligacji
         const pierwszaKolumnaNaglowek = document.getElementById("pierwszaKolumnaNaglowek");
         if (["OTS", "ROR", "DOR"].includes(typ)) {
@@ -683,10 +697,9 @@
         let zyskNetto = 0;
         let harmonogram = [];
         let skumulowaneOdsetki = 0;
-        let skumulowanaKwota = kwota; // Zmienna do przechowywania wartości "Kwota po cykl."
+        let skumulowanaKwota = kwota;
 
         for (let i = 1; i <= miesiace; i++) {
-            // Dla OTS, ROR, DOR pokazujemy numer miesiąca, dla pozostałych rok
             let okresWiersz = ["OTS", "ROR", "DOR"].includes(typ) ? i : Math.ceil(i / 12);
 
             let oprocentowanieMiesieczne;
@@ -711,17 +724,15 @@
             skumulowaneOdsetki += odsetkiMiesiac;
             zyskNetto += odsetkiNettoMiesiac;
 
-            // Aktualizacja skumulowanej kwoty (wartość inwestycji + odsetki netto)
             skumulowanaKwota += odsetkiNettoMiesiac;
 
             if (config.kapitalizacja) {
-                kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek dla TOS, EDO, ROS, ROD
+                kapital += odsetkiNettoMiesiac;
             }
 
-            // Obliczanie opłaty za wcześniejszy wykup
             let oplataZaWykup = 0;
-            if (i < miesiace) { // W ostatnim miesiącu opłata wynosi 0 zł
-                oplataZaWykup = kwota * config.oplataWykup; // Opłata jako procent wartości inwestycji
+            if (i < miesiace) {
+                oplataZaWykup = kwota * config.oplataWykup;
             }
 
             harmonogram.push({
@@ -740,7 +751,6 @@
 
         harmonogramData = harmonogram;
 
-        // Ustawianie wartości w paskach z "zł"
         document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
         document.querySelector('.result-wrapper .legend-item[data-index="0"] .color-box').setAttribute('data-tooltip', `Kapitał: ${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
 
@@ -845,6 +855,15 @@
             `;
         });
 
+        // Obliczenie dynamicznej skali osi Y
+        const maxKwotaPoCyklu = Math.max(...harmonogram.map(wiersz => parseFloat(wiersz.kwotaPoZakonczeniuCyklu)));
+        const minKwota = kwota;
+        const range = maxKwotaPoCyklu - minKwota;
+        const padding = range * 0.1; // Dodajemy 10% marginesu nad i pod wartościami
+        const yMin = minKwota - padding;
+        const yMax = maxKwotaPoCyklu + padding;
+        const stepSize = range / 5; // Dzielimy zakres na 5 kroków
+
         const ctxLine = document.getElementById("obligacjeChartLine").getContext("2d");
         chartLine = new Chart(ctxLine, {
             type: 'line',
@@ -854,8 +873,8 @@
                     {
                         label: 'Zainwestowana kwota',
                         data: harmonogram.map(() => kwota),
-                        borderColor: '#000000',
-                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                        borderColor: '#8B7D47', // Ciemniejszy beż
+                        backgroundColor: 'rgba(139, 125, 71, 0.1)',
                         fill: false,
                         tension: 0,
                         borderWidth: 2
@@ -863,8 +882,8 @@
                     {
                         label: 'Kwota po zakończeniu cyklu',
                         data: harmonogram.map(wiersz => parseFloat(wiersz.kwotaPoZakonczeniuCyklu)),
-                        borderColor: '#28a745',
-                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                        borderColor: '#D4C791', // Jaśniejszy złoty
+                        backgroundColor: 'rgba(212, 199, 145, 0.2)',
                         fill: true,
                         tension: 0.1,
                         borderWidth: 2
@@ -889,9 +908,10 @@
                             text: 'Wartość (PLN)',
                             font: { size: 14 }
                         },
-                        beginAtZero: true,
+                        min: yMin,
+                        max: yMax,
                         ticks: {
-                            stepSize: 500,
+                            stepSize: stepSize,
                             font: { size: 12 }
                         }
                     }
@@ -944,7 +964,8 @@
         yOffset += 10;
 
         doc.setFontSize(14);
-        doc.text(removePolishChars("Wyniki inwestycji"), 10, yOffset);
+        const typ = document.getElementById("typObligacji").value;
+        doc.text(removePolishChars(`Wynik inwestycji dla obligacji ${nazwyObligacji[typ]}`), 10, yOffset);
         yOffset += 8;
 
         doc.setFontSize(10);
@@ -970,7 +991,6 @@
             doc.text(removePolishChars("Harmonogram odsetek"), 10, yOffset);
             yOffset += 6;
 
-            const typ = document.getElementById("typObligacji").value;
             const pierwszaKolumna = ["OTS", "ROR", "DOR"].includes(typ) ? "Miesiac" : "Rok";
 
             const tableData = harmonogramData.map(row => [
