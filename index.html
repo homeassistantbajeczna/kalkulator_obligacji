@@ -127,9 +127,9 @@
                     <h5 class="btn-toggle" onclick="toggleHarmonogram('harmonogramContent')">Harmonogram odsetek ▼</h5>
                     <div id="harmonogramContent">
                         <table class="table table-striped">
-                            <thead>
+                            <thead id="harmonogramNaglowek">
                                 <tr>
-                                    <th>Rok</th>
+                                    <th id="pierwszaKolumnaNaglowek">Rok</th>
                                     <th>Kwota wykupu</th>
                                     <th>Oproc. cykl</th>
                                     <th>Odsetki</th>
@@ -670,14 +670,25 @@
             return;
         }
 
+        // Ustawienie nagłówka pierwszej kolumny (Rok/Miesiąc) w zależności od typu obligacji
+        const pierwszaKolumnaNaglowek = document.getElementById("pierwszaKolumnaNaglowek");
+        if (["OTS", "ROR", "DOR"].includes(typ)) {
+            pierwszaKolumnaNaglowek.textContent = "Miesiąc";
+        } else {
+            pierwszaKolumnaNaglowek.textContent = "Rok";
+        }
+
         let kapital = kwota;
         let odsetkiCalkowite = 0;
         let zyskNetto = 0;
         let harmonogram = [];
         let skumulowaneOdsetki = 0;
+        let skumulowanaKwota = kwota; // Zmienna do przechowywania wartości "Kwota po cykl."
 
         for (let i = 1; i <= miesiace; i++) {
-            let rok = Math.ceil(i / 12);
+            // Dla OTS, ROR, DOR pokazujemy numer miesiąca, dla pozostałych rok
+            let okresWiersz = ["OTS", "ROR", "DOR"].includes(typ) ? i : Math.ceil(i / 12);
+
             let oprocentowanieMiesieczne;
             if (config.zmienne) {
                 if (config.indeksowaneInflacja) {
@@ -700,8 +711,11 @@
             skumulowaneOdsetki += odsetkiMiesiac;
             zyskNetto += odsetkiNettoMiesiac;
 
+            // Aktualizacja skumulowanej kwoty (wartość inwestycji + odsetki netto)
+            skumulowanaKwota += odsetkiNettoMiesiac;
+
             if (config.kapitalizacja) {
-                kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
+                kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek dla TOS, EDO, ROS, ROD
             }
 
             // Obliczanie opłaty za wcześniejszy wykup
@@ -711,7 +725,7 @@
             }
 
             harmonogram.push({
-                rok: rok,
+                okres: okresWiersz,
                 kwotaDoWykupu: kwota.toFixed(2),
                 oprocentowanieNaCykl: (oprocentowanieMiesieczne * 12 * 100).toFixed(2) + "%",
                 odsetkiBrutto: odsetkiMiesiac.toFixed(2),
@@ -720,7 +734,7 @@
                 podatek: podatekMiesiac.toFixed(2),
                 zyskNetto: odsetkiNettoMiesiac.toFixed(2),
                 inflacjaRoczna: (inflacja * 100).toFixed(2) + "%",
-                kwotaPoZakonczeniuCyklu: kapital.toFixed(2)
+                kwotaPoZakonczeniuCyklu: skumulowanaKwota.toFixed(2)
             });
         }
 
@@ -817,7 +831,7 @@
         harmonogram.forEach(wiersz => {
             tabela.innerHTML += `
                 <tr>
-                    <td>${wiersz.rok}</td>
+                    <td>${wiersz.okres}</td>
                     <td>${parseFloat(wiersz.kwotaDoWykupu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                     <td>${wiersz.oprocentowanieNaCykl}</td>
                     <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
@@ -835,7 +849,7 @@
         chartLine = new Chart(ctxLine, {
             type: 'line',
             data: {
-                labels: harmonogram.map(wiersz => `Rok ${wiersz.rok}`),
+                labels: harmonogram.map(wiersz => ["OTS", "ROR", "DOR"].includes(typ) ? `Miesiąc ${wiersz.okres}` : `Rok ${wiersz.okres}`),
                 datasets: [
                     {
                         label: 'Zainwestowana kwota',
@@ -864,7 +878,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Okres (lata)',
+                            text: ["OTS", "ROR", "DOR"].includes(typ) ? 'Okres (miesiące)' : 'Okres (lata)',
                             font: { size: 14 }
                         },
                         ticks: { font: { size: 12 } }
@@ -956,8 +970,11 @@
             doc.text(removePolishChars("Harmonogram odsetek"), 10, yOffset);
             yOffset += 6;
 
+            const typ = document.getElementById("typObligacji").value;
+            const pierwszaKolumna = ["OTS", "ROR", "DOR"].includes(typ) ? "Miesiac" : "Rok";
+
             const tableData = harmonogramData.map(row => [
-                row.rok,
+                row.okres,
                 row.kwotaDoWykupu + ' zł',
                 row.oprocentowanieNaCykl,
                 row.odsetkiBrutto + ' zł',
@@ -972,7 +989,7 @@
             doc.autoTable({
                 startY: yOffset,
                 head: [[
-                    removePolishChars('Rok'),
+                    removePolishChars(pierwszaKolumna),
                     removePolishChars('Kwota wykupu'),
                     removePolishChars('Oproc. cykl'),
                     removePolishChars('Odsetki'),
