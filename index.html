@@ -131,14 +131,14 @@
                                 <tr>
                                     <th id="pierwszaKolumnaNaglowek">Rok</th>
                                     <th>Wartość inwestycji</th>
-                                    <th>Oproc. cykl</th>
+                                    <th>Oprocentowanie</th>
                                     <th>Odsetki</th>
-                                    <th>Odsetki skum.</th>
-                                    <th>Opłata wyk.</th>
+                                    <th>Suma odsetek</th>
                                     <th>Podatek</th>
                                     <th>Zysk netto</th>
+                                    <th>Opłata za wykup</th>
                                     <th>Inflacja</th>
-                                    <th>Kwota po cykl.</th>
+                                    <th>Kwota za cykl</th>
                                 </tr>
                             </thead>
                             <tbody id="harmonogramTabela"></tbody>
@@ -771,9 +771,9 @@
                 oprocentowanieNaCykl: (oprocentowanieRoczne * 100).toFixed(2) + "%",
                 odsetkiBrutto: odsetkiCykl.toFixed(2),
                 skumulowaneOdsetki: skumulowaneOdsetki.toFixed(2),
-                oplataZaWykup: oplataZaWykup.toFixed(2),
                 podatek: podatekCykl.toFixed(2),
                 zyskNetto: odsetkiNettoCykl.toFixed(2),
+                oplataZaWykup: oplataZaWykup.toFixed(2),
                 inflacjaRoczna: (inflacja * 100).toFixed(2) + "%",
                 kwotaPoZakonczeniuCyklu: kwotaPoCyklu.toFixed(2)
             });
@@ -876,9 +876,9 @@
                     <td>${wiersz.oprocentowanieNaCykl}</td>
                     <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                     <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
-                    <td>${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                     <td>${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                     <td>${parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                     <td>${wiersz.inflacjaRoczna}</td>
                     <td>${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                 </tr>
@@ -1029,9 +1029,9 @@
                 row.oprocentowanieNaCykl,
                 row.odsetkiBrutto + ' zł',
                 row.skumulowaneOdsetki + ' zł',
-                row.oplataZaWykup + ' zł',
                 row.podatek + ' zł',
                 row.zyskNetto + ' zł',
+                row.oplataZaWykup + ' zł',
                 row.inflacjaRoczna,
                 row.kwotaPoZakonczeniuCyklu + ' zł'
             ]);
@@ -1041,14 +1041,14 @@
                 head: [[
                     removePolishChars(pierwszaKolumna),
                     removePolishChars('Wartość inwestycji'),
-                    removePolishChars('Oproc. cykl'),
+                    removePolishChars('Oprocentowanie'),
                     removePolishChars('Odsetki'),
-                    removePolishChars('Odsetki skum.'),
-                    removePolishChars('Opłata wyk.'),
+                    removePolishChars('Suma odsetek'),
                     removePolishChars('Podatek'),
                     removePolishChars('Zysk netto'),
+                    removePolishChars('Opłata za wykup'),
                     removePolishChars('Inflacja'),
-                    removePolishChars('Kwota po cykl.')
+                    removePolishChars('Kwota za cykl')
                 ]],
                 body: tableData,
                 theme: 'grid',
