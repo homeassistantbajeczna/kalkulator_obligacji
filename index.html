@@ -419,16 +419,16 @@
         width: 100%;
         max-width: 1000px;
         display: block;
-        table-layout: fixed; /* Zmieniono na fixed, aby kolumny były równomiernie rozłożone */
+        table-layout: fixed;
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
         overflow: hidden;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        background: linear-gradient(90deg, #C2B280, #b0a070); /* Dodano tło gradientowe dla całej tabeli */
+        background: #f9f9f9; /* Jednolite tło tabeli, pasujące do tła wierszy */
     }
     .harmonogram th {
-        background: linear-gradient(90deg, #C2B280, #b0a070);
+        background: linear-gradient(90deg, #C2B280, #b0a070); /* Gradient tylko w nagłówkach */
         color: #000000;
         padding: 12px;
         text-align: center;
@@ -444,7 +444,7 @@
         text-align: center;
         font-weight: 400;
         border-bottom: 1px solid #eee;
-        background-color: #f9f9f9;
+        background-color: #f9f9f9; /* Tło wierszy */
         color: #000000;
         white-space: nowrap;
         overflow: hidden;
