@@ -130,7 +130,7 @@
                             <thead id="harmonogramNaglowek">
                                 <tr>
                                     <th id="pierwszaKolumnaNaglowek">Rok</th>
-                                    <th>Kwota wykupu</th>
+                                    <th>Wartość inwestycji</th>
                                     <th>Oproc. cykl</th>
                                     <th>Odsetki</th>
                                     <th>Odsetki skum.</th>
@@ -734,19 +734,48 @@
 
             // Obliczenie odsetek za cały cykl (miesiąc lub rok) na podstawie aktualnego kapitału
             let odsetkiCykl = kapital * oprocentowanieMiesieczne * miesiecyWCyklu;
-            let podatekCykl = odsetkiCykl * podatekBelki;
-            let odsetkiNettoCykl = odsetkiCykl - podatekCykl;
+
+            // Podatek Belki liczony tylko w ostatnim cyklu
+            let podatekCykl = 0;
+            let odsetkiNettoCykl = odsetkiCykl; // Domyślnie odsetki brutto, bo podatek jeszcze nie jest odliczany
 
             odsetkiCalkowite += odsetkiCykl;
             skumulowaneOdsetki += odsetkiCykl;
-            zyskNetto += odsetkiNettoCykl;
-            skumulowanaKwota += odsetkiNettoCykl;
 
             // Aktualizacja kapitału dla obligacji z kapitalizacją
-            let kwotaDoWykupu = kwota; // Domyślnie początkowa kwota
+            let wartoscInwestycji = kwota; // Domyślnie początkowa kwota
             if (config.kapitalizacja) {
-                kapital += odsetkiNettoCykl; // Kapitalizacja: dodajemy odsetki netto do kapitału
-                kwotaDoWykupu = kapital; // Kwota wykupu to aktualny kapitał (z odsetkami netto)
+                kapital += odsetkiCykl; // Kapitalizacja: dodajemy odsetki brutto do kapitału
+                wartoscInwestycji = kapital; // Wartość inwestycji to aktualny kapitał (z odsetkami brutto)
+            }
+
+            // Obliczenie podatku i zysku netto w ostatnim cyklu
+            if (i === liczbaCykli) {
+                if (config.kapitalizacja) {
+                    // Dla obligacji z kapitalizacją podatek liczony od wszystkich skumulowanych odsetek
+                    podatekCykl = skumulowaneOdsetki * podatekBelki;
+                    zyskNetto = skumulowaneOdsetki - podatekCykl;
+                    odsetkiNettoCykl = zyskNetto; // Zysk netto w ostatnim cyklu
+                    skumulowanaKwota = kwota + zyskNetto; // Końcowa kwota po odliczeniu podatku
+                } else {
+                    // Dla obligacji bez kapitalizacji podatek liczony w każdym cyklu
+                    podatekCykl = odsetkiCykl * podatekBelki;
+                    odsetkiNettoCykl = odsetkiCykl - podatekCykl;
+                    zyskNetto += odsetkiNettoCykl;
+                    skumulowanaKwota += odsetkiNettoCykl;
+                }
+            } else {
+                if (config.kapitalizacja) {
+                    // W cyklach pośrednich zysk netto to odsetki brutto (podatek jeszcze nie odliczony)
+                    zyskNetto += odsetkiCykl;
+                    skumulowanaKwota += odsetkiCykl;
+                } else {
+                    // Dla obligacji bez kapitalizacji podatek liczony w każdym cyklu
+                    podatekCykl = odsetkiCykl * podatekBelki;
+                    odsetkiNettoCykl = odsetkiCykl - podatekCykl;
+                    zyskNetto += odsetkiNettoCykl;
+                    skumulowanaKwota += odsetkiNettoCykl;
+                }
             }
 
             let oplataZaWykup = 0;
@@ -756,7 +785,7 @@
 
             harmonogram.push({
                 okres: okresWiersz,
-                kwotaDoWykupu: kwotaDoWykupu.toFixed(2), // Zaktualizowana kwota wykupu
+                wartoscInwestycji: wartoscInwestycji.toFixed(2), // Zaktualizowana wartość inwestycji
                 oprocentowanieNaCykl: (oprocentowanieRoczne * 100).toFixed(2) + "%",
                 odsetkiBrutto: odsetkiCykl.toFixed(2),
                 skumulowaneOdsetki: skumulowaneOdsetki.toFixed(2),
@@ -776,7 +805,7 @@
         document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         document.querySelector('.result-wrapper .legend-item[data-index="1"] .color-box').setAttribute('data-tooltip', `Odsetki: ${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
-        const podatekCalkowity = odsetkiCalkowite * podatekBelki;
+        const podatekCalkowity = config.kapitalizacja ? (skumulowaneOdsetki * podatekBelki) : (odsetkiCalkowite * podatekBelki);
         document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         document.querySelector('.result-wrapper .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
@@ -861,7 +890,7 @@
             tabela.innerHTML += `
                 <tr>
                     <td>${wiersz.okres}</td>
-                    <td>${parseFloat(wiersz.kwotaDoWykupu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                     <td>${wiersz.oprocentowanieNaCykl}</td>
                     <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                     <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
@@ -1014,7 +1043,7 @@
 
             const tableData = harmonogramData.map(row => [
                 row.okres,
-                row.kwotaDoWykupu + ' zł',
+                row.wartoscInwestycji + ' zł',
                 row.oprocentowanieNaCykl,
                 row.odsetkiBrutto + ' zł',
                 row.skumulowaneOdsetki + ' zł',
@@ -1029,7 +1058,7 @@
                 startY: yOffset,
                 head: [[
                     removePolishChars(pierwszaKolumna),
-                    removePolishChars('Kwota wykupu'),
+                    removePolishChars('Wartość inwestycji'),
                     removePolishChars('Oproc. cykl'),
                     removePolishChars('Odsetki'),
                     removePolishChars('Odsetki skum.'),
