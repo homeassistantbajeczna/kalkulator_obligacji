@@ -413,21 +413,21 @@
     .harmonogram {
         margin-top: 20px;
         font-size: 0.8em;
-        background-color: #f9f9f9; /* Jednolite tło dla harmonogramu */
-        border-radius: 10px; /* Zaokrąglone rogi */
-        padding: 10px; /* Dodano padding */
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        padding: 10px;
     }
     .harmonogram table {
         margin: 0 auto;
-        width: auto; /* Szerokość tabeli zależna od zawartości */
+        width: auto;
         max-width: 1000px;
-        display: table; /* Zmieniono z block na table */
+        display: table;
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
         overflow: hidden;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        background: #f9f9f9; /* Jednolite tło tabeli */
+        background: #f9f9f9;
     }
     .harmonogram th {
         background: linear-gradient(90deg, #C2B280, #b0a070);
@@ -510,9 +510,9 @@
         flex-wrap: wrap;
         margin-top: 20px;
         position: relative;
-        background-color: #f9f9f9; /* Jednolite tło dla kontenera */
-        border-radius: 10px; /* Zaokrąglone rogi */
-        padding: 10px; /* Dodano padding */
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        padding: 10px;
     }
     .result-wrapper {
         flex: 1;
@@ -549,14 +549,14 @@
     }
 
     const obligacjeConfig = {
-        "OTS": { okres: 3, oprocentowanie: 3.00, zmienne: false, kapitalizacja: false },
-        "ROR": { okres: 12, oprocentowanie: 5.75, zmienne: true, marza: 0.00, kapitalizacja: false },
-        "DOR": { okres: 24, oprocentowanie: 5.90, zmienne: true, marza: 0.15, kapitalizacja: false },
-        "TOS": { okres: 36, oprocentowanie: 5.95, zmienne: false, kapitalizacja: true },
-        "COI": { okres: 48, oprocentowanie: 6.30, zmienne: true, marza: 0.75, indeksowaneInflacja: true, kapitalizacja: false },
-        "EDO": { okres: 120, oprocentowanie: 6.55, zmienne: true, marza: 2.00, indeksowaneInflacja: true, kapitalizacja: true },
-        "ROS": { okres: 72, oprocentowanie: 6.40, zmienne: true, marza: 1.50, indeksowaneInflacja: true, kapitalizacja: true },
-        "ROD": { okres: 144, oprocentowanie: 6.70, zmienne: true, marza: 2.50, indeksowaneInflacja: true, kapitalizacja: true }
+        "OTS": { okres: 3, oprocentowanie: 3.00, zmienne: false, kapitalizacja: false, oplataWykup: 0.00 }, // 0%
+        "ROR": { okres: 12, oprocentowanie: 5.75, zmienne: true, marza: 0.00, kapitalizacja: false, oplataWykup: 0.005 }, // 0,5%
+        "DOR": { okres: 24, oprocentowanie: 5.90, zmienne: true, marza: 0.15, kapitalizacja: false, oplataWykup: 0.007 }, // 0,7%
+        "TOS": { okres: 36, oprocentowanie: 5.95, zmienne: false, kapitalizacja: true, oplataWykup: 0.01 }, // 1%
+        "COI": { okres: 48, oprocentowanie: 6.30, zmienne: true, marza: 0.75, indeksowaneInflacja: true, kapitalizacja: false, oplataWykup: 0.02 }, // 2%
+        "EDO": { okres: 120, oprocentowanie: 6.55, zmienne: true, marza: 2.00, indeksowaneInflacja: true, kapitalizacja: true, oplataWykup: 0.03 }, // 3%
+        "ROS": { okres: 72, oprocentowanie: 6.40, zmienne: true, marza: 1.50, indeksowaneInflacja: true, kapitalizacja: true, oplataWykup: 0.02 }, // 2%
+        "ROD": { okres: 144, oprocentowanie: 6.70, zmienne: true, marza: 2.50, indeksowaneInflacja: true, kapitalizacja: true, oplataWykup: 0.03 } // 3%
     };
 
     const opisyObligacji = {
@@ -571,7 +571,7 @@
     };
 
     document.getElementById("kwotaRange").addEventListener("input", function() {
-        const kwotaInput = document.getElementById("kwota");
+        const kwotaInput = 🙂document.getElementById("kwota");
         kwotaInput.value = this.value;
         updateIloscObligacji();
     });
@@ -704,8 +704,11 @@
                 kapital += odsetkiNettoMiesiac; // Kapitalizacja odsetek
             }
 
-            // Opłata za wykup (stała 30 PLN, jak w przykładzie)
-            let oplataZaWykup = 30;
+            // Obliczanie opłaty za wcześniejszy wykup
+            let oplataZaWykup = 0;
+            if (i < miesiace) { // W ostatnim miesiącu opłata wynosi 0 zł
+                oplataZaWykup = kwota * config.oplataWykup; // Opłata jako procent wartości inwestycji
+            }
 
             harmonogram.push({
                 rok: rok,
@@ -815,15 +818,15 @@
             tabela.innerHTML += `
                 <tr>
                     <td>${wiersz.rok}</td>
-                    <td>${parseFloat(wiersz.kwotaDoWykupu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
+                    <td>${parseFloat(wiersz.kwotaDoWykupu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                     <td>${wiersz.oprocentowanieNaCykl}</td>
-                    <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
-                    <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
-                    <td>${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
-                    <td>${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
-                    <td>${parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
+                    <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                    <td>${parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                     <td>${wiersz.inflacjaRoczna}</td>
-                    <td>${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} PLN</td>
+                    <td>${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                 </tr>
             `;
         });
@@ -955,15 +958,15 @@
 
             const tableData = harmonogramData.map(row => [
                 row.rok,
-                row.kwotaDoWykupu + ' PLN',
+                row.kwotaDoWykupu + ' zł',
                 row.oprocentowanieNaCykl,
-                row.odsetkiBrutto + ' PLN',
-                row.skumulowaneOdsetki + ' PLN',
-                row.oplataZaWykup + ' PLN',
-                row.podatek + ' PLN',
-                row.zyskNetto + ' PLN',
+                row.odsetkiBrutto + ' zł',
+                row.skumulowaneOdsetki + ' zł',
+                row.oplataZaWykup + ' zł',
+                row.podatek + ' zł',
+                row.zyskNetto + ' zł',
                 row.inflacjaRoczna,
-                row.kwotaPoZakonczeniuCyklu + ' PLN'
+                row.kwotaPoZakonczeniuCyklu + ' zł'
             ]);
 
             doc.autoTable({
