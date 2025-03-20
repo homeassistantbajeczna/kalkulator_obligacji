@@ -18,7 +18,11 @@
         <div class="form-section" id="formSection">
             <div class="header-row">
                 <h4>Kalkulator Obligacji Skarbu Państwa</h4>
-                <button type="button" class="btn btn-primary btn-sm" id="ikeIkzeBtn">Inwestycje w IKE lub IKZE</button>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="ikeIkzeBtn">
+                    <span class="checkbox-custom"></span>
+                    Inwestycje w IKE lub IKZE
+                </label>
             </div>
             <div class="form-container">
                 <div class="form-wrapper">
@@ -88,7 +92,7 @@
                 </div>
             </div>
             <div class="form-row">
-                <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">OBLICZ</button>
+                <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">Oblicz</button>
             </div>
             <div class="obligacje-opis" id="obligacjeOpis"></div>
         </div>
@@ -194,15 +198,50 @@
     }
     .header-row {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
         margin-bottom: 15px;
+        position: relative;
     }
     .header-row h4 {
         font-size: 1.2em;
         color: #333333;
         font-weight: 700;
         margin: 0;
+    }
+    .checkbox-label {
+        position: absolute;
+        top: 0;
+        right: 10px;
+        display: flex;
+        align-items: center;
+        font-size: 0.8em;
+        color: #333333;
+        cursor: pointer;
+    }
+    .checkbox-label input {
+        display: none;
+    }
+    .checkbox-custom {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #C2B280;
+        background-color: #fff;
+        margin-right: 5px;
+        display: inline-block;
+        position: relative;
+    }
+    .checkbox-label input:checked + .checkbox-custom {
+        background-color: #C2B280;
+    }
+    .checkbox-label input:checked + .checkbox-custom::after {
+        content: '✔';
+        color: #000;
+        font-size: 12px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
     .form-section {
         padding: 10px;
@@ -479,25 +518,29 @@
         margin-bottom: 10px;
     }
     .btn-primary, .btn-secondary {
-        background-color: #C2B280;
-        border-color: #C2B280;
+        background: linear-gradient(135deg, #C2B280, #b0a070);
+        border: none;
         color: #000000;
         font-size: 0.9em;
-        padding: 5px 20px;
+        padding: 8px 20px;
         width: auto;
         margin: 25px auto 0;
         display: block;
+        border-radius: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
     }
     .btn-primary:hover, .btn-secondary:hover {
-        background-color: #b0a070;
-        border-color: #b0a070;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #b0a070, #C2B280);
         color: #000000;
     }
     .btn-sm {
         font-size: 0.7em;
         padding: 3px 10px;
     }
-    #ikeIkzeBtn, #generatePdfBtn {
+    #generatePdfBtn {
         position: absolute;
         top: 0;
         right: 10px;
@@ -650,16 +693,29 @@
             }
         });
 
-        document.getElementById("ikeIkzeBtn").addEventListener("click", function() {
-            isIkeIkzeMode = true;
+        document.getElementById("ikeIkzeBtn").addEventListener("change", function() {
+            isIkeIkzeMode = this.checked;
             const select = document.getElementById("typObligacji");
-            select.innerHTML = `
-                <option value="ROR">12-miesięczne (ROR)</option>
-                <option value="DOR">24-miesięczne (DOR)</option>
-                <option value="TOS">3-letnie (TOS)</option>
-                <option value="COI">4-letnie (COI)</option>
-                <option value="EDO" selected>10-letnie (EDO)</option>
-            `;
+            if (isIkeIkzeMode) {
+                select.innerHTML = `
+                    <option value="ROR">12-miesięczne (ROR)</option>
+                    <option value="DOR">24-miesięczne (DOR)</option>
+                    <option value="TOS">3-letnie (TOS)</option>
+                    <option value="COI">4-letnie (COI)</option>
+                    <option value="EDO" selected>10-letnie (EDO)</option>
+                `;
+            } else {
+                select.innerHTML = `
+                    <option value="OTS" selected>3-miesięczne (OTS)</option>
+                    <option value="ROR">12-miesięczne (ROR)</option>
+                    <option value="DOR">24-miesięczne (DOR)</option>
+                    <option value="TOS">3-letnie (TOS)</option>
+                    <option value="COI">4-letnie (COI)</option>
+                    <option value="EDO">10-letnie (EDO)</option>
+                    <option value="ROS">6-letnie (ROS)</option>
+                    <option value="ROD">12-letnie (ROD)</option>
+                `;
+            }
             const typ = select.value;
             const config = obligacjeConfig[typ];
             document.getElementById("okres").value = config.okres;
@@ -667,7 +723,6 @@
             updateLata();
             updateOprocentowanieInfo();
             updateOpisObligacji();
-            document.getElementById("ikeIkzeBtn").style.backgroundColor = "#b0a070"; // Wyróżnienie przycisku
         });
 
         function updateIloscObligacji() {
@@ -726,7 +781,7 @@
             document.getElementById("formSection").style.display = "block";
             document.getElementById("resultSection").style.display = "none";
             isIkeIkzeMode = false;
-            document.getElementById("ikeIkzeBtn").style.backgroundColor = "#C2B280"; // Reset koloru przycisku
+            document.getElementById("ikeIkzeBtn").checked = false;
             const select = document.getElementById("typObligacji");
             select.innerHTML = `
                 <option value="OTS" selected>3-miesięczne (OTS)</option>
@@ -984,7 +1039,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const obliczBtn = document.getElementById("obliczBtn");
             if (obliczBtn) obliczBtn.addEventListener("click", obliczObligacje);
-            else console.error("Przycisk 'OBLICZ' nie został znaleziony w dokumencie.");
+            else console.error("Przycisk 'Oblicz' nie został znaleziony w dokumencie.");
         });
 
         function removePolishChars(text) {
