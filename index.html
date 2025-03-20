@@ -314,6 +314,10 @@
         font-size: 0.6em;
         color: #333333;
         text-align: center;
+        max-width: 400px; /* Ograniczenie szerokości do 400px, aby dopasować do szerokości formularza */
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.4; /* Poprawa czytelności tekstu */
     }
     .obligacje-opis ul, .harmonogram-opis ul {
         list-style: none;
@@ -788,9 +792,9 @@
             const select = document.getElementById("typObligacji");
             if (isIkeIkzeMode) {
                 select.innerHTML = `
-                    <option value="ROR" selected>12-miesięczne (ROR)</option>
+                    <option value="ROR">12-miesięczne (ROR)</option>
                     <option value="DOR">24-miesięczne (DOR)</option>
-                    <option value="TOS">3-letnie (TOS)</option>
+                    <option value="TOS" selected>3-letnie (TOS)</option>
                     <option value="COI">4-letnie (COI)</option>
                     <option value="EDO">10-letnie (EDO)</option>
                 `;
