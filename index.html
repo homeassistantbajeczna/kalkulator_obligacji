@@ -698,11 +698,11 @@
             const select = document.getElementById("typObligacji");
             if (isIkeIkzeMode) {
                 select.innerHTML = `
-                    <option value="ROR">12-miesięczne (ROR)</option>
+                    <option value="ROR" selected>12-miesięczne (ROR)</option>
                     <option value="DOR">24-miesięczne (DOR)</option>
                     <option value="TOS">3-letnie (TOS)</option>
                     <option value="COI">4-letnie (COI)</option>
-                    <option value="EDO" selected>10-letnie (EDO)</option>
+                    <option value="EDO">10-letnie (EDO)</option>
                 `;
             } else {
                 select.innerHTML = `
@@ -780,19 +780,32 @@
         function showForm() {
             document.getElementById("formSection").style.display = "block";
             document.getElementById("resultSection").style.display = "none";
-            isIkeIkzeMode = false;
-            document.getElementById("ikeIkzeBtn").checked = false;
+            
+            // Zachowaj stan checkboxa "Inwestycje w IKE lub IKZE"
+            const ikeIkzeBtn = document.getElementById("ikeIkzeBtn");
+            ikeIkzeBtn.checked = isIkeIkzeMode;
+            
             const select = document.getElementById("typObligacji");
-            select.innerHTML = `
-                <option value="OTS" selected>3-miesięczne (OTS)</option>
-                <option value="ROR">12-miesięczne (ROR)</option>
-                <option value="DOR">24-miesięczne (DOR)</option>
-                <option value="TOS">3-letnie (TOS)</option>
-                <option value="COI">4-letnie (COI)</option>
-                <option value="EDO">10-letnie (EDO)</option>
-                <option value="ROS">6-letnie (ROS)</option>
-                <option value="ROD">12-letnie (ROD)</option>
-            `;
+            if (isIkeIkzeMode) {
+                select.innerHTML = `
+                    <option value="ROR" selected>12-miesięczne (ROR)</option>
+                    <option value="DOR">24-miesięczne (DOR)</option>
+                    <option value="TOS">3-letnie (TOS)</option>
+                    <option value="COI">4-letnie (COI)</option>
+                    <option value="EDO">10-letnie (EDO)</option>
+                `;
+            } else {
+                select.innerHTML = `
+                    <option value="OTS" selected>3-miesięczne (OTS)</option>
+                    <option value="ROR">12-miesięczne (ROR)</option>
+                    <option value="DOR">24-miesięczne (DOR)</option>
+                    <option value="TOS">3-letnie (TOS)</option>
+                    <option value="COI">4-letnie (COI)</option>
+                    <option value="EDO">10-letnie (EDO)</option>
+                    <option value="ROS">6-letnie (ROS)</option>
+                    <option value="ROD">12-letnie (ROD)</option>
+                `;
+            }
             const typ = select.value;
             const config = obligacjeConfig[typ];
             document.getElementById("okres").value = config.okres;
