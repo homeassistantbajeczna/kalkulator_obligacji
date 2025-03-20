@@ -16,7 +16,10 @@
     </div>
     <div class="container">
         <div class="form-section" id="formSection">
-            <h4>Kalkulator Obligacji Skarbu Państwa</h4>
+            <div class="header-row">
+                <h4>Kalkulator Obligacji Skarbu Państwa</h4>
+                <button type="button" class="btn btn-primary btn-sm" id="ikeIkzeBtn">Inwestycje w IKE lub IKZE</button>
+            </div>
             <div class="form-container">
                 <div class="form-wrapper">
                     <form id="obligacjeForm">
@@ -85,7 +88,7 @@
                 </div>
             </div>
             <div class="form-row">
-                <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">ObVisitor</button>
+                <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">OBLICZ</button>
             </div>
             <div class="obligacje-opis" id="obligacjeOpis"></div>
         </div>
@@ -145,7 +148,7 @@
                                     <th>Odsetki</th>
                                     <th>Suma odsetek</th>
                                     <th>Podatek</th>
-                                    <th>Zysk netto</th>
+                                    <th id="zyskKolumnaNaglowek">Zysk netto</th>
                                     <th>Opłata za wykup</th>
                                     <th id="kolumnaStopaInflacja">Inflacja</th>
                                     <th>Kwota za cykl</th>
@@ -153,6 +156,7 @@
                             </thead>
                             <tbody id="harmonogramTabela"></tbody>
                         </table>
+                        <div class="harmonogram-opis" id="harmonogramOpis"></div>
                     </div>
                 </div>
                 <div class="chart-container-line">
@@ -188,16 +192,21 @@
         border-radius: 10px;
         box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-    .form-section {
-        padding: 10px;
-        position: relative;
-    }
-    .form-section h4 {
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 15px;
-        text-align: center;
+    }
+    .header-row h4 {
         font-size: 1.2em;
         color: #333333;
         font-weight: 700;
+        margin: 0;
+    }
+    .form-section {
+        padding: 10px;
+        position: relative;
     }
     .form-row {
         display: flex;
@@ -261,17 +270,17 @@
         margin-top: 2px;
         text-align: left;
     }
-    .obligacje-opis {
+    .obligacje-opis, .harmonogram-opis {
         margin-top: 20px;
         font-size: 0.6em;
         color: #333333;
         text-align: center;
     }
-    .obligacje-opis ul {
+    .obligacje-opis ul, .harmonogram-opis ul {
         list-style: none;
         padding-left: 0;
     }
-    .obligacje-opis li {
+    .obligacje-opis li, .harmonogram-opis li {
         margin-bottom: 5px;
     }
     .result-section {
@@ -488,7 +497,7 @@
         font-size: 0.7em;
         padding: 3px 10px;
     }
-    #generatePdfBtn {
+    #ikeIkzeBtn, #generatePdfBtn {
         position: absolute;
         top: 0;
         right: 10px;
@@ -550,6 +559,7 @@
     <script>
         let chart, chartLine;
         let harmonogramData = [];
+        let isIkeIkzeMode = false;
 
         const { jsPDF } = window.jspdf || {};
         if (!jsPDF) {
@@ -640,6 +650,26 @@
             }
         });
 
+        document.getElementById("ikeIkzeBtn").addEventListener("click", function() {
+            isIkeIkzeMode = true;
+            const select = document.getElementById("typObligacji");
+            select.innerHTML = `
+                <option value="ROR">12-miesięczne (ROR)</option>
+                <option value="DOR">24-miesięczne (DOR)</option>
+                <option value="TOS">3-letnie (TOS)</option>
+                <option value="COI">4-letnie (COI)</option>
+                <option value="EDO" selected>10-letnie (EDO)</option>
+            `;
+            const typ = select.value;
+            const config = obligacjeConfig[typ];
+            document.getElementById("okres").value = config.okres;
+            document.getElementById("oprocentowanie").value = config.oprocentowanie;
+            updateLata();
+            updateOprocentowanieInfo();
+            updateOpisObligacji();
+            document.getElementById("ikeIkzeBtn").style.backgroundColor = "#b0a070"; // Wyróżnienie przycisku
+        });
+
         function updateIloscObligacji() {
             const kwota = parseFloat(document.getElementById("kwota").value) || 0;
             const ilosc = Math.floor(kwota / 100);
@@ -695,6 +725,26 @@
         function showForm() {
             document.getElementById("formSection").style.display = "block";
             document.getElementById("resultSection").style.display = "none";
+            isIkeIkzeMode = false;
+            document.getElementById("ikeIkzeBtn").style.backgroundColor = "#C2B280"; // Reset koloru przycisku
+            const select = document.getElementById("typObligacji");
+            select.innerHTML = `
+                <option value="OTS" selected>3-miesięczne (OTS)</option>
+                <option value="ROR">12-miesięczne (ROR)</option>
+                <option value="DOR">24-miesięczne (DOR)</option>
+                <option value="TOS">3-letnie (TOS)</option>
+                <option value="COI">4-letnie (COI)</option>
+                <option value="EDO">10-letnie (EDO)</option>
+                <option value="ROS">6-letnie (ROS)</option>
+                <option value="ROD">12-letnie (ROD)</option>
+            `;
+            const typ = select.value;
+            const config = obligacjeConfig[typ];
+            document.getElementById("okres").value = config.okres;
+            document.getElementById("oprocentowanie").value = config.oprocentowanie;
+            updateLata();
+            updateOprocentowanieInfo();
+            updateOpisObligacji();
         }
 
         function obliczObligacje() {
@@ -704,16 +754,17 @@
             const miesiace = config.okres;
             const inflacja = parseFloat(document.getElementById("inflacja").value) / 100 || 0;
             const stopaRel = parseFloat(document.getElementById("stopaRef")?.value) / 100 || 0.0575;
-            const podatekBelki = 0.19;
+            const podatekBelki = isIkeIkzeMode ? 0 : 0.19;
 
             if (kwota < 100 || miesiace <= 0) {
                 alert("Proszę wypełnić wszystkie wymagane pola poprawnymi wartościami.");
                 return;
             }
 
-            document.getElementById("resultHeader").textContent = `Wynik inwestycji dla obligacji ${nazwyObligacji[typ]}`;
+            document.getElementById("resultHeader").textContent = `Wynik inwestycji dla obligacji ${nazwyObligacji[typ]}${isIkeIkzeMode ? " (IKE/IKZE)" : ""}`;
             const pierwszaKolumnaNaglowek = document.getElementById("pierwszaKolumnaNaglowek");
             const kolumnaStopaInflacja = document.getElementById("kolumnaStopaInflacja");
+            const zyskKolumnaNaglowek = document.getElementById("zyskKolumnaNaglowek");
             if (["OTS", "ROR", "DOR"].includes(typ)) {
                 pierwszaKolumnaNaglowek.textContent = "Miesiąc";
                 kolumnaStopaInflacja.textContent = ["ROR", "DOR"].includes(typ) ? "Stopa Ref. NBP" : "Inflacja";
@@ -721,6 +772,7 @@
                 pierwszaKolumnaNaglowek.textContent = "Rok";
                 kolumnaStopaInflacja.textContent = "Inflacja";
             }
+            zyskKolumnaNaglowek.textContent = isIkeIkzeMode ? "Zysk" : "Zysk netto";
 
             let kapital = kwota;
             let odsetkiCalkowite = 0;
@@ -747,7 +799,7 @@
                 let odsetkiCykl = kapital * oprocentowanieMiesieczne * miesiecyWCyklu;
 
                 let podatekCykl = odsetkiCykl * podatekBelki;
-                let odsetkiNettoCykl = odsetkiCykl - podatekCykl;
+                let odsetkiNettoCykl = isIkeIkzeMode ? odsetkiCykl : (odsetkiCykl - podatekCykl);
 
                 odsetkiCalkowite += odsetkiCykl;
                 skumulowaneOdsetki += odsetkiCykl;
@@ -759,13 +811,8 @@
                     wartoscInwestycji = kapital;
                 }
 
-                let kwotaPoCyklu;
-                if (config.kapitalizacja) {
-                    let podatekSkumulowany = skumulowaneOdsetki * podatekBelki;
-                    kwotaPoCyklu = wartoscInwestycji - podatekSkumulowany;
-                } else {
-                    kwotaPoCyklu = kwota + zyskNettoCalkowity;
-                }
+                let kwotaPoCyklu = isIkeIkzeMode ? (config.kapitalizacja ? wartoscInwestycji : kwota + zyskNettoCalkowity) : 
+                    (config.kapitalizacja ? (wartoscInwestycji - skumulowaneOdsetki * 0.19) : kwota + zyskNettoCalkowity);
 
                 let oplataZaWykup = i < liczbaCykli ? kwota * config.oplataWykup : 0;
 
@@ -789,7 +836,7 @@
             document.querySelector('.result-wrapper .legend-item[data-index="0"] .color-box').setAttribute('data-tooltip', `Kapitał: ${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
             document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
             document.querySelector('.result-wrapper .legend-item[data-index="1"] .color-box').setAttribute('data-tooltip', `Odsetki: ${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
-            const podatekCalkowity = odsetkiCalkowite * podatekBelki;
+            const podatekCalkowity = odsetkiCalkowite * (isIkeIkzeMode ? 0 : 0.19);
             document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
             document.querySelector('.result-wrapper .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
             document.getElementById("okresInwestycji").textContent = miesiace;
@@ -858,7 +905,7 @@
                         <td>${wiersz.oprocentowanieNaCykl}</td>
                         <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
-                        <td>${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                        <td>${isIkeIkzeMode ? "0,00 zł*" : parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}</td>
                         <td>${parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${wiersz.stopaRefLubInflacja}</td>
@@ -866,6 +913,12 @@
                     </tr>
                 `;
             });
+
+            if (isIkeIkzeMode) {
+                document.getElementById("harmonogramOpis").textContent = "* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.";
+            } else {
+                document.getElementById("harmonogramOpis").textContent = "";
+            }
 
             const maxKwotaPoCyklu = Math.max(...harmonogram.map(wiersz => parseFloat(wiersz.kwotaPoZakonczeniuCyklu)));
             const minKwota = kwota;
@@ -925,13 +978,13 @@
 
             document.getElementById("formSection").style.display = "none";
             document.getElementById("resultSection").style.display = "block";
-            updateOpisObligacji(); // Aktualizacja opisu na stronie podsumowania
+            updateOpisObligacji();
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             const obliczBtn = document.getElementById("obliczBtn");
             if (obliczBtn) obliczBtn.addEventListener("click", obliczObligacje);
-            else console.error("Przycisk 'ObVisitor' nie został znaleziony w dokumencie.");
+            else console.error("Przycisk 'OBLICZ' nie został znaleziony w dokumencie.");
         });
 
         function removePolishChars(text) {
@@ -953,7 +1006,7 @@
 
             const typ = document.getElementById("typObligacji").value;
             doc.setFontSize(14);
-            doc.text(removePolishChars(`Wynik inwestycji dla obligacji ${nazwyObligacji[typ]}`), 10, yOffset);
+            doc.text(removePolishChars(`Wynik inwestycji dla obligacji ${nazwyObligacji[typ]}${isIkeIkzeMode ? " (IKE/IKZE)" : ""}`), 10, yOffset);
             yOffset += 8;
 
             doc.setFontSize(10);
@@ -971,7 +1024,7 @@
             yOffset += 6;
             doc.text(removePolishChars(`Okres inwestycji: ${okres} miesiecy`), 10, yOffset);
             yOffset += 6;
-            doc.text(removePolishChars(`Zysk netto: ${zysk} zł`), 10, yOffset);
+            doc.text(removePolishChars(`Zysk${isIkeIkzeMode ? "" : " netto"}: ${zysk} zł`), 10, yOffset);
             yOffset += 10;
 
             if (harmonogramData.length > 0 && jsPDF.prototype.autoTable) {
@@ -981,6 +1034,7 @@
 
                 const pierwszaKolumna = ["OTS", "ROR", "DOR"].includes(typ) ? "Miesiac" : "Rok";
                 const stopaKolumna = ["ROR", "DOR"].includes(typ) ? "Stopa Ref. NBP" : "Inflacja";
+                const zyskNaglowek = isIkeIkzeMode ? "Zysk" : "Zysk netto";
 
                 const tableData = harmonogramData.map(row => [
                     row.okres,
@@ -988,7 +1042,7 @@
                     row.oprocentowanieNaCykl,
                     row.odsetkiBrutto + ' zł',
                     row.skumulowaneOdsetki + ' zł',
-                    row.podatek + ' zł',
+                    isIkeIkzeMode ? "0,00 zł*" : row.podatek + ' zł',
                     row.zyskNetto + ' zł',
                     row.oplataZaWykup + ' zł',
                     row.stopaRefLubInflacja,
@@ -1004,7 +1058,7 @@
                         removePolishChars('Odsetki'),
                         removePolishChars('Suma odsetek'),
                         removePolishChars('Podatek'),
-                        removePolishChars('Zysk netto'),
+                        removePolishChars(zyskNaglowek),
                         removePolishChars('Opłata za wykup'),
                         removePolishChars(stopaKolumna),
                         removePolishChars('Kwota za cykl')
@@ -1026,6 +1080,12 @@
                         9: { cellWidth: 25 }
                     }
                 });
+
+                if (isIkeIkzeMode) {
+                    yOffset = doc.lastAutoTable.finalY + 10;
+                    doc.setFontSize(8);
+                    doc.text(removePolishChars("* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE."), 10, yOffset);
+                }
             }
 
             doc.save("Kalkulator_Obligacji_Skarbowych.pdf");
