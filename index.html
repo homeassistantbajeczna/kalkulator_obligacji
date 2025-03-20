@@ -623,14 +623,14 @@
         };
 
         const opisyObligacji = {
-            "OTS": "* OTS (3-miesięczne): Stałe oprocentowanie 3,00%, idealne na krótkoterminowe inwestycje.",
-            "ROR": "* ROR (12-miesięczne): Oprocentowanie zmienne, w pierwszym miesiącu 5,75%, kolejne oparte na stopie NBP.",
-            "DOR": "* DOR (24-miesięczne): Oprocentowanie zmienne, 5,90% w pierwszym miesiącu, kolejne NBP + 0,15%.",
-            "TOS": "* TOS (3-letnie): Stałe oprocentowanie 5,95%, przeznaczone dla stabilnych inwestycji z kapitalizacją odsetek.",
-            "COI": "* COI (4-letnie): Indeksowane inflacją, 6,30% w pierwszym roku, kolejne inflacja + 1,50%, dla ochrony przed wzrostem cen.",
-            "EDO": "* EDO (10-letnie): Indeksowane inflacją, 6,55% w pierwszym roku, kolejne inflacja + 2,00%, długoterminowa ochrona kapitału z kapitalizacją.",
-            "ROS": "* ROS (6-letnie): Indeksowane inflacją, 6,50% w pierwszym roku, kolejne inflacja + 2,00%, dla średnioterminowych inwestorów z kapitalizacją.",
-            "ROD": "* ROD (12-letnie): Indeksowane inflacją, 6,80% w pierwszym roku, kolejne inflacja + 2,50%, dla długoterminowych strategii z kapitalizacją."
+            "OTS": "* OTS (3-miesięczne): stałe oprocentowanie 3,00% na okres 3-miesięcy, wypłata odsetek nastąpi przy wykupie obligacji. Wcześniejszy odkup powoduje nienaliczenie odsetek, natomiast nie ma opłat za wcześniejszy odkup. Obligacje OTS są idealne dla krótkoterminowych inwestycji.",
+            "ROR": "* ROR (12-miesięczne): oprocentowanie zmienne, w pierwszym miesiącu 5,75%, w pozostałych 11 miesiącach oprocentowanie oparte na stopie referencyjnej NBP + 0%. Wypłata odsetek następuje co miesiąc, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości 0,5% wartości obligacji (0,5 zł za każdą obligację lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty), nie powoduje utraty należnych odsetek. Obligacje ROR przeznaczone są dla krótko i średnioterminowych inwestorów.",
+            "DOR": "* DOR (24-miesięczne): oprocentowanie zmienne, 5,90% w pierwszym miesiącu, w pozostałych 23 miesiącach oprocentowanie oparte na stopie referencyjnej NBP + 0,15%. Wypłata odsetek następuje co miesiąc, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości 0,7% wartości obligacji (0,7 zł za każdą obligację lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty), nie powoduje utraty należnych odsetek. Obligacje DOR przeznaczone są dla średnioterminowych inwestorów.",
+            "TOS": "* TOS (3-letnie): stałe oprocentowanie 5,95% na okres 3-lat, wypłata odsetek nastąpi przy wykupie obligacji po 3 latach inwestycji. Wcześniejszy odkup wiąże się z opłatą w wysokości 1% wartości obligacji (1 zł za każdą obligację lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty), nie powoduje utraty należnych odsetek. Roczna kapitalizacja odsetek zwiększa efektywności inwestycji. Obligacje TOS przeznaczone dla stabilnych średnioterminowych inwestycji.",
+            "COI": "* COI (4-letnie): obligacje Indeksowane inflacją, 6,30% w pierwszym roku, w kolejnych 3 latach oprocentowanie wynosi wartość inflacji + 1,50%. Wypłata odsetek następuje po każdym roku inwestycji, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości 2% wartości obligacji (2 zł za każdą obligację lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty), nie powoduje utraty należnych odsetek. Obligacje COI są idealne dla średnio i długoterminowych inwestycji oraz dla ochrony przed wzrostem inflacji.",
+            "EDO": "* EDO (10-letnie): obligacje indeksowane inflacją, 6,55% w pierwszym roku, w kolejnych 9 latach oprocentowanie wynosi wartość inflacji + 2,00%. Wypłata odsetek następuje przy wykupie obligacji po 10 latach inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości 3% wartości obligacji (3 zł za każdą obligację lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty), nie powoduje utraty należnych odsetek. Roczna kapitalizacja odsetek zwiększa efektywności inwestycji. Obligacje EDO są idealne długoterminowych inwestycji oraz dla ochrony przed wzrostem inflacji.",
+            "ROS": "* ROS (6-letnie): rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu 800+. Obligacje indeksowane inflacją 6,50% w pierwszym roku, w kolejnych 5 latach oprocentowanie wynosi wartość inflacji + 2,00%. Wypłata odsetek następuje przy wykupie obligacji po 6 latach inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości 2% wartości obligacji (2 zł za każdą obligację lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty), nie powoduje utraty należnych odsetek. Roczna kapitalizacja odsetek zwiększa efektywności inwestycji. Obligacje ROS są idealne dla rodzinnych inwestycji oraz dla ochrony przed wzrostem inflacji.",
+            "ROD": "* ROD (12-letnie): rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu 800+. Obligacje indeksowane inflacją 6,80% w pierwszym roku, w kolejnych 11 latach oprocentowanie wynosi wartość inflacji + 2,50%. Wypłata odsetek następuje przy wykupie obligacji po 12 latach inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości 3% wartości obligacji (3 zł za każdą obligację lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty), nie powoduje utraty należnych odsetek. Roczna kapitalizacja odsetek zwiększa efektywności inwestycji. Obligacje ROD są idealne dla długoterminowych rodzinnych inwestycji oraz dla ochrony przed wzrostem inflacji."
         };
 
         const nazwyObligacji = {
@@ -698,9 +698,9 @@
             const select = document.getElementById("typObligacji");
             if (isIkeIkzeMode) {
                 select.innerHTML = `
-                    <option value="ROR" selected>12-miesięczne (ROR)</option>
+                    <option value="ROR">12-miesięczne (ROR)</option>
                     <option value="DOR">24-miesięczne (DOR)</option>
-                    <option value="TOS">3-letnie (TOS)</option>
+                    <option value="TOS" selected>3-letnie (TOS)</option>
                     <option value="COI">4-letnie (COI)</option>
                     <option value="EDO">10-letnie (EDO)</option>
                 `;
