@@ -53,6 +53,8 @@
                                 <input type="range" class="form-range" id="inflacjaRange" min="0" max="50" step="0.1" value="4.9">
                                 <div class="sub-info"></div>
                             </div>
+                        </div>
+                        <div class="form-row">
                             <div class="form-group" id="stopaRefGroup" style="display: none;">
                                 <label for="stopaRef" class="form-label">Stopa Ref. NBP</label>
                                 <div class="input-group">
@@ -62,8 +64,6 @@
                                 <input type="range" class="form-range" id="stopaRefRange" min="0" max="20" step="0.05" value="5.75">
                                 <div class="sub-info"></div>
                             </div>
-                        </div>
-                        <div class="form-row">
                             <div class="form-group">
                                 <label for="okres" class="form-label">Okres inwestycji</label>
                                 <div class="input-group">
@@ -85,7 +85,7 @@
                 </div>
             </div>
             <div class="form-row">
-                <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">Oblicz</button>
+                <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">ObVisitor</button>
             </div>
             <div class="obligacje-opis" id="obligacjeOpis"></div>
         </div>
@@ -140,7 +140,7 @@
                                 <tr>
                                     <th id="pierwszaKolumnaNaglowek">Rok</th>
                                     <th>Wartość inwestycji</th>
-                                    <th>Oprocentowanie</th>
+                                    <th>Oproc.</th>
                                     <th>Odsetki</th>
                                     <th>Suma odsetek</th>
                                     <th>Podatek</th>
@@ -700,7 +700,7 @@
             const config = obligacjeConfig[typ];
             const miesiace = config.okres;
             const inflacja = parseFloat(document.getElementById("inflacja").value) / 100 || 0;
-            const stopaRef = parseFloat(document.getElementById("stopaRef")?.value) / 100 || 0.0575;
+            const stopaRel = parseFloat(document.getElementById("stopaRef")?.value) / 100 || 0.0575;
             const podatekBelki = 0.19;
 
             if (kwota < 100 || miesiace <= 0) {
@@ -734,7 +734,7 @@
                 if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
                     oprocentowanieRoczne = (i === 1 ? config.oprocentowanie / 100 : (inflacja + config.marza / 100));
                 } else if (["ROR", "DOR"].includes(typ)) {
-                    oprocentowanieRoczne = (i === 1 ? config.oprocentowanie / 100 : (stopaRef + config.marza / 100));
+                    oprocentowanieRoczne = (i === 1 ? config.oprocentowanie / 100 : (stopaRel + config.marza / 100));
                 } else {
                     oprocentowanieRoczne = config.oprocentowanie / 100;
                 }
@@ -775,7 +775,7 @@
                     podatek: podatekCykl.toFixed(2),
                     zyskNetto: odsetkiNettoCykl.toFixed(2),
                     oplataZaWykup: oplataZaWykup.toFixed(2),
-                    stopaRefLubInflacja: ["ROR", "DOR"].includes(typ) ? (stopaRef * 100).toFixed(2) + "%" : (inflacja * 100).toFixed(2) + "%",
+                    stopaRefLubInflacja: ["ROR", "DOR"].includes(typ) ? (stopaRel * 100).toFixed(2) + "%" : (inflacja * 100).toFixed(2) + "%",
                     kwotaPoZakonczeniuCyklu: kwotaPoCyklu.toFixed(2)
                 });
             }
@@ -996,7 +996,7 @@
                     head: [[
                         removePolishChars(pierwszaKolumna),
                         removePolishChars('Wartość inwestycji'),
-                        removePolishChars('Oprocentowanie'),
+                        removePolishChars('Oproc.'),
                         removePolishChars('Odsetki'),
                         removePolishChars('Suma odsetek'),
                         removePolishChars('Podatek'),
