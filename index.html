@@ -31,7 +31,7 @@
                                 <div class="sub-info" id="iloscObligacji">Ilość obligacji: 100</div>
                             </div>
                             <div class="form-group">
-                                <label for="typObligacji" class="form-label">Typ obligacji</label>
+                                <label for="typObligacji" class="form-label">Typ obligacji*</label>
                                 <select class="form-control" id="typObligacji">
                                     <option value="OTS" selected>3-miesięczne (OTS)</option>
                                     <option value="ROR">12-miesięczne (ROR)</option>
@@ -128,6 +128,7 @@
                     <span class="highlight yellow" data-hover="3 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span> mc-y</span>
                     <span class="highlight green" data-hover="">Zysk netto: <span id="zyskNetto">-</span> zł</span>
                 </div>
+                <div class="obligacje-opis" id="obligacjeOpisPodsumowanie"></div>
             </div>
         </div>
         <div class="harmonogram-container">
@@ -669,7 +670,9 @@
 
         function updateOpisObligacji() {
             const typ = document.getElementById("typObligacji").value;
-            document.getElementById("obligacjeOpis").textContent = opisyObligacji[typ] || "";
+            const opis = opisyObligacji[typ] || "";
+            document.getElementById("obligacjeOpis").textContent = opis;
+            document.getElementById("obligacjeOpisPodsumowanie").textContent = opis;
         }
 
         updateIloscObligacji();
@@ -922,12 +925,13 @@
 
             document.getElementById("formSection").style.display = "none";
             document.getElementById("resultSection").style.display = "block";
+            updateOpisObligacji(); // Aktualizacja opisu na stronie podsumowania
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             const obliczBtn = document.getElementById("obliczBtn");
             if (obliczBtn) obliczBtn.addEventListener("click", obliczObligacje);
-            else console.error("Przycisk 'Oblicz' nie został znaleziony w dokumencie.");
+            else console.error("Przycisk 'ObVisitor' nie został znaleziony w dokumencie.");
         });
 
         function removePolishChars(text) {
