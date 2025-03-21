@@ -94,8 +94,10 @@
             <div class="form-row">
                 <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">Oblicz</button>
             </div>
-            <div class="obligacje-opis" id="obligacjeOpis"></div>
-            <div class="data-info">Dane z dnia 01.03.2025r.</div>
+            <div class="opis-container">
+                <div class="obligacje-opis" id="obligacjeOpis"></div>
+                <div class="data-info"><strong>Dane z dnia</strong> 01.03.2025r.</div>
+            </div>
         </div>
     </div>
     <div class="result-section" id="resultSection">
@@ -310,21 +312,25 @@
         margin-top: 2px;
         text-align: left;
     }
-    .obligacje-opis, .harmonogram-opis {
+    .opis-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
         margin-top: 20px;
+        max-width: 1200px;
+    }
+    .obligacje-opis, .harmonogram-opis {
         font-size: 0.6em;
         color: #333333;
         text-align: center;
         max-width: 400px;
-        margin-left: auto;
-        margin-right: auto;
         line-height: 1.4;
     }
     .data-info {
-        margin-top: 10px;
         font-size: 0.6em;
         color: #C2B280;
-        text-align: center;
+        text-align: right;
+        max-width: 200px;
     }
     .obligacje-opis ul, .harmonogram-opis ul {
         list-style: none;
@@ -646,7 +652,7 @@
             "OTS": "* <strong>OTS (3-miesięczne) </strong>: stałe oprocentowanie <strong>3,00%</strong> na okres <strong>3-miesięcy</strong>, wypłata odsetek nastąpi <strong>przy wykupie</strong> obligacji. Wcześniejszy odkup powoduje nienaliczenie odsetek, natomiast <strong>nie ma opłat za wcześniejszy odkup</strong>. Obligacje <strong>OTS</strong> są idealne dla <strong>krótkoterminowych inwestycji</strong>.",
             "ROR": "* <strong>ROR (12-miesięczne) </strong>: <strong>oprocentowanie zmienne</strong>, w pierwszym miesiącu <strong>5,75%</strong>, w pozostałych <strong>11 miesiącach</strong> oprocentowanie oparte na <strong>stopie referencyjnej NBP + 0%</strong>. Wypłata odsetek następuje <strong>co miesiąc</strong>, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>0,5%</strong> wartości obligacji (<strong>0,5 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>ROR</strong> przeznaczone są dla <strong>krótko i średnioterminowych inwestorów</strong>.",
             "DOR": "* <strong>DOR (24-miesięczne) </strong>: <strong>oprocentowanie zmienne</strong>, <strong>5,90% w pierwszym miesiącu</strong>, w pozostałych <strong>23 miesiącach</strong> oprocentowanie oparte na <strong>stopie referencyjnej NBP + 0,15%</strong>. Wypłata odsetek następuje <strong>co miesiąc</strong>, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>0,7%</strong> wartości obligacji (<strong>0,7 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>DOR</strong> przeznaczone są dla <strong>średnioterminowych inwestorów</strong>.",
-            "TOS": "* <strong>TOS (3-letnie)</strong>: <strong>stałe oprocentowanie 5,95%</strong> na okres <strong>3-lat</strong>, wypłata odsetek nastąpi <strong>przy wykupie<strong> obligacji po <strong>3 latach</strong> inwestycji. Wcześniejszy odkup wiąże się z opłatą w wysokości <strong>1%</strong> wartości obligacji (<strong>1 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>TOS</strong> przeznaczone dla <strong>stabilnych średnioterminowych inwestycji</strong>.",
+            "TOS": "* <strong>TOS (3-letnie)</strong>: <strong>stałe oprocentowanie 5,95%</strong> na okres <strong>3-lat</strong>, wypłata odsetek nastąpi <strong>przy wykupie</strong> obligacji po <strong>3 latach</strong> inwestycji. Wcześniejszy odkup wiąże się z opłatą w wysokości <strong>1%</strong> wartości obligacji (<strong>1 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>TOS</strong> przeznaczone dla <strong>stabilnych średnioterminowych inwestycji</strong>.",
             "COI": "* <strong>COI (4-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,30% w pierwszym roku</strong>, w kolejnych <strong>3 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 1,50%</strong>. Wypłata odsetek następuje <strong>po każdym roku</strong> inwestycji, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>COI</strong> są idealne dla <strong>średnio i długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
             "EDO": "* <strong>EDO (10-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,55% w pierwszym roku</strong>, w kolejnych <strong>9 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>10 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>EDO</strong> są idealne dla <strong>długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
             "ROS": "* <strong>ROS (6-letnie)</strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,50% w pierwszym roku</strong>, w kolejnych <strong>5 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>6 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROS</strong> są idealne dla <strong>rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
@@ -718,9 +724,9 @@
             const select = document.getElementById("typObligacji");
             if (isIkeIkzeMode) {
                 select.innerHTML = `
-                    <option value="ROR" selected>12-miesięczne (ROR)</option>
+                    <option value="ROR">12-miesięczne (ROR)</option>
                     <option value="DOR">24-miesięczne (DOR)</option>
-                    <option value="TOS">3-letnie (TOS)</option>
+                    <option value="TOS" selected>3-letnie (TOS)</option>
                     <option value="COI">4-letnie (COI)</option>
                     <option value="EDO">10-letnie (EDO)</option>
                 `;
@@ -1023,7 +1029,7 @@
             });
 
             if (isIkeIkzeMode) {
-                document.getElementById("harmonogramOpis").textContent = "* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.";
+                document.getElementById("harmonogramOpis").innerHTML = "* Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku IKE oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku IKZE.";
             } else {
                 document.getElementById("harmonogramOpis").textContent = "";
             }
@@ -1192,7 +1198,7 @@
                 if (isIkeIkzeMode) {
                     yOffset = doc.lastAutoTable.finalY + 10;
                     doc.setFontSize(8);
-                    doc.text(removePolishChars("* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE."), 10, yOffset);
+                    doc.text(removePolishChars("* Podatek wyniesie 0 zl po osiagnieciu wieku emerytalnego i 55 roku zycia lub 60 roku zycia w przypadku IKE oraz 10 % zryczaltowanego podatku po osiagnieciu 65 roku zycia w przypadku IKZE."), 10, yOffset);
                 }
             }
 
