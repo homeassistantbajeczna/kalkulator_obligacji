@@ -95,6 +95,7 @@
                 <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">Oblicz</button>
             </div>
             <div class="obligacje-opis" id="obligacjeOpis"></div>
+            <div class="data-info">Dane z dnia 01.03.2025r.</div>
         </div>
     </div>
     <div class="result-section" id="resultSection">
@@ -318,6 +319,12 @@
         margin-left: auto;
         margin-right: auto;
         line-height: 1.4;
+    }
+    .data-info {
+        margin-top: 10px;
+        font-size: 0.6em;
+        color: #C2B280;
+        text-align: center;
     }
     .obligacje-opis ul, .harmonogram-opis ul {
         list-style: none;
@@ -607,6 +614,15 @@
         let chart, chartLine;
         let harmonogramData = [];
         let isIkeIkzeMode = false;
+        let lastFormData = {
+            kwota: 10000,
+            typObligacji: "OTS",
+            inflacja: 4.9,
+            stopaRef: 5.75,
+            okres: 3,
+            oprocentowanie: 3,
+            ikeIkze: false
+        };
 
         const { jsPDF } = window.jspdf || {};
         if (!jsPDF) {
@@ -784,14 +800,23 @@
         function showForm() {
             document.getElementById("formSection").style.display = "block";
             document.getElementById("resultSection").style.display = "none";
-            
-            const ikeIkzeBtn = document.getElementById("ikeIkzeBtn");
-            ikeIkzeBtn.checked = isIkeIkzeMode;
-            
+
+            document.getElementById("kwota").value = lastFormData.kwota;
+            document.getElementById("kwotaRange").value = lastFormData.kwota;
+            document.getElementById("typObligacji").value = lastFormData.typObligacji;
+            document.getElementById("inflacja").value = lastFormData.inflacja;
+            document.getElementById("inflacjaRange").value = lastFormData.inflacja;
+            document.getElementById("stopaRef").value = lastFormData.stopaRef;
+            document.getElementById("stopaRefRange").value = lastFormData.stopaRef;
+            document.getElementById("okres").value = lastFormData.okres;
+            document.getElementById("oprocentowanie").value = lastFormData.oprocentowanie;
+            document.getElementById("ikeIkzeBtn").checked = lastFormData.ikeIkze;
+            isIkeIkzeMode = lastFormData.ikeIkze;
+
             const select = document.getElementById("typObligacji");
             if (isIkeIkzeMode) {
                 select.innerHTML = `
-                    <option value="ROR" selected>12-miesięczne (ROR)</option>
+                    <option value="ROR">12-miesięczne (ROR)</option>
                     <option value="DOR">24-miesięczne (DOR)</option>
                     <option value="TOS">3-letnie (TOS)</option>
                     <option value="COI">4-letnie (COI)</option>
@@ -799,7 +824,7 @@
                 `;
             } else {
                 select.innerHTML = `
-                    <option value="OTS" selected>3-miesięczne (OTS)</option>
+                    <option value="OTS">3-miesięczne (OTS)</option>
                     <option value="ROR">12-miesięczne (ROR)</option>
                     <option value="DOR">24-miesięczne (DOR)</option>
                     <option value="TOS">3-letnie (TOS)</option>
@@ -809,10 +834,12 @@
                     <option value="ROD">12-letnie (ROD)</option>
                 `;
             }
-            const typ = select.value;
-            const config = obligacjeConfig[typ];
-            document.getElementById("okres").value = config.okres;
-            document.getElementById("oprocentowanie").value = config.oprocentowanie;
+            select.value = lastFormData.typObligacji;
+
+            const stopaRefGroup = document.getElementById("stopaRefGroup");
+            stopaRefGroup.style.display = ["ROR", "DOR"].includes(lastFormData.typObligacji) ? "block" : "none";
+
+            updateIloscObligacji();
             updateLata();
             updateOprocentowanieInfo();
             updateOpisObligacji();
@@ -826,6 +853,16 @@
             const inflacja = parseFloat(document.getElementById("inflacja").value) / 100 || 0;
             const stopaRel = parseFloat(document.getElementById("stopaRef")?.value) / 100 || 0.0575;
             const podatekBelki = isIkeIkzeMode ? 0 : 0.19;
+
+            lastFormData = {
+                kwota: kwota,
+                typObligacji: typ,
+                inflacja: inflacja * 100,
+                stopaRef: stopaRel * 100,
+                okres: miesiace,
+                oprocentowanie: config.oprocentowanie,
+                ikeIkze: isIkeIkzeMode
+            };
 
             if (kwota < 100 || miesiace <= 0) {
                 alert("Proszę wypełnić wszystkie wymagane pola poprawnymi wartościami.");
