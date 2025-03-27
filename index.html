@@ -51,26 +51,17 @@
                                 </select>
                                 <div class="sub-info"></div>
                             </div>
-                            <div class="form-group" id="stopaRefGroup" style="display: none;">
-                                <label for="stopaRef" class="form-label">Stopa Ref. NBP</label>
+                            <div class="form-group" id="dynamicRateGroup" style="display: none;">
+                                <label for="dynamicRate" class="form-label" id="dynamicRateLabel">Stopa Ref. NBP</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" id="stopaRef" min="0" max="20" step="0.05" value="5.75">
+                                    <input type="number" class="form-control" id="dynamicRate" min="0" max="50" step="0.05" value="5.75">
                                     <span class="input-group-text">%</span>
                                 </div>
-                                <input type="range" class="form-range" id="stopaRefRange" min="0" max="20" step="0.05" value="5.75">
+                                <input type="range" class="form-range" id="dynamicRateRange" min="0" max="50" step="0.05" value="5.75">
                                 <div class="sub-info"></div>
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group" id="inflacjaGroup" style="display: none;">
-                                <label for="inflacja" class="form-label">Inflacja</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="inflacja" min="0" max="50" step="0.1" value="4.9">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <input type="range" class="form-range" id="inflacjaRange" min="0" max="50" step="0.1" value="4.9">
-                                <div class="sub-info"></div>
-                            </div>
                             <div class="form-group">
                                 <label for="okres" class="form-label">Okres inwestycji</label>
                                 <div class="input-group">
@@ -628,11 +619,11 @@
         let lastFormData = {
             kwota: 10000,
             typObligacji: "OTS",
-            inflacja: 4.9,
-            stopaRef: 5.75,
+            dynamicRate: 5.75,
             okres: 3,
             oprocentowanie: 3,
-            ikeIkze: false
+            ikeIkze: false,
+            isInflacja: false
         };
 
         const { jsPDF } = window.jspdf || {};
@@ -658,7 +649,7 @@
             "ROR": "* <strong>ROR (12-miesięczne) </strong>: <strong>oprocentowanie zmienne</strong>, w pierwszym miesiącu <strong>5,75%</strong>, w pozostałych <strong>11 miesiącach</strong> oprocentowanie oparte na <strong>stopie referencyjnej NBP + 0%</strong>. Wypłata odsetek następuje <strong>co miesiąc</strong>, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>0,5%</strong> wartości obligacji (<strong>0,5 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>ROR</strong> przeznaczone są dla <strong>krótko i średnioterminowych inwestorów</strong>.",
             "DOR": "* <strong>DOR (24-miesięczne) </strong>: <strong>oprocentowanie zmienne</strong>, <strong>5,90% w pierwszym miesiącu</strong>, w pozostałych <strong>23 miesiącach</strong> oprocentowanie oparte na <strong>stopie referencyjnej NBP + 0,15%</strong>. Wypłata odsetek następuje <strong>co miesiąc</strong>, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>0,7%</strong> wartości obligacji (<strong>0,7 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>DOR</strong> przeznaczone są dla <strong>średnioterminowych inwestorów</strong>.",
             "TOS": "* <strong>TOS (3-letnie)</strong>: <strong>stałe oprocentowanie 5,95%</strong> na okres <strong>3-lat</strong>, wypłata odsetek nastąpi <strong>przy wykupie</strong> obligacji po <strong>3 latach</strong> inwestycji. Wcześniejszy odkup wiąże się z opłatą w wysokości <strong>1%</strong> wartości obligacji (<strong>1 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>TOS</strong> przeznaczone dla <strong>stabilnych średnioterminowych inwestycji</strong>.",
-            "COI": "* <strong>COI (4-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,30% w pierwszym roku</strong>, w kolejnych <strong>3 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 1,50%</strong>. Wypłata odsetek następuje <strong>po każdym roku</strong> inwestycji, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>COI</strong> są idealne dla <strong>średnio i długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.WELL",
+            "COI": "* <strong>COI (4-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,30% w pierwszym roku</strong>, w kolejnych <strong>3 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 1,50%</strong>. Wypłata odsetek następuje <strong>po każdym roku</strong> inwestycji, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>COI</strong> są idealne dla <strong>średnio i długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
             "EDO": "* <strong>EDO (10-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,55% w pierwszym roku</strong>, w kolejnych <strong>9 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>10 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>EDO</strong> są idealne dla <strong>długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
             "ROS": "* <strong>ROS (6-letnie)</strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,50% w pierwszym roku</strong>, w kolejnych <strong>5 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>6 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROS</strong> są idealne dla <strong>rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
             "ROD": "* <strong>ROD (12-letnie) </strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,80% w pierwszym roku</strong>, w kolejnych <strong>11 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,50%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>12 latach</strong> inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROD</strong> są idealne dla <strong>długoterminowych rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>."  
@@ -675,14 +666,14 @@
             "ROD": "12-letnich (ROD)"
         };
 
-        document.getElementById("stopaRefRange")?.addEventListener("input", function() {
-            const stopaRefInput = document.getElementById("stopaRef");
-            stopaRefInput.value = this.value;
+        document.getElementById("dynamicRateRange").addEventListener("input", function() {
+            const dynamicRateInput = document.getElementById("dynamicRate");
+            dynamicRateInput.value = this.value;
         });
 
-        document.getElementById("stopaRef")?.addEventListener("input", function() {
-            const stopaRefRange = document.getElementById("stopaRefRange");
-            stopaRefRange.value = this.value;
+        document.getElementById("dynamicRate").addEventListener("input", function() {
+            const dynamicRateRange = document.getElementById("dynamicRateRange");
+            dynamicRateRange.value = this.value;
         });
 
         document.getElementById("kwotaRange").addEventListener("input", function() {
@@ -697,43 +688,26 @@
             updateIloscObligacji();
         });
 
-        document.getElementById("inflacjaRange").addEventListener("input", function() {
-            const inflacjaInput = document.getElementById("inflacja");
-            inflacjaInput.value = this.value;
-        });
+        document.getElementById("typObligacji").addEventListener("change", updateDynamicRateField);
+        document.getElementById("ikeIkzeBtn").addEventListener("change", updateDynamicRateField);
 
-        document.getElementById("inflacja").addEventListener("input", function() {
-            const inflacjaRange = document.getElementById("inflacjaRange");
-            inflacjaRange.value = this.value;
-        });
-
-        document.getElementById("typObligacji").addEventListener("change", function() {
-            const typ = this.value;
+        function updateDynamicRateField() {
+            const typ = document.getElementById("typObligacji").value;
             const config = obligacjeConfig[typ];
+            const dynamicRateGroup = document.getElementById("dynamicRateGroup");
+            const dynamicRateLabel = document.getElementById("dynamicRateLabel");
+            const dynamicRateInput = document.getElementById("dynamicRate");
+            const dynamicRateRange = document.getElementById("dynamicRateRange");
+
             document.getElementById("okres").value = config.okres;
             document.getElementById("oprocentowanie").value = config.oprocentowanie;
             updateLata();
             updateOprocentowanieInfo();
             updateOpisObligacji();
 
-            const inflacjaGroup = document.getElementById("inflacjaGroup");
-            const stopaRefGroup = document.getElementById("stopaRefGroup");
-
-            if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-                inflacjaGroup.style.display = "block";
-                stopaRefGroup.style.display = "none";
-            } else if (["ROR", "DOR"].includes(typ)) {
-                inflacjaGroup.style.display = "none";
-                stopaRefGroup.style.display = "block";
-            } else {
-                inflacjaGroup.style.display = "none";
-                stopaRefGroup.style.display = "none";
-            }
-        });
-
-        document.getElementById("ikeIkzeBtn").addEventListener("change", function() {
-            isIkeIkzeMode = this.checked;
+            isIkeIkzeMode = document.getElementById("ikeIkzeBtn").checked;
             const select = document.getElementById("typObligacji");
+
             if (isIkeIkzeMode) {
                 select.innerHTML = `
                     <option value="ROR">12-miesięczne (ROR)</option>
@@ -754,28 +728,33 @@
                     <option value="ROD">12-letnie (ROD)</option>
                 `;
             }
-            const typ = select.value;
-            const config = obligacjeConfig[typ];
-            document.getElementById("okres").value = config.okres;
-            document.getElementById("oprocentowanie").value = config.oprocentowanie;
-            updateLata();
-            updateOprocentowanieInfo();
-            updateOpisObligacji();
-
-            const inflacjaGroup = document.getElementById("inflacjaGroup");
-            const stopaRefGroup = document.getElementById("stopaRefGroup");
+            select.value = typ;
 
             if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-                inflacjaGroup.style.display = "block";
-                stopaRefGroup.style.display = "none";
+                dynamicRateLabel.textContent = "Inflacja";
+                dynamicRateInput.value = 4.9;
+                dynamicRateRange.value = 4.9;
+                dynamicRateInput.step = "0.1";
+                dynamicRateRange.step = "0.1";
+                dynamicRateInput.max = "50";
+                dynamicRateRange.max = "50";
+                dynamicRateGroup.style.display = "block";
+                lastFormData.isInflacja = true;
             } else if (["ROR", "DOR"].includes(typ)) {
-                inflacjaGroup.style.display = "none";
-                stopaRefGroup.style.display = "block";
+                dynamicRateLabel.textContent = "Stopa Ref. NBP";
+                dynamicRateInput.value = 5.75;
+                dynamicRateRange.value = 5.75;
+                dynamicRateInput.step = "0.05";
+                dynamicRateRange.step = "0.05";
+                dynamicRateInput.max = "20";
+                dynamicRateRange.max = "20";
+                dynamicRateGroup.style.display = "block";
+                lastFormData.isInflacja = false;
             } else {
-                inflacjaGroup.style.display = "none";
-                stopaRefGroup.style.display = "none";
+                dynamicRateGroup.style.display = "none";
+                lastFormData.isInflacja = false;
             }
-        });
+        }
 
         function updateIloscObligacji() {
             const kwota = parseFloat(document.getElementById("kwota").value) || 0;
@@ -816,6 +795,7 @@
         updateLata();
         updateOprocentowanieInfo();
         updateOpisObligacji();
+        updateDynamicRateField();
 
         function toggleHarmonogram(sectionId) {
             const content = document.getElementById(sectionId);
@@ -836,10 +816,8 @@
             document.getElementById("kwota").value = lastFormData.kwota;
             document.getElementById("kwotaRange").value = lastFormData.kwota;
             document.getElementById("typObligacji").value = lastFormData.typObligacji;
-            document.getElementById("inflacja").value = lastFormData.inflacja;
-            document.getElementById("inflacjaRange").value = lastFormData.inflacja;
-            document.getElementById("stopaRef").value = lastFormData.stopaRef;
-            document.getElementById("stopaRefRange").value = lastFormData.stopaRef;
+            document.getElementById("dynamicRate").value = lastFormData.dynamicRate;
+            document.getElementById("dynamicRateRange").value = lastFormData.dynamicRate;
             document.getElementById("okres").value = lastFormData.okres;
             document.getElementById("oprocentowanie").value = lastFormData.oprocentowanie;
             document.getElementById("ikeIkzeBtn").checked = lastFormData.ikeIkze;
@@ -868,20 +846,7 @@
             }
             select.value = lastFormData.typObligacji;
 
-            const inflacjaGroup = document.getElementById("inflacjaGroup");
-            const stopaRefGroup = document.getElementById("stopaRefGroup");
-
-            if (["COI", "EDO", "ROS", "ROD"].includes(lastFormData.typObligacji)) {
-                inflacjaGroup.style.display = "block";
-                stopaRefGroup.style.display = "none";
-            } else if (["ROR", "DOR"].includes(lastFormData.typObligacji)) {
-                inflacjaGroup.style.display = "none";
-                stopaRefGroup.style.display = "block";
-            } else {
-                inflacjaGroup.style.display = "none";
-                stopaRefGroup.style.display = "none";
-            }
-
+            updateDynamicRateField();
             updateIloscObligacji();
             updateLata();
             updateOprocentowanieInfo();
@@ -893,18 +858,20 @@
             const typ = document.getElementById("typObligacji").value;
             const config = obligacjeConfig[typ];
             const miesiace = config.okres;
-            const inflacja = parseFloat(document.getElementById("inflacja").value) / 100 || 0;
-            const stopaRel = parseFloat(document.getElementById("stopaRef")?.value) / 100 || 0.0575;
+            const dynamicRate = parseFloat(document.getElementById("dynamicRate").value) / 100 || (["COI", "EDO", "ROS", "ROD"].includes(typ) ? 0.049 : 0.0575);
+            const isInflacja = ["COI", "EDO", "ROS", "ROD"].includes(typ);
+            const inflacja = isInflacja ? dynamicRate : 0;
+            const stopaRel = !isInflacja ? dynamicRate : 0.0575;
             const podatekBelki = isIkeIkzeMode ? 0 : 0.19;
 
             lastFormData = {
                 kwota: kwota,
                 typObligacji: typ,
-                inflacja: inflacja * 100,
-                stopaRef: stopaRel * 100,
+                dynamicRate: dynamicRate * 100,
                 okres: miesiace,
                 oprocentowanie: config.oprocentowanie,
-                ikeIkze: isIkeIkzeMode
+                ikeIkze: isIkeIkzeMode,
+                isInflacja: isInflacja
             };
 
             if (kwota < 100 || miesiace <= 0) {
@@ -1143,18 +1110,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const typ = document.getElementById("typObligacji").value;
-            const inflacjaGroup = document.getElementById("inflacjaGroup");
-            const stopaRefGroup = document.getElementById("stopaRefGroup");
-
-            inflacjaGroup.style.display = "none";
-            stopaRefGroup.style.display = "none";
-
-            updateIloscObligacji();
-            updateLata();
-            updateOprocentowanieInfo();
-            updateOpisObligacji();
-
             const obliczBtn = document.getElementById("obliczBtn");
             if (obliczBtn) obliczBtn.addEventListener("click", obliczObligacje);
             else console.error("Przycisk 'Oblicz' nie został znaleziony w dokumencie.");
