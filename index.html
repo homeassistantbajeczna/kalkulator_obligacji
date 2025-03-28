@@ -1327,8 +1327,8 @@ body {
         const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${isIkeIkzeMode ? " (IKE/IKZE)" : ""}`;
         const opis = opisyObligacji[typ] || "";
 
-        // Ustawiamy font Helvetica z polskimi znakami
-        doc.setFont("Helvetica", "normal");
+        // Ustawiamy font Times New Roman z polskimi znakami
+        doc.setFont("timesnewroman", "normal");
 
         doc.setFontSize(16);
         doc.text(headerText, 10, 10);
@@ -1372,7 +1372,7 @@ body {
             startY: 20 + opisLines.length * 5 + 35,
             head: [headers],
             body: tableData,
-            styles: { font: "Helvetica", fontSize: 8, cellPadding: 2 }
+            styles: { font: "timesnewroman", fontSize: 8, cellPadding: 2 }
             headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0] },
             columnStyles: { 0: { cellWidth: 15 } }
         });
