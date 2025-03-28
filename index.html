@@ -18,7 +18,8 @@
         <div class="form-section" id="formSection">
             <div class="header-row">
                 <h4>Kalkulator Obligacji Skarbu Państwa</h4>
-                <label class="checkbox-label">
+                <!-- Przycisk IKE/IKZE po prawej stronie nagłówka -->
+                <label class="checkbox-label header-checkbox">
                     <input type="checkbox" id="ikeIkzeBtn">
                     <span class="checkbox-custom"></span>
                     Inwestycje w IKE lub IKZE
@@ -80,23 +81,23 @@
                             </div>
                         </div>
                         <div class="variable-rate-container">
+                            <!-- Checkboxy nad dynamicznymi inputami -->
+                            <div class="checkbox-row" id="variableCheckboxRow">
+                                <label class="checkbox-label" id="inflacjaZmiennaLabel" style="display: none;">
+                                    <input type="checkbox" id="inflacjaZmiennaBtn">
+                                    <span class="checkbox-custom"></span>
+                                    Inflacja zmienna
+                                </label>
+                                <label class="checkbox-label" id="stopaZmiennaLabel" style="display: none;">
+                                    <input type="checkbox" id="stopaZmiennaBtn">
+                                    <span class="checkbox-custom"></span>
+                                    Zmienna Stopa Ref. NBP
+                                </label>
+                            </div>
                             <div class="variable-inputs" id="variableInputs" style="display: none;">
                                 <div class="variable-inputs-wrapper" id="variableInputsWrapper"></div>
                                 <button type="button" class="btn btn-secondary btn-sm" id="addVariableBtn" style="display: none;">Dodaj kolejne</button>
                             </div>
-                        </div>
-                        <!-- Przeniesione checkboxy nad przycisk Oblicz -->
-                        <div class="checkbox-row">
-                            <label class="checkbox-label" id="inflacjaZmiennaLabel" style="display: none;">
-                                <input type="checkbox" id="inflacjaZmiennaBtn">
-                                <span class="checkbox-custom"></span>
-                                Inflacja zmienna
-                            </label>
-                            <label class="checkbox-label" id="stopaZmiennaLabel" style="display: none;">
-                                <input type="checkbox" id="stopaZmiennaBtn">
-                                <span class="checkbox-custom"></span>
-                                Zmienna Stopa Ref. NBP
-                            </label>
                         </div>
                         <div class="form-row">
                             <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">Oblicz</button>
