@@ -80,28 +80,29 @@
                             </div>
                         </div>
                         <div class="variable-rate-container">
-                            <div class="checkbox-row">
-                                <label class="checkbox-label" id="inflacjaZmiennaLabel" style="display: none;">
-                                    <input type="checkbox" id="inflacjaZmiennaBtn">
-                                    <span class="checkbox-custom"></span>
-                                    Inflacja zmienna
-                                </label>
-                                <label class="checkbox-label" id="stopaZmiennaLabel" style="display: none;">
-                                    <input type="checkbox" id="stopaZmiennaBtn">
-                                    <span class="checkbox-custom"></span>
-                                    Zmienna Stopa Ref. NBP
-                                </label>
-                            </div>
                             <div class="variable-inputs" id="variableInputs" style="display: none;">
                                 <div class="variable-inputs-wrapper" id="variableInputsWrapper"></div>
                                 <button type="button" class="btn btn-secondary btn-sm" id="addVariableBtn" style="display: none;">Dodaj kolejne</button>
                             </div>
                         </div>
+                        <!-- Przeniesione checkboxy nad przycisk Oblicz -->
+                        <div class="checkbox-row">
+                            <label class="checkbox-label" id="inflacjaZmiennaLabel" style="display: none;">
+                                <input type="checkbox" id="inflacjaZmiennaBtn">
+                                <span class="checkbox-custom"></span>
+                                Inflacja zmienna
+                            </label>
+                            <label class="checkbox-label" id="stopaZmiennaLabel" style="display: none;">
+                                <input type="checkbox" id="stopaZmiennaBtn">
+                                <span class="checkbox-custom"></span>
+                                Zmienna Stopa Ref. NBP
+                            </label>
+                        </div>
+                        <div class="form-row">
+                            <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">Oblicz</button>
+                        </div>
                     </form>
                 </div>
-            </div>
-            <div class="form-row">
-                <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">Oblicz</button>
             </div>
             <div class="opis-container">
                 <div class="obligacje-opis" id="obligacjeOpis"></div>
@@ -110,75 +111,75 @@
                 <div class="data-info"><strong>Dane z dnia:</strong> <span class="data-date"><strong>01.03.2025r.</strong></span></div>
             </div>
         </div>
-    </div>
-    <div class="result-section" id="resultSection">
-        <div class="result-header">
-            <h4 id="resultHeader">Podsumowanie wyników</h4>
-            <button id="generatePdfBtn" class="btn btn-primary btn-sm">Generuj PDF</button>
-        </div>
-        <button class="btn btn-secondary mb-3" onclick="showForm()">Powrót do edycji</button>
-        <div class="result-container">
-            <div class="result-wrapper">
-                <div class="chart-container">
-                    <div class="chart">
-                        <canvas id="obligacjeChart"></canvas>
-                    </div>
-                    <div class="chart-legend">
-                        <div class="legend-item" data-index="0">
-                            <div class="color-box" style="background-color: #28a745;" data-tooltip="">
-                                <span class="value" id="valueKapital">-</span>
-                            </div>
-                            <span class="legend-text" id="legendKapital">Kapitał</span>
-                        </div>
-                        <div class="legend-item" data-index="1">
-                            <div class="color-box" style="background-color: #007bff;" data-tooltip="">
-                                <span class="value" id="valueOdsetki">-</span>
-                            </div>
-                            <span class="legend-text" id="legendOdsetki">Odsetki</span>
-                        </div>
-                        <div class="legend-item" data-index="2">
-                            <div class="color-box" style="background-color: #dc3545;" data-tooltip="">
-                                <span class="value" id="valuePodatek">-</span>
-                            </div>
-                            <span class="legend-text" id="legendPodatek">Podatek</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="summary-footer">
-                    <span class="highlight yellow" data-hover="3 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span> mc-y</span>
-                    <span class="highlight green" data-hover="">Zysk netto: <span id="zyskNetto">-</span> zł</span>
-                </div>
-                <div class="obligacje-opis" id="obligacjeOpisPodsumowanie"></div>
+                <div class="result-section" id="resultSection">
+            <div class="result-header">
+                <h4 id="resultHeader">Podsumowanie wyników</h4>
+                <button id="generatePdfBtn" class="btn btn-primary btn-sm">Generuj PDF</button>
             </div>
-        </div>
-        <div class="harmonogram-container">
-            <div class="result-wrapper">
-                <div class="harmonogram">
-                    <h5 class="btn-toggle" onclick="toggleHarmonogram('harmonogramContent')">Harmonogram odsetek ▼</h5>
-                    <div id="harmonogramContent">
-                        <table class="table table-striped">
-                            <thead id="harmonogramNaglowek">
-                                <tr>
-                                    <th id="pierwszaKolumnaNaglowek">Rok</th>
-                                    <th>Wartość inwestycji</th>
-                                    <th>Oproc.</th>
-                                    <th>Odsetki</th>
-                                    <th>Suma odsetek</th>
-                                    <th>Podatek</th>
-                                    <th id="zyskKolumnaNaglowek">Zysk netto</th>
-                                    <th>Opłata za wykup</th>
-                                    <th id="kolumnaStopaInflacja">Inflacja</th>
-                                    <th>Kwota za cykl</th>
-                                </tr>
-                            </thead>
-                            <tbody id="harmonogramTabela"></tbody>
-                        </table>
-                        <div class="harmonogram-opis" id="harmonogramOpis"></div>
+            <button class="btn btn-secondary mb-3" onclick="showForm()">Powrót do edycji</button>
+            <div class="result-container">
+                <div class="result-wrapper">
+                    <div class="chart-container">
+                        <div class="chart">
+                            <canvas id="obligacjeChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item" data-index="0">
+                                <div class="color-box" style="background-color: #28a745;" data-tooltip="">
+                                    <span class="value" id="valueKapital">-</span>
+                                </div>
+                                <span class="legend-text" id="legendKapital">Kapitał</span>
+                            </div>
+                            <div class="legend-item" data-index="1">
+                                <div class="color-box" style="background-color: #007bff;" data-tooltip="">
+                                    <span class="value" id="valueOdsetki">-</span>
+                                </div>
+                                <span class="legend-text" id="legendOdsetki">Odsetki</span>
+                            </div>
+                            <div class="legend-item" data-index="2">
+                                <div class="color-box" style="background-color: #dc3545;" data-tooltip="">
+                                    <span class="value" id="valuePodatek">-</span>
+                                </div>
+                                <span class="legend-text" id="legendPodatek">Podatek</span>
+                            </div>
+                        </div>
                     </div>
+                    <div class="summary-footer">
+                        <span class="highlight yellow" data-hover="3 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span> mc-y</span>
+                        <span class="highlight green" data-hover="">Zysk netto: <span id="zyskNetto">-</span> zł</span>
+                    </div>
+                    <div class="obligacje-opis" id="obligacjeOpisPodsumowanie"></div>
                 </div>
-                <div class="chart-container-line">
-                    <div class="chart-line">
-                        <canvas id="obligacjeChartLine"></canvas>
+            </div>
+            <div class="harmonogram-container">
+                <div class="result-wrapper">
+                    <div class="harmonogram">
+                        <h5 class="btn-toggle" onclick="toggleHarmonogram('harmonogramContent')">Harmonogram odsetek ▼</h5>
+                        <div id="harmonogramContent">
+                            <table class="table table-striped">
+                                <thead id="harmonogramNaglowek">
+                                    <tr>
+                                        <th id="pierwszaKolumnaNaglowek">Rok</th>
+                                        <th>Wartość inwestycji</th>
+                                        <th>Oproc.</th>
+                                        <th>Odsetki</th>
+                                        <th>Suma odsetek</th>
+                                        <th>Podatek</th>
+                                        <th id="zyskKolumnaNaglowek">Zysk netto</th>
+                                        <th>Opłata za wykup</th>
+                                        <th id="kolumnaStopaInflacja">Inflacja</th>
+                                        <th>Kwota za cykl</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="harmonogramTabela"></tbody>
+                            </table>
+                            <div class="harmonogram-opis" id="harmonogramOpis"></div>
+                        </div>
+                    </div>
+                    <div class="chart-container-line">
+                        <div class="chart-line">
+                            <canvas id="obligacjeChartLine"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -223,9 +224,6 @@
         margin: 0;
     }
     .checkbox-label {
-        position: absolute;
-        top: 0;
-        right: 10px;
         display: flex;
         align-items: center;
         font-size: 0.8em;
@@ -255,6 +253,11 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+    }
+    .checkbox-label.header-checkbox {
+        position: absolute;
+        top: 0;
+        right: 10px;
     }
     .form-section {
         padding: 10px;
@@ -345,13 +348,6 @@
     }
     .data-date {
         font-size: 0.8em;
-    }
-    .obligacje-opis ul, .harmonogram-opis ul {
-        list-style: none;
-        padding-left: 0;
-    }
-    .obligacje-opis li, .harmonogram-opis li {
-        margin-bottom: 5px;
     }
     .result-section {
         display: none;
@@ -700,24 +696,25 @@
             okres: 3,
             oprocentowanie: 3,
             ikeIkze: false,
-            isInflacja: false
+            isInflacja: false,
+            inflacjaZmienna: false,
+            stopaZmienna: false,
+            variableInflacjaChanges: [],
+            variableStopaChanges: []
         };
 
         const maxVariableChanges = {
-            "ROR": 11, // 12 miesięcy - 1 stały
-            "DOR": 23, // 24 miesiące - 1 stały
-            "COI": 3,  // 4 lata - 1 stały
-            "EDO": 9,  // 10 lat - 1 stały
-            "ROS": 5,  // 6 lat - 1 stały
-            "ROD": 11  // 12 lat - 1 stały
+            "ROR": 11,
+            "DOR": 23,
+            "COI": 3,
+            "EDO": 9,
+            "ROS": 5,
+            "ROD": 11
         };
 
         const { jsPDF } = window.jspdf || {};
-        if (!jsPDF) {
-            console.error("Biblioteka jsPDF nie została załadowana.");
-        } else if (!jsPDF.prototype.autoTable) {
-            console.warn("Plugin autoTable nie został załadowany. PDF bez tabel harmonogramu.");
-        }
+        if (!jsPDF) console.error("Biblioteka jsPDF nie została załadowana.");
+        else if (!jsPDF.prototype.autoTable) console.warn("Plugin autoTable nie został załadowany.");
 
         const obligacjeConfig = {
             "OTS": { okres: 3, oprocentowanie: 3.00, zmienne: false, kapitalizacja: false, oplataWykup: 0.00 },
@@ -731,46 +728,36 @@
         };
 
         const opisyObligacji = {
-            "OTS": "* <strong>OTS (3-miesięczne) </strong>: stałe oprocentowanie <strong>3,00%</strong> na okres <strong>3-miesięcy</strong>, wypłata odsetek nastąpi <strong>przy wykupie</strong> obligacji. Wcześniejszy odkup powoduje nienaliczenie odsetek, natomiast <strong>nie ma opłat za wcześniejszy odkup</strong>. Obligacje <strong>OTS</strong> są idealne dla <strong>krótkoterminowych inwestycji</strong>.",
-            "ROR": "* <strong>ROR (12-miesięczne) </strong>: <strong>oprocentowanie zmienne</strong>, w pierwszym miesiącu <strong>5,75%</strong>, w pozostałych <strong>11 miesiącach</strong> oprocentowanie oparte na <strong>stopie referencyjnej NBP + 0%</strong>. Wypłata odsetek następuje <strong>co miesiąc</strong>, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>0,5%</strong> wartości obligacji (<strong>0,5 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>ROR</strong> przeznaczone są dla <strong>krótko i średnioterminowych inwestorów</strong>.",
-            "DOR": "* <strong>DOR (24-miesięczne) </strong>: <strong>oprocentowanie zmienne</strong>, <strong>5,90% w pierwszym miesiącu</strong>, w pozostałych <strong>23 miesiącach</strong> oprocentowanie oparte na <strong>stopie referencyjnej NBP + 0,15%</strong>. Wypłata odsetek następuje <strong>co miesiąc</strong>, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>0,7%</strong> wartości obligacji (<strong>0,7 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>DOR</strong> przeznaczone są dla <strong>średnioterminowych inwestorów</strong>.",
-            "TOS": "* <strong>TOS (3-letnie)</strong>: <strong>stałe oprocentowanie 5,95%</strong> na okres <strong>3-lat</strong>, wypłata odsetek nastąpi <strong>przy wykupie</strong> obligacji po <strong>3 latach</strong> inwestycji. Wcześniejszy odkup wiąże się z opłatą w wysokości <strong>1%</strong> wartości obligacji (<strong>1 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>TOS</strong> przeznaczone dla <strong>stabilnych średnioterminowych inwestycji</strong>.",
-            "COI": "* <strong>COI (4-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,30% w pierwszym roku</strong>, w kolejnych <strong>3 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 1,50%</strong>. Wypłata odsetek następuje <strong>po każdym roku</strong> inwestycji, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>COI</strong> są idealne dla <strong>średnio i długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
-            "EDO": "* <strong>EDO (10-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,55% w pierwszym roku</strong>, w kolejnych <strong>9 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>10 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>EDO</strong> są idealne dla <strong>długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
-            "ROS": "* <strong>ROS (6-letnie)</strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,50% w pierwszym roku</strong>, w kolejnych <strong>5 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>6 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROS</strong> są idealne dla <strong>rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
-            "ROD": "* <strong>ROD (12-letnie) </strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,80% w pierwszym roku</strong>, w kolejnych <strong>11 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,50%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>12 latach</strong> inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROD</strong> są idealne dla <strong>długoterminowych rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>."
+            "OTS": "* <strong>OTS (3-miesięczne)</strong>: stałe oprocentowanie <strong>3,00%</strong> na okres <strong>3-miesięcy</strong>, wypłata odsetek przy wykupie. Brak opłat za wcześniejszy odkup.",
+            "ROR": "* <strong>ROR (12-miesięczne)</strong>: zmienne oprocentowanie, 5,75% w pierwszym miesiącu, potem stopa NBP + 0%. Wypłata co miesiąc, opłata za wcześniejszy odkup: 0,5%.",
+            "DOR": "* <strong>DOR (24-miesięczne)</strong>: zmienne oprocentowanie, 5,90% w pierwszym miesiącu, potem stopa NBP + 0,15%. Wypłata co miesiąc, opłata za wcześniejszy odkup: 0,7%.",
+            "TOS": "* <strong>TOS (3-letnie)</strong>: stałe 5,95%, kapitalizacja roczna, wypłata przy wykupie, opłata za wcześniejszy odkup: 1%.",
+            "COI": "* <strong>COI (4-letnie)</strong>: indeksowane inflacją, 6,30% w pierwszym roku, potem inflacja + 1,50%. Wypłata roczna, opłata za wcześniejszy odkup: 2%.",
+            "EDO": "* <strong>EDO (10-letnie)</strong>: indeksowane inflacją, 6,55% w pierwszym roku, potem inflacja + 2,00%. Kapitalizacja roczna, opłata za wcześniejszy odkup: 3%.",
+            "ROS": "* <strong>ROS (6-letnie)</strong>: dla beneficjentów 800+, indeksowane inflacją, 6,50% w pierwszym roku, potem inflacja + 2,00%. Kapitalizacja roczna, opłata: 2%.",
+            "ROD": "* <strong>ROD (12-letnie)</strong>: dla beneficjentów 800+, indeksowane inflacją, 6,80% w pierwszym roku, potem inflacja + 2,50%. Kapitalizacja roczna, opłata: 3%."
         };
 
         const nazwyObligacji = {
-            "OTS": "3-miesięcznych (OTS)",
-            "ROR": "12-miesięcznych (ROR)",
-            "DOR": "24-miesięcznych (DOR)",
-            "TOS": "3-letnich (TOS)",
-            "COI": "4-letnich (COI)",
-            "EDO": "10-letnich (EDO)",
-            "ROS": "6-letnich (ROS)",
-            "ROD": "12-letnich (ROD)"
+            "OTS": "3-miesięcznych (OTS)", "ROR": "12-miesięcznych (ROR)", "DOR": "24-miesięcznych (DOR)", "TOS": "3-letnich (TOS)",
+            "COI": "4-letnich (COI)", "EDO": "10-letnich (EDO)", "ROS": "6-letnich (ROS)", "ROD": "12-letnich (ROD)"
         };
 
         document.getElementById("dynamicRateRange").addEventListener("input", function() {
-            const dynamicRateInput = document.getElementById("dynamicRate");
-            dynamicRateInput.value = this.value;
+            document.getElementById("dynamicRate").value = this.value;
         });
 
         document.getElementById("dynamicRate").addEventListener("input", function() {
-            const dynamicRateRange = document.getElementById("dynamicRateRange");
-            dynamicRateRange.value = this.value;
+            document.getElementById("dynamicRateRange").value = this.value;
         });
 
         document.getElementById("kwotaRange").addEventListener("input", function() {
-            const kwotaInput = document.getElementById("kwota");
-            kwotaInput.value = this.value;
+            document.getElementById("kwota").value = this.value;
             updateIloscObligacji();
         });
 
         document.getElementById("kwota").addEventListener("input", function() {
-            const kwotaRange = document.getElementById("kwotaRange");
-            kwotaRange.value = this.value;
+            document.getElementById("kwotaRange").value = this.value;
             updateIloscObligacji();
         });
 
@@ -826,8 +813,8 @@
 
             if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
                 dynamicRateLabel.textContent = "Inflacja";
-                dynamicRateInput.value = 4.9;
-                dynamicRateRange.value = 4.9;
+                dynamicRateInput.value = lastFormData.dynamicRate || 4.9;
+                dynamicRateRange.value = lastFormData.dynamicRate || 4.9;
                 dynamicRateInput.step = "0.1";
                 dynamicRateRange.step = "0.1";
                 dynamicRateInput.max = "50";
@@ -836,8 +823,8 @@
                 lastFormData.isInflacja = true;
             } else if (["ROR", "DOR"].includes(typ)) {
                 dynamicRateLabel.textContent = "Stopa Ref. NBP";
-                dynamicRateInput.value = 5.75;
-                dynamicRateRange.value = 5.75;
+                dynamicRateInput.value = lastFormData.dynamicRate || 5.75;
+                dynamicRateRange.value = lastFormData.dynamicRate || 5.75;
                 dynamicRateInput.step = "0.05";
                 dynamicRateRange.step = "0.05";
                 dynamicRateInput.max = "20";
@@ -854,10 +841,10 @@
             inflacjaZmiennaLabel.style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
             stopaZmiennaLabel.style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
 
-            document.getElementById("inflacjaZmiennaBtn").checked = false;
-            document.getElementById("stopaZmiennaBtn").checked = false;
-            variableInflacjaChanges = [];
-            variableStopaChanges = [];
+            document.getElementById("inflacjaZmiennaBtn").checked = lastFormData.inflacjaZmienna || false;
+            document.getElementById("stopaZmiennaBtn").checked = lastFormData.stopaZmienna || false;
+            variableInflacjaChanges = lastFormData.variableInflacjaChanges ? [...lastFormData.variableInflacjaChanges] : [];
+            variableStopaChanges = lastFormData.variableStopaChanges ? [...lastFormData.variableStopaChanges] : [];
             updateVariableInputs();
         }
 
@@ -876,16 +863,11 @@
         function updateOprocentowanieInfo() {
             const typ = document.getElementById("typObligacji").value;
             const config = obligacjeConfig[typ];
-            let info = "";
-            if (config.zmienne) {
-                if (config.indeksowaneInflacja) {
-                    info = `Pierwszy rok: ${config.oprocentowanie}%, kolejne: inflacja + ${config.marza}%`;
-                } else {
-                    info = `Pierwszy miesiąc: ${config.oprocentowanie}%, kolejne: stopa NBP + ${config.marza}%`;
-                }
-            } else {
-                info = `Stałe: ${config.oprocentowanie}%`;
-            }
+            let info = config.zmienne ? 
+                (config.indeksowaneInflacja ? 
+                    `Pierwszy rok: ${config.oprocentowanie}%, kolejne: inflacja + ${config.marza}%` : 
+                    `Pierwszy miesiąc: ${config.oprocentowanie}%, kolejne: stopa NBP + ${config.marza}%`) : 
+                `Stałe: ${config.oprocentowanie}%`;
             document.getElementById("oprocentowanieInfo").textContent = info;
         }
 
@@ -905,13 +887,8 @@
         function toggleHarmonogram(sectionId) {
             const content = document.getElementById(sectionId);
             const toggleBtn = content.previousElementSibling;
-            if (content.style.display === "none") {
-                content.style.display = "block";
-                toggleBtn.textContent = "Harmonogram odsetek ▼";
-            } else {
-                content.style.display = "none";
-                toggleBtn.textContent = "Harmonogram odsetek ►";
-            }
+            content.style.display = content.style.display === "none" ? "block" : "none";
+            toggleBtn.textContent = content.style.display === "none" ? "Harmonogram odsetek ►" : "Harmonogram odsetek ▼";
         }
 
         function showForm() {
@@ -926,35 +903,11 @@
             document.getElementById("oprocentowanie").value = lastFormData.oprocentowanie;
             document.getElementById("ikeIkzeBtn").checked = lastFormData.ikeIkze;
             isIkeIkzeMode = lastFormData.ikeIkze;
-
-            const select = document.getElementById("typObligacji");
-            if (isIkeIkzeMode) {
-                select.innerHTML = `
-                    <option value="ROR">12-miesięczne (ROR)</option>
-                    <option value="DOR">24-miesięczne (DOR)</option>
-                    <option value="TOS" selected>3-letnie (TOS)</option>
-                    <option value="COI">4-letnie (COI)</option>
-                    <option value="EDO">10-letnie (EDO)</option>
-                `;
-            } else {
-                select.innerHTML = `
-                    <option value="OTS" selected>3-miesięczne (OTS)</option>
-                    <option value="ROR">12-miesięczne (ROR)</option>
-                    <option value="DOR">24-miesięczne (DOR)</option>
-                    <option value="TOS">3-letnie (TOS)</option>
-                    <option value="COI">4-letnie (COI)</option>
-                    <option value="EDO">10-letnie (EDO)</option>
-                    <option value="ROS">6-letnie (ROS)</option>
-                    <option value="ROD">12-letnie (ROD)</option>
-                `;
-            }
-
-            const availableOptions = Array.from(select.options).map(opt => opt.value);
-            if (!availableOptions.includes(lastFormData.typObligacji)) {
-                select.value = isIkeIkzeMode ? "TOS" : "OTS";
-            } else {
-                select.value = lastFormData.typObligacji;
-            }
+            document.getElementById("typObligacji").value = lastFormData.typObligacji;
+            document.getElementById("inflacjaZmiennaBtn").checked = lastFormData.inflacjaZmienna || false;
+            document.getElementById("stopaZmiennaBtn").checked = lastFormData.stopaZmienna || false;
+            variableInflacjaChanges = lastFormData.variableInflacjaChanges ? [...lastFormData.variableInflacjaChanges] : [];
+            variableStopaChanges = lastFormData.variableStopaChanges ? [...lastFormData.variableStopaChanges] : [];
 
             updateDynamicRateField();
             updateIloscObligacji();
@@ -1052,13 +1005,17 @@
                         changes[index].wartosc = parseFloat(rateInput.value);
                     });
                 });
+
+                const maxChanges = maxVariableChanges[typ] || 0;
+                addVariableBtn.style.display = changes.length < maxChanges ? "block" : "none";
             } else {
                 variableInputs.style.display = "none";
                 addVariableBtn.style.display = "none";
                 wrapper.innerHTML = "";
             }
         }
-                function addVariableChange() {
+
+        function addVariableChange() {
             const typ = document.getElementById("typObligacji").value;
             const isInflacjaZmienna = document.getElementById("inflacjaZmiennaBtn").checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
             const changes = isInflacjaZmienna ? variableInflacjaChanges : variableStopaChanges;
@@ -1106,7 +1063,11 @@
                 okres: miesiace,
                 oprocentowanie: config.oprocentowanie,
                 ikeIkze: isIkeIkzeMode,
-                isInflacja: isInflacja
+                isInflacja: isInflacja,
+                inflacjaZmienna: inflacjaZmienna,
+                stopaZmienna: stopaZmienna,
+                variableInflacjaChanges: [...variableInflacjaChanges],
+                variableStopaChanges: [...variableStopaChanges]
             };
 
             if (kwota < 100 || miesiace <= 0) {
@@ -1122,13 +1083,11 @@
             if (["OTS", "ROR", "DOR"].includes(typ)) {
                 pierwszaKolumnaNaglowek.textContent = "Miesiąc";
                 kolumnaStopaInflacja.textContent = ["ROR", "DOR"].includes(typ) ? "Stopa Ref. NBP" : "Inflacja";
-                if (["OTS"].includes(typ)) kolumnaStopaInflacja.style.display = "none";
-                else kolumnaStopaInflacja.style.display = "table-cell";
+                kolumnaStopaInflacja.style.display = ["OTS"].includes(typ) ? "none" : "table-cell";
             } else {
                 pierwszaKolumnaNaglowek.textContent = "Rok";
                 kolumnaStopaInflacja.textContent = "Inflacja";
-                if (["TOS"].includes(typ)) kolumnaStopaInflacja.style.display = "none";
-                else kolumnaStopaInflacja.style.display = "table-cell";
+                kolumnaStopaInflacja.style.display = ["TOS"].includes(typ) ? "none" : "table-cell";
             }
             zyskKolumnaNaglowek.textContent = isIkeIkzeMode ? "Zysk" : "Zysk netto";
 
@@ -1159,10 +1118,10 @@
                     oprocentowanieRoczne = i === 1 ? config.oprocentowanie / 100 : (dynamicValue + config.marza / 100);
                     stopaRefLubInflacja = (dynamicValue * 100).toFixed(2) + "%";
                 } else if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-                    oprocentowanieRoczne = (i === 1 ? config.oprocentowanie / 100 : (inflacja + config.marza / 100));
+                    oprocentowanieRoczne = i === 1 ? config.oprocentowanie / 100 : (inflacja + config.marza / 100);
                     stopaRefLubInflacja = (inflacja * 100).toFixed(2) + "%";
                 } else if (["ROR", "DOR"].includes(typ)) {
-                    oprocentowanieRoczne = (i === 1 ? config.oprocentowanie / 100 : (stopaRel + config.marza / 100));
+                    oprocentowanieRoczne = i === 1 ? config.oprocentowanie / 100 : (stopaRel + config.marza / 100);
                     stopaRefLubInflacja = (stopaRel * 100).toFixed(2) + "%";
                 } else {
                     oprocentowanieRoczne = config.oprocentowanie / 100;
@@ -1246,10 +1205,8 @@
                     const index = parseInt(this.getAttribute('data-index'));
                     chart.setActiveElements([{ datasetIndex: 0, index: index }]);
                     chart.update();
-
                     const currentLegend = document.querySelector(`#legend${['Kapital', 'Odsetki', 'Podatek'][index]}`);
                     if (currentLegend) currentLegend.style.opacity = 0;
-
                     const valueElements = document.querySelectorAll('#valueKapital, #valueOdsetki, #valuePodatek');
                     valueElements.forEach((value, idx) => {
                         if (idx === index) value.textContent = `${['Kapitał', 'Odsetki', 'Podatek'][idx]}: ${value.textContent}`;
@@ -1260,10 +1217,8 @@
                     const index = parseInt(this.getAttribute('data-index'));
                     chart.setActiveElements([]);
                     chart.update();
-
                     const currentLegend = document.querySelector(`#legend${['Kapital', 'Odsetki', 'Podatek'][index]}`);
                     if (currentLegend) currentLegend.style.opacity = 1;
-
                     document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
                     document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
                     document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
@@ -1338,136 +1293,105 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: {
-                            title: { display: true, text: ["OTS", "ROR", "DOR"].includes(typ) ? 'Okres (miesiące)' : 'Okres (lata)', font: { size: 14 } },
-                            ticks: { font: { size: 12 } }
-                        },
-                        y: {
-                            title: { display: true, text: 'Wartość (PLN)', font: { size: 14 } },
-                            min: yMin,
-                            max: yMax,
-                            ticks: { stepSize: stepSize, font: { size: 12 } }
-                        }
+                        x: { title: { display: true, text: ["OTS", "ROR", "DOR"].includes(typ) ? 'Okres (miesiące)' : 'Okres (lata)', font: { size: 14 } }, ticks: { font: { size: 12 } } },
+                        y: { title: { display: true, text: 'Wartość (PLN)', font: { size: 14 } }, min: yMin, max: yMax, ticks: { stepSize: stepSize, font: { size: 12 } } }
                     },
-                    plugins: {
-                        legend: { display: true, position: 'top', labels: { font: { size: 12 } } },
-                        tooltip: { enabled: true, backgroundColor: 'rgba(0, 0, 0, 0.8)', titleFont: { size: 12 }, bodyFont: { size: 10 } }
-                    }
+                    plugins: { legend: { display: true, position: 'top', labels: { font: { size: 12 } } }, tooltip: { enabled: true, backgroundColor: 'rgba(0, 0, 0, 0.8)' } }
                 }
             });
 
             document.getElementById("formSection").style.display = "none";
             document.getElementById("resultSection").style.display = "block";
-            updateOpisObligacji();
         }
 
         document.getElementById("generatePdfBtn").addEventListener("click", function() {
             if (!jsPDF) {
-                alert("Biblioteka jsPDF nie jest dostępna. Nie można wygenerować PDF.");
+                alert("Błąd: Biblioteka jsPDF nie jest załadowana.");
                 return;
             }
 
             const doc = new jsPDF();
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const margin = 10;
-            const tableWidth = pageWidth - 2 * margin;
+            const typ = lastFormData.typObligacji;
+            const nazwaObligacji = nazwyObligacji[typ];
+            const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${isIkeIkzeMode ? " (IKE/IKZE)" : ""}`;
+            const opis = opisyObligacji[typ] || "";
+            const harmonogramOpis = document.getElementById("harmonogramOpis").textContent;
 
             doc.setFontSize(16);
-            doc.text("Kalkulator Obligacji Skarbu Państwa", pageWidth / 2, 15, { align: "center" });
-
-            doc.setFontSize(12);
-            doc.text(`Wynik inwestycji dla obligacji ${nazwyObligacji[lastFormData.typObligacji]}${isIkeIkzeMode ? " (IKE/IKZE)" : ""}`, pageWidth / 2, 25, { align: "center" });
+            doc.text(headerText, 10, 10);
 
             doc.setFontSize(10);
-            const summaryText = [
-                `Kapitał: ${lastFormData.kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `Odsetki: ${(harmonogramData.reduce((sum, row) => sum + parseFloat(row.odsetkiBrutto), 0)).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `Podatek: ${(harmonogramData.reduce((sum, row) => sum + parseFloat(row.podatek), 0)).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `Okres inwestycji: ${lastFormData.okres} miesięcy`,
-                `Zysk netto: ${(harmonogramData.reduce((sum, row) => sum + parseFloat(row.zyskNetto), 0)).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
+            const opisLines = doc.splitTextToSize(opis.replace(/<[^>]+>/g, ''), 190);
+            doc.text(opisLines, 10, 20);
+
+            const chartCanvas = document.getElementById("obligacjeChart");
+            const chartLineCanvas = document.getElementById("obligacjeChartLine");
+            const chartImgData = chartCanvas.toDataURL("image/png");
+            const chartLineImgData = chartLineCanvas.toDataURL("image/png");
+
+            doc.addImage(chartImgData, 'PNG', 10, 40 + opisLines.length * 5, 60, 60);
+            doc.addImage(chartLineImgData, 'PNG', 10, 110 + opisLines.length * 5, 190, 80);
+
+            const summaryData = [
+                ["Kapitał", document.getElementById("valueKapital").textContent],
+                ["Odsetki", document.getElementById("valueOdsetki").textContent],
+                ["Podatek", document.getElementById("valuePodatek").textContent],
+                ["Okres inwestycji", document.getElementById("okresInwestycji").textContent + " mc-y"],
+                ["Zysk netto", document.getElementById("zyskNetto").textContent + " zł"]
             ];
-            doc.text(summaryText, margin, 40);
+
+            doc.autoTable({
+                startY: 100 + opisLines.length * 5,
+                head: [['Nazwa', 'Wartość']],
+                body: summaryData,
+                theme: 'grid',
+                styles: { fontSize: 8 },
+                columnStyles: { 0: { cellWidth: 40 }, 1: { cellWidth: 50 } }
+            });
 
             if (jsPDF.prototype.autoTable) {
-                const tableData = harmonogramData.map(row => {
-                    const rowData = [
-                        row.okres,
-                        `${parseFloat(row.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                        row.oprocentowanieNaCykl + (row.changeApplied ? ' ★' : ''),
-                        `${parseFloat(row.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                        `${parseFloat(row.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                        isIkeIkzeMode ? "0,00 zł*" : `${parseFloat(row.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                        `${parseFloat(row.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                        `${parseFloat(row.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
+                const tableData = harmonogramData.map(wiersz => {
+                    let row = [
+                        wiersz.okres,
+                        parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł",
+                        wiersz.oprocentowanieNaCykl,
+                        parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł",
+                        parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł",
+                        isIkeIkzeMode ? "0,00 zł*" : parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł",
+                        parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł",
+                        parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"
                     ];
-                    if (!["OTS", "TOS"].includes(lastFormData.typObligacji)) {
-                        rowData.push(row.stopaRefLubInflacja);
-                    }
-                    rowData.push(`${parseFloat(row.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
-                    return rowData;
+                    if (!["OTS", "TOS"].includes(typ)) row.push(wiersz.stopaRefLubInflacja);
+                    row.push(parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł");
+                    return row;
                 });
 
-                const tableHeaders = [
-                    ["OTS", "ROR", "DOR"].includes(lastFormData.typObligacji) ? "Miesiąc" : "Rok",
-                    "Wartość inwestycji",
-                    "Oproc.",
-                    "Odsetki",
-                    "Suma odsetek",
-                    "Podatek",
-                    isIkeIkzeMode ? "Zysk" : "Zysk netto",
-                    "Opłata za wykup"
-                ];
-                if (!["OTS", "TOS"].includes(lastFormData.typObligacji)) {
-                    tableHeaders.push(lastFormData.isInflacja ? "Inflacja" : "Stopa Ref. NBP");
-                }
-                tableHeaders.push("Kwota za cykl");
+                let head = ["Nr", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", "Zysk netto", "Opłata za wykup"];
+                if (!["OTS", "TOS"].includes(typ)) head.push(["ROR", "DOR"].includes(typ) ? "Stopa Ref. NBP" : "Inflacja");
+                head.push("Kwota za cykl");
 
                 doc.autoTable({
-                    head: [tableHeaders],
+                    startY: 200 + opisLines.length * 5,
+                    head: [head],
                     body: tableData,
-                    startY: 70,
-                    margin: { left: margin, right: margin },
-                    styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-                    headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0], fontStyle: 'bold' },
-                    columnStyles: { 0: { cellWidth: 'auto' } },
-                    didDrawPage: function(data) {
-                        doc.setFontSize(8);
-                        doc.text(`Strona ${data.pageNumber}`, pageWidth - margin, pageHeight - margin, { align: "right" });
-                    }
+                    theme: 'grid',
+                    styles: { fontSize: 8 },
+                    columnStyles: { 0: { cellWidth: 10 } }
                 });
 
-                if (isIkeIkzeMode) {
-                    const finalY = doc.lastAutoTable.finalY || 70;
+                if (harmonogramOpis) {
                     doc.setFontSize(8);
-                    doc.text("* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", margin, finalY + 10);
+                    doc.text(harmonogramOpis, 10, doc.lastAutoTable.finalY + 10);
                 }
-            } else {
-                doc.setFontSize(8);
-                doc.text("Harmonogram odsetek nie został wygenerowany z powodu braku pluginu autoTable.", margin, 70);
             }
 
-            doc.setFontSize(8);
-            const opisText = opisyObligacji[lastFormData.typObligacji] || "";
-            const opisLines = doc.splitTextToSize(opisText.replace(/<[^>]+>/g, ''), pageWidth - 2 * margin);
-            let finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : 90;
-            doc.text(opisLines, margin, finalY);
-
-            doc.setFontSize(8);
-            doc.text("Dane z dnia: 01.03.2025r.", pageWidth - margin, pageHeight - margin, { align: "right" });
-
-            doc.save(`Kalkulator_Obligacji_${lastFormData.typObligacji}.pdf`);
+            doc.save(`Wynik_inwestycji_${typ}_${new Date().toLocaleDateString('pl-PL')}.pdf`);
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const obliczBtn = document.getElementById("obliczBtn");
-            if (obliczBtn) obliczBtn.addEventListener("click", obliczObligacje);
-            else console.error("Przycisk 'Oblicz' nie został znaleziony w dokumencie.");
-
-            document.getElementById("inflacjaZmiennaBtn").addEventListener("change", updateVariableInputs);
-            document.getElementById("stopaZmiennaBtn").addEventListener("change", updateVariableInputs);
-            document.getElementById("addVariableBtn").addEventListener("click", addVariableChange);
-        });
+        document.getElementById("obliczBtn").addEventListener("click", obliczObligacje);
+        document.getElementById("inflacjaZmiennaBtn").addEventListener("change", updateVariableInputs);
+        document.getElementById("stopaZmiennaBtn").addEventListener("change", updateVariableInputs);
+        document.getElementById("addVariableBtn").addEventListener("click", addVariableChange);
     </script>
 </body>
 </html>
