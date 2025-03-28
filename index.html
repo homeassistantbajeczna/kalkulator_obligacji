@@ -966,7 +966,7 @@
                 rateGroup.className = "form-group";
                 rateGroup.innerHTML = `
                     <label class="form-label">${isInflacjaZmienna ? "Inflacja" : "Stopa NBP"}</label>
-                    <div class="input-group">
+                    <div class="input-groups">
                         <input type="number" class="form-control variable-rate" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
                         <span class="input-group-text">%</span>
                     </div>
@@ -1327,8 +1327,8 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        // Ustawienie czcionki z polskimi znakami
-        doc.setFont("times");
+        // Ustawienie czcionki z obsługą UTF-8 (Helvetica w nowszych wersjach wspiera polskie znaki)
+        doc.setFont("Helvetica", "normal");
         doc.setFontSize(16);
 
         // Pobranie danych do PDF-a
@@ -1390,13 +1390,17 @@
             head: [headers],
             body: tableData,
             styles: { 
-                font: "times", // Ustawienie czcionki dla tabeli
+                font: "Helvetica", // Ustawienie czcionki dla tabeli
                 fontSize: 8, 
-                cellPadding: 2 
+                cellPadding: 2,
+                halign: 'left', // Wyrównanie tekstu w tabeli
+                overflow: 'linebreak' // Obsługa zawijania tekstu
             },
             headStyles: { 
                 fillColor: [194, 178, 128], 
-                textColor: [0, 0, 0] 
+                textColor: [0, 0, 0],
+                font: "Helvetica",
+                halign: 'left'
             },
             columnStyles: { 
                 0: { cellWidth: 15 } 
