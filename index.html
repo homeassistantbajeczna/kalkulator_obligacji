@@ -40,10 +40,10 @@
                             <div class="form-group">
                                 <label for="typObligacji" class="form-label">Typ obligacji*</label>
                                 <select class="form-control" id="typObligacji">
-                                    <option value="OTS">3-miesięczne (OTS)</option>
+                                    <option value="OTS" selected>3-miesięczne (OTS)</option>
                                     <option value="ROR">12-miesięczne (ROR)</option>
                                     <option value="DOR">24-miesięczne (DOR)</option>
-                                    <option value="TOS" selected>3-letnie (TOS)</option>
+                                    <option value="TOS">3-letnie (TOS)</option>
                                     <option value="COI">4-letnie (COI)</option>
                                     <option value="EDO">10-letnie (EDO)</option>
                                     <option value="ROS">6-letnie (ROS)</option>
@@ -652,7 +652,7 @@
             "COI": "* <strong>COI (4-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,30% w pierwszym roku</strong>, w kolejnych <strong>3 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 1,50%</strong>. Wypłata odsetek następuje <strong>po każdym roku</strong> inwestycji, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>COI</strong> są idealne dla <strong>średnio i długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
             "EDO": "* <strong>EDO (10-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,55% w pierwszym roku</strong>, w kolejnych <strong>9 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>10 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>EDO</strong> są idealne dla <strong>długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
             "ROS": "* <strong>ROS (6-letnie)</strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,50% w pierwszym roku</strong>, w kolejnych <strong>5 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>6 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROS</strong> są idealne dla <strong>rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
-            "ROD": "* <strong>ROD (12-letnie) </strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,80% w pierwszym roku</strong>, w kolejnych <strong>11 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,50%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>12 latach</strong> inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROD</strong> są idealne dla <strong>długoterminowych rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>."  
+            "ROD": "* <strong>ROD (12-letnie) </strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,80% w pierwszym roku</strong>, w kolejnych <strong>11 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,50%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>12 latach</strong> inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROD</strong> są idealne dla <strong>długoterminowych rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>."
         };
 
         const nazwyObligacji = {
@@ -718,19 +718,25 @@
                 `;
             } else {
                 select.innerHTML = `
-                    <option value="OTS">3-miesięczne (OTS)</option>
+                    <option value="OTS" selected>3-miesięczne (OTS)</option>
                     <option value="ROR">12-miesięczne (ROR)</option>
                     <option value="DOR">24-miesięczne (DOR)</option>
-                    <option value="TOS" selected>3-letnie (TOS)</option>
+                    <option value="TOS">3-letnie (TOS)</option>
                     <option value="COI">4-letnie (COI)</option>
                     <option value="EDO">10-letnie (EDO)</option>
                     <option value="ROS">6-letnie (ROS)</option>
                     <option value="ROD">12-letnie (ROD)</option>
                 `;
             }
-            select.value = typ;
 
-            if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+            const availableOptions = Array.from(select.options).map(opt => opt.value);
+            if (!availableOptions.includes(typ)) {
+                select.value = isIkeIkzeMode ? "TOS" : "OTS";
+            } else {
+                select.value = typ;
+            }
+
+            if (["COI", "EDO", "ROS", "ROD"].includes(select.value)) {
                 dynamicRateLabel.textContent = "Inflacja";
                 dynamicRateInput.value = 4.9;
                 dynamicRateRange.value = 4.9;
@@ -740,7 +746,7 @@
                 dynamicRateRange.max = "50";
                 dynamicRateGroup.style.display = "block";
                 lastFormData.isInflacja = true;
-            } else if (["ROR", "DOR"].includes(typ)) {
+            } else if (["ROR", "DOR"].includes(select.value)) {
                 dynamicRateLabel.textContent = "Stopa Ref. NBP";
                 dynamicRateInput.value = 5.75;
                 dynamicRateRange.value = 5.75;
@@ -815,7 +821,6 @@
 
             document.getElementById("kwota").value = lastFormData.kwota;
             document.getElementById("kwotaRange").value = lastFormData.kwota;
-            document.getElementById("typObligacji").value = lastFormData.typObligacji;
             document.getElementById("dynamicRate").value = lastFormData.dynamicRate;
             document.getElementById("dynamicRateRange").value = lastFormData.dynamicRate;
             document.getElementById("okres").value = lastFormData.okres;
@@ -828,13 +833,13 @@
                 select.innerHTML = `
                     <option value="ROR">12-miesięczne (ROR)</option>
                     <option value="DOR">24-miesięczne (DOR)</option>
-                    <option value="TOS">3-letnie (TOS)</option>
+                    <option value="TOS" selected>3-letnie (TOS)</option>
                     <option value="COI">4-letnie (COI)</option>
                     <option value="EDO">10-letnie (EDO)</option>
                 `;
             } else {
                 select.innerHTML = `
-                    <option value="OTS">3-miesięczne (OTS)</option>
+                    <option value="OTS" selected>3-miesięczne (OTS)</option>
                     <option value="ROR">12-miesięczne (ROR)</option>
                     <option value="DOR">24-miesięczne (DOR)</option>
                     <option value="TOS">3-letnie (TOS)</option>
@@ -844,7 +849,13 @@
                     <option value="ROD">12-letnie (ROD)</option>
                 `;
             }
-            select.value = lastFormData.typObligacji;
+
+            const availableOptions = Array.from(select.options).map(opt => opt.value);
+            if (!availableOptions.includes(lastFormData.typObligacji)) {
+                select.value = isIkeIkzeMode ? "TOS" : "OTS";
+            } else {
+                select.value = lastFormData.typObligacji;
+            }
 
             updateDynamicRateField();
             updateIloscObligacji();
