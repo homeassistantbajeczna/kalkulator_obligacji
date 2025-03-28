@@ -167,7 +167,7 @@
                                         <th id="zyskKolumnaNaglowek">Zysk netto</th>
                                         <th>Opłata za wykup</th>
                                         <th id="kolumnaStopaInflacja">Inflacja</th>
-                                        <th>Suma netto</th> <!-- Zmiana z "Kwota za cykl" na "Suma netto" -->
+                                        <th>Suma netto</th>
                                     </tr>
                                 </thead>
                                 <tbody id="harmonogramTabela"></tbody>
@@ -638,11 +638,11 @@
         display: flex;
         flex-direction: column;
         margin-bottom: 10px;
-        align-items: center; /* Zmiana z center na flex-start dla wyrównania do lewej */
+        align-items: center;
     }
     .fields-wrapper {
         display: flex;
-        justify-content: center; /* Zmiana z center na flex-start dla wyrównania do lewej */
+        justify-content: center;
         gap: 10px;
     }
     .variable-input-group .form-group {
@@ -650,21 +650,17 @@
     }
     .remove-btn-wrapper {
         display: flex;
-        justify-content: center; /* Zmiana z center na flex-start dla wyrównania do lewej */
+        justify-content: center;
         margin-top: 5px;
     }
-    /* Nowy styl dla nagłówków */
-.variable-input-group .form-label {
-    text-align: left !important; /* Wyrównanie nagłówków do lewej */
-    width: 100%; /* Upewniamy się, że nagłówek zajmuje pełną szerokość */
-    padding-left: 0; /* Usuwamy domyślne paddingi, jeśli są */
+    .variable-input-group .form-label {
+        text-align: left !important;
+        width: 100%;
+        padding-left: 0;
     }
-
-    /* Upewniamy się, że pola wejściowe są wyśrodkowane */
     .variable-input-group .input-group {
-    justify-content: center; /* Wyśrodkowanie pól wejściowych */
+        justify-content: center;
     }
-        
     .variable-input-group .btn-danger {
         font-size: 0.7em;
         padding: 2px 8px;
@@ -1315,25 +1311,39 @@
         document.getElementById("resultSection").style.display = "block";
     }
 
+    document.getElementById("obliczBtn").addEventListener("click", obliczObligacje);
+
+    document.getElementById("inflacjaZmiennaBtn").addEventListener("change", updateVariableInputs);
+    document.getElementById("stopaZmiennaBtn").addEventListener("change", updateVariableInputs);
+    document.getElementById("addVariableBtn").addEventListener("click", addVariableChange);
+
     document.getElementById("generatePdfBtn").addEventListener("click", function() {
         if (!jsPDF) {
             alert("Błąd: Biblioteka jsPDF nie jest załadowana.");
             return;
         }
 
+        const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+
+        // Ustawienie czcionki z polskimi znakami
+        doc.setFont("times");
+        doc.setFontSize(16);
+
         const typ = lastFormData.typObligacji;
         const nazwaObligacji = nazwyObligacji[typ];
         const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${isIkeIkzeMode ? " (IKE/IKZE)" : ""}`;
         const opis = opisyObligacji[typ] || "";
 
-        doc.setFontSize(16);
+        // Nagłówek
         doc.text(headerText, 10, 10);
 
+        // Opis obligacji
         doc.setFontSize(10);
         const opisLines = doc.splitTextToSize(opis.replace(/<[^>]+>/g, ""), 190);
         doc.text(opisLines, 10, 20);
 
+        // Podsumowanie
         const summary = [
             `Kapitał: ${lastFormData.kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
             `Odsetki: ${parseFloat(document.getElementById("valueOdsetki").textContent.replace(" zł", "").replace(/\s/g, "")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
@@ -1344,6 +1354,7 @@
         doc.text("Podsumowanie:", 10, 20 + opisLines.length * 5 + 5);
         doc.text(summary, 10, 20 + opisLines.length * 5 + 10);
 
+        // Nagłówki tabeli
         const headers = ["OTS", "ROR", "DOR"].includes(typ) ? 
             ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", ["ROR", "DOR"].includes(typ) ? "Stopa Ref. NBP" : "Inflacja", "Suma netto"] :
             ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
@@ -1365,15 +1376,26 @@
             return row;
         });
 
+        // Tabela z użyciem autoTable
         doc.autoTable({
             startY: 20 + opisLines.length * 5 + 35,
             head: [headers],
             body: tableData,
-            styles: { fontSize: 8, cellPadding: 2 },
-            headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0] },
-            columnStyles: { 0: { cellWidth: 15 } }
+            styles: { 
+                font: "times", // Ustawienie czcionki dla tabeli
+                fontSize: 8, 
+                cellPadding: 2 
+            },
+            headStyles: { 
+                fillColor: [194, 178, 128], 
+                textColor: [0, 0, 0] 
+            },
+            columnStyles: { 
+                0: { cellWidth: 15 } 
+            }
         });
 
+        // Opis harmonogramu
         const harmonogramOpis = document.getElementById("harmonogramOpis").textContent;
         if (harmonogramOpis) {
             doc.setFontSize(8);
@@ -1381,11 +1403,7 @@
             doc.text(opisLinesHarmonogram, 10, doc.lastAutoTable.finalY + 10);
         }
 
+        // Zapis pliku
         doc.save(`Wynik_inwestycji_${nazwaObligacji.replace(/\s/g, "_")}.pdf`);
     });
-
-    document.getElementById("obliczBtn").addEventListener("click", obliczObligacje);
-    document.getElementById("inflacjaZmiennaBtn").addEventListener("change", updateVariableInputs);
-    document.getElementById("stopaZmiennaBtn").addEventListener("change", updateVariableInputs);
-    document.getElementById("addVariableBtn").addEventListener("click", addVariableChange);
 </script>
