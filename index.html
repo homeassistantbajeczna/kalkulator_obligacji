@@ -1318,8 +1318,9 @@
     document.getElementById("addVariableBtn").addEventListener("click", addVariableChange);
 
     document.getElementById("generatePdfBtn").addEventListener("click", function() {
-        if (!jsPDF) {
-            alert("Błąd: Biblioteka jsPDF nie jest załadowana.");
+        // Sprawdzenie, czy biblioteka jsPDF jest załadowana
+        if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+            alert("Błąd: Biblioteka jsPDF nie jest załadowana. Sprawdź, czy skrypt jest poprawnie podłączony.");
             return;
         }
 
@@ -1330,6 +1331,7 @@
         doc.setFont("times");
         doc.setFontSize(16);
 
+        // Pobranie danych do PDF-a
         const typ = lastFormData.typObligacji;
         const nazwaObligacji = nazwyObligacji[typ];
         const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${isIkeIkzeMode ? " (IKE/IKZE)" : ""}`;
@@ -1340,7 +1342,7 @@
 
         // Opis obligacji
         doc.setFontSize(10);
-        const opisLines = doc.splitTextToSize(opis.replace(/<[^>]+>/g, ""), 190);
+        const opisLines = doc.splitTextToSize(opis.replace(/<[^>]+>/g, ""), 190); // Usunięcie tagów HTML
         doc.text(opisLines, 10, 20);
 
         // Podsumowanie
@@ -1376,6 +1378,12 @@
             return row;
         });
 
+        // Sprawdzenie, czy autoTable jest dostępne
+        if (typeof doc.autoTable === 'undefined') {
+            alert("Błąd: Plugin autoTable nie jest załadowany. Sprawdź, czy skrypt jspdf-autotable jest poprawnie podłączony.");
+            return;
+        }
+
         // Tabela z użyciem autoTable
         doc.autoTable({
             startY: 20 + opisLines.length * 5 + 35,
@@ -1404,6 +1412,10 @@
         }
 
         // Zapis pliku
-        doc.save(`Wynik_inwestycji_${nazwaObligacji.replace(/\s/g, "_")}.pdf`);
+        try {
+            doc.save(`Wynik_inwestycji_${nazwaObligacji.replace(/\s/g, "_")}.pdf`);
+        } catch (error) {
+            alert("Wystąpił błąd podczas zapisywania PDF-a: " + error.message);
+        }
     });
 </script>
