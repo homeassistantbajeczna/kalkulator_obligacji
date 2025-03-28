@@ -653,6 +653,18 @@
         justify-content: center; /* Zmiana z center na flex-start dla wyrównania do lewej */
         margin-top: 5px;
     }
+    /* Nowy styl dla nagłówków */
+.variable-input-group .form-label {
+    text-align: left !important; /* Wyrównanie nagłówków do lewej */
+    width: 100%; /* Upewniamy się, że nagłówek zajmuje pełną szerokość */
+    padding-left: 0; /* Usuwamy domyślne paddingi, jeśli są */
+    }
+
+    /* Upewniamy się, że pola wejściowe są wyśrodkowane */
+    .variable-input-group .input-group {
+    justify-content: center; /* Wyśrodkowanie pól wejściowych */
+    }
+        
     .variable-input-group .btn-danger {
         font-size: 0.7em;
         padding: 2px 8px;
@@ -812,8 +824,8 @@
 
         if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
             dynamicRateLabel.textContent = "Inflacja";
-            dynamicRateInput.value = lastFormData.isInflacja ? (lastFormData.dynamicRate || 4.90) : 4.90; // Poprawiono na 4.90
-            dynamicRateRange.value = lastFormData.isInflacja ? (lastFormData.dynamicRate || 4.90) : 4.90; // Poprawiono na 4.90
+            dynamicRateInput.value = lastFormData.isInflacja ? (lastFormData.dynamicRate || 4.90) : 4.90;
+            dynamicRateRange.value = lastFormData.isInflacja ? (lastFormData.dynamicRate || 4.90) : 4.90;
             dynamicRateInput.step = "0.1";
             dynamicRateRange.step = "0.1";
             dynamicRateInput.max = "50";
@@ -946,7 +958,7 @@
                 const cyklGroup = document.createElement("div");
                 cyklGroup.className = "form-group";
                 cyklGroup.innerHTML = `
-                    <label class="form-label" style="text-align: left;">Od ${["ROR", "DOR"].includes(typ) ? "miesiąca" : "roku"}</label>
+                    <label class="form-label">Od ${["ROR", "DOR"].includes(typ) ? "miesiąca" : "roku"}</label>
                     <div class="input-group">
                         <input type="number" class="form-control variable-cykl" min="1" max="${maxCykl}" step="1" value="${change.cykl}">
                         <span class="input-group-text">${["ROR", "DOR"].includes(typ) ? "mc" : "rok"}</span>
@@ -957,7 +969,7 @@
                 const rateGroup = document.createElement("div");
                 rateGroup.className = "form-group";
                 rateGroup.innerHTML = `
-                    <label class="form-label" style="text-align: left;">${isInflacjaZmienna ? "Inflacja" : "Stopa NBP"}</label>
+                    <label class="form-label">${isInflacjaZmienna ? "Inflacja" : "Stopa NBP"}</label>
                     <div class="input-group">
                         <input type="number" class="form-control variable-rate" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
                         <span class="input-group-text">%</span>
