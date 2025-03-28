@@ -692,75 +692,81 @@
         document.getElementById("ikeIkzeBtn").addEventListener("change", updateDynamicRateField);
 
         function updateDynamicRateField() {
-            const typ = document.getElementById("typObligacji").value;
-            const config = obligacjeConfig[typ];
-            const dynamicRateGroup = document.getElementById("dynamicRateGroup");
-            const dynamicRateLabel = document.getElementById("dynamicRateLabel");
-            const dynamicRateInput = document.getElementById("dynamicRate");
-            const dynamicRateRange = document.getElementById("dynamicRateRange");
+    const dynamicRateGroup = document.getElementById("dynamicRateGroup");
+    const dynamicRateLabel = document.getElementById("dynamicRateLabel");
+    const dynamicRateInput = document.getElementById("dynamicRate");
+    const dynamicRateRange = document.getElementById("dynamicRateRange");
 
-            document.getElementById("okres").value = config.okres;
-            document.getElementById("oprocentowanie").value = config.oprocentowanie;
-            updateLata();
-            updateOprocentowanieInfo();
-            updateOpisObligacji();
+    isIkeIkzeMode = document.getElementById("ikeIkzeBtn").checked;
+    const select = document.getElementById("typObligacji");
+    const previousTyp = select.value; // Zachowujemy poprzednią wartość
 
-            isIkeIkzeMode = document.getElementById("ikeIkzeBtn").checked;
-            const select = document.getElementById("typObligacji");
+    // Aktualizacja listy opcji w zależności od trybu IKE/IKZE
+    if (isIkeIkzeMode) {
+        select.innerHTML = `
+            <option value="ROR">12-miesięczne (ROR)</option>
+            <option value="DOR">24-miesięczne (DOR)</option>
+            <option value="TOS" selected>3-letnie (TOS)</option>
+            <option value="COI">4-letnie (COI)</option>
+            <option value="EDO">10-letnie (EDO)</option>
+        `;
+    } else {
+        select.innerHTML = `
+            <option value="OTS" selected>3-miesięczne (OTS)</option>
+            <option value="ROR">12-miesięczne (ROR)</option>
+            <option value="DOR">24-miesięczne (DOR)</option>
+            <option value="TOS">3-letnie (TOS)</option>
+            <option value="COI">4-letnie (COI)</option>
+            <option value="EDO">10-letnie (EDO)</option>
+            <option value="ROS">6-letnie (ROS)</option>
+            <option value="ROD">12-letnie (ROD)</option>
+        `;
+    }
 
-            if (isIkeIkzeMode) {
-                select.innerHTML = `
-                    <option value="ROR">12-miesięczne (ROR)</option>
-                    <option value="DOR">24-miesięczne (DOR)</option>
-                    <option value="TOS" selected>3-letnie (TOS)</option>
-                    <option value="COI">4-letnie (COI)</option>
-                    <option value="EDO">10-letnie (EDO)</option>
-                `;
-            } else {
-                select.innerHTML = `
-                    <option value="OTS" selected>3-miesięczne (OTS)</option>
-                    <option value="ROR">12-miesięczne (ROR)</option>
-                    <option value="DOR">24-miesięczne (DOR)</option>
-                    <option value="TOS">3-letnie (TOS)</option>
-                    <option value="COI">4-letnie (COI)</option>
-                    <option value="EDO">10-letnie (EDO)</option>
-                    <option value="ROS">6-letnie (ROS)</option>
-                    <option value="ROD">12-letnie (ROD)</option>
-                `;
-            }
+    // Sprawdzamy, czy poprzedni typ jest dostępny w nowej liście
+    const availableOptions = Array.from(select.options).map(opt => opt.value);
+    if (!availableOptions.includes(previousTyp)) {
+        select.value = isIkeIkzeMode ? "TOS" : "OTS";
+    } else {
+        select.value = previousTyp;
+    }
 
-            const availableOptions = Array.from(select.options).map(opt => opt.value);
-            if (!availableOptions.includes(typ)) {
-                select.value = isIkeIkzeMode ? "TOS" : "OTS";
-            } else {
-                select.value = typ;
-            }
+    // Pobieramy aktualny typ po zmianach i aktualizujemy pola
+    const typ = select.value;
+    const config = obligacjeConfig[typ];
 
-            if (["COI", "EDO", "ROS", "ROD"].includes(select.value)) {
-                dynamicRateLabel.textContent = "Inflacja";
-                dynamicRateInput.value = 4.9;
-                dynamicRateRange.value = 4.9;
-                dynamicRateInput.step = "0.1";
-                dynamicRateRange.step = "0.1";
-                dynamicRateInput.max = "50";
-                dynamicRateRange.max = "50";
-                dynamicRateGroup.style.display = "block";
-                lastFormData.isInflacja = true;
-            } else if (["ROR", "DOR"].includes(select.value)) {
-                dynamicRateLabel.textContent = "Stopa Ref. NBP";
-                dynamicRateInput.value = 5.75;
-                dynamicRateRange.value = 5.75;
-                dynamicRateInput.step = "0.05";
-                dynamicRateRange.step = "0.05";
-                dynamicRateInput.max = "20";
-                dynamicRateRange.max = "20";
-                dynamicRateGroup.style.display = "block";
-                lastFormData.isInflacja = false;
-            } else {
-                dynamicRateGroup.style.display = "none";
-                lastFormData.isInflacja = false;
-            }
-        }
+    document.getElementById("okres").value = config.okres;
+    document.getElementById("oprocentowanie").value = config.oprocentowanie;
+    updateLata();
+    updateOprocentowanieInfo();
+    updateOpisObligacji();
+
+    // Aktualizacja pola dynamicznego (inflacja/stopa NBP)
+    if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+        dynamicRateLabel.textContent = "Inflacja";
+        dynamicRateInput.value = 4.9;
+        dynamicRateRange.value = 4.9;
+        dynamicRateInput.step = "0.1";
+        dynamicRateRange.step = "0.1";
+        dynamicRateInput.max = "50";
+        dynamicRateRange.max = "50";
+        dynamicRateGroup.style.display = "block";
+        lastFormData.isInflacja = true;
+    } else if (["ROR", "DOR"].includes(typ)) {
+        dynamicRateLabel.textContent = "Stopa Ref. NBP";
+        dynamicRateInput.value = 5.75;
+        dynamicRateRange.value = 5.75;
+        dynamicRateInput.step = "0.05";
+        dynamicRateRange.step = "0.05";
+        dynamicRateInput.max = "20";
+        dynamicRateRange.max = "20";
+        dynamicRateGroup.style.display = "block";
+        lastFormData.isInflacja = false;
+    } else {
+        dynamicRateGroup.style.display = "none";
+        lastFormData.isInflacja = false;
+    }
+}
 
         function updateIloscObligacji() {
             const kwota = parseFloat(document.getElementById("kwota").value) || 0;
