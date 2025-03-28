@@ -79,25 +79,25 @@
                                 <div class="sub-info" id="oprocentowanieInfo"></div>
                             </div>
                         </div>
+                        <div class="variable-rate-container">
+                            <div class="checkbox-row">
+                                <label class="checkbox-label" id="inflacjaZmiennaLabel" style="display: none;">
+                                    <input type="checkbox" id="inflacjaZmiennaBtn">
+                                    <span class="checkbox-custom"></span>
+                                    Inflacja zmienna
+                                </label>
+                                <label class="checkbox-label" id="stopaZmiennaLabel" style="display: none;">
+                                    <input type="checkbox" id="stopaZmiennaBtn">
+                                    <span class="checkbox-custom"></span>
+                                    Zmienna Stopa Ref. NBP
+                                </label>
+                            </div>
+                            <div class="variable-inputs" id="variableInputs" style="display: none;">
+                                <div class="variable-inputs-wrapper" id="variableInputsWrapper"></div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="addVariableBtn" style="display: none;">Dodaj kolejne</button>
+                            </div>
+                        </div>
                     </form>
-                </div>
-            </div>
-            <div class="variable-rate-container">
-                <div class="checkbox-row">
-                    <label class="checkbox-label" id="inflacjaZmiennaLabel" style="display: none;">
-                        <input type="checkbox" id="inflacjaZmiennaBtn">
-                        <span class="checkbox-custom"></span>
-                        Inflacja zmienna
-                    </label>
-                    <label class="checkbox-label" id="stopaZmiennaLabel" style="display: none;">
-                        <input type="checkbox" id="stopaZmiennaBtn">
-                        <span class="checkbox-custom"></span>
-                        Zmienna Stopa Ref. NBP
-                    </label>
-                </div>
-                <div class="variable-inputs" id="variableInputs" style="display: none;">
-                    <div class="variable-inputs-wrapper" id="variableInputsWrapper"></div>
-                    <button type="button" class="btn btn-secondary btn-sm" id="addVariableBtn" style="display: none;">Dodaj kolejne</button>
                 </div>
             </div>
             <div class="form-row">
@@ -641,13 +641,22 @@
     }
     .variable-input-group {
         display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+    .fields-wrapper {
+        display: flex;
         justify-content: center;
         gap: 10px;
-        margin-bottom: 10px;
-        align-items: flex-end;
     }
     .variable-input-group .form-group {
         max-width: 120px;
+    }
+    .remove-btn-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 5px;
     }
     .variable-input-group .btn-danger {
         font-size: 0.7em;
@@ -692,6 +701,15 @@
             oprocentowanie: 3,
             ikeIkze: false,
             isInflacja: false
+        };
+
+        const maxVariableChanges = {
+            "ROR": 11, // 12 miesięcy - 1 stały
+            "DOR": 23, // 24 miesiące - 1 stały
+            "COI": 3,  // 4 lata - 1 stały
+            "EDO": 9,  // 10 lat - 1 stały
+            "ROS": 5,  // 6 lat - 1 stały
+            "ROD": 11  // 12 lat - 1 stały
         };
 
         const { jsPDF } = window.jspdf || {};
@@ -970,6 +988,9 @@
                     const inputGroup = document.createElement("div");
                     inputGroup.className = "variable-input-group";
 
+                    const fieldsWrapper = document.createElement("div");
+                    fieldsWrapper.className = "fields-wrapper";
+
                     const cyklGroup = document.createElement("div");
                     cyklGroup.className = "form-group";
                     cyklGroup.innerHTML = `
@@ -992,16 +1013,21 @@
                         <input type="range" class="form-range variable-rate-range" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
                     `;
 
-                    if (index > 0) {
+                    fieldsWrapper.appendChild(cyklGroup);
+                    fieldsWrapper.appendChild(rateGroup);
+                    inputGroup.appendChild(fieldsWrapper);
+
+                    if (index === changes.length - 1 && changes.length > 1) {
+                        const removeBtnWrapper = document.createElement("div");
+                        removeBtnWrapper.className = "remove-btn-wrapper";
                         const removeBtn = document.createElement("button");
                         removeBtn.className = "btn btn-danger btn-sm";
                         removeBtn.textContent = "Usuń";
-                        removeBtn.onclick = () => removeVariableChange(index);
-                        inputGroup.appendChild(removeBtn);
+                        removeBtn.onclick = () => removeVariableChange();
+                        removeBtnWrapper.appendChild(removeBtn);
+                        inputGroup.appendChild(removeBtnWrapper);
                     }
 
-                    inputGroup.appendChild(cyklGroup);
-                    inputGroup.appendChild(rateGroup);
                     wrapper.appendChild(inputGroup);
 
                     const cyklInput = inputGroup.querySelector(".variable-cykl");
@@ -1037,18 +1063,25 @@
             const isInflacjaZmienna = document.getElementById("inflacjaZmiennaBtn").checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
             const changes = isInflacjaZmienna ? variableInflacjaChanges : variableStopaChanges;
             const maxCykl = ["ROR", "DOR"].includes(typ) ? obligacjeConfig[typ].okres : obligacjeConfig[typ].okres / 12;
+            const maxChanges = maxVariableChanges[typ] || 0;
+
+            if (changes.length >= maxChanges) {
+                alert(`Osiągnięto maksymalną liczbę zmian dla obligacji ${typ} (${maxChanges}).`);
+                return;
+            }
+
             const lastCykl = changes.length > 0 ? changes[changes.length - 1].cykl : 1;
             const newCykl = Math.min(lastCykl + 1, maxCykl);
             changes.push({ cykl: newCykl, wartosc: isInflacjaZmienna ? 4.9 : 5.75 });
             updateVariableInputs();
         }
 
-        function removeVariableChange(index) {
+        function removeVariableChange() {
             const typ = document.getElementById("typObligacji").value;
             const isInflacjaZmienna = document.getElementById("inflacjaZmiennaBtn").checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
             const changes = isInflacjaZmienna ? variableInflacjaChanges : variableStopaChanges;
             if (changes.length > 1) {
-                changes.splice(index, 1);
+                changes.pop();
                 updateVariableInputs();
             }
         }
@@ -1242,9 +1275,9 @@
             harmonogram.forEach(wiersz => {
                 let rowHTML = `
                     <tr>
-                        <td>${wiersz.okres}${wiersz.changeApplied ? ' ★' : ''}</td>
+                        <td>${wiersz.okres}</td>
                         <td>${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
-                        <td>${wiersz.oprocentowanieNaCykl}</td>
+                        <td>${wiersz.oprocentowanieNaCykl}${wiersz.changeApplied ? ' ★' : ''}</td>
                         <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${isIkeIkzeMode ? "0,00 zł*" : parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}</td>
@@ -1359,9 +1392,9 @@
             if (jsPDF.prototype.autoTable) {
                 const tableData = harmonogramData.map(row => {
                     const rowData = [
-                        row.okres + (row.changeApplied ? ' ★' : ''),
+                        row.okres,
                         `${parseFloat(row.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                        row.oprocentowanieNaCykl,
+                        row.oprocentowanieNaCykl + (row.changeApplied ? ' ★' : ''),
                         `${parseFloat(row.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
                         `${parseFloat(row.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
                         isIkeIkzeMode ? "0,00 zł*" : `${parseFloat(row.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
