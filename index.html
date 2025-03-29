@@ -848,12 +848,13 @@
         updateOprocentowanieInfo();
         updateOpisObligacji();
 
-        if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-            setDynamicRateField("Inflacja", state.lastFormData.isInflacja ? (state.lastFormData.dynamicRate || 4.90) : 4.90, "0.1", "50");
-            state.lastFormData.isInflacja = true;
-        } else if (["ROR", "DOR"].includes(typ)) {
-            setDynamicRateField("Stopa Ref. NBP", state.lastFormData.isInflacja ? 5.75 : (state.lastFormData.dynamicRate || 5.75), "0.05", "20");
+        // Poprawiona logika wyświetlania pola dynamicRate dla ROR i DOR
+        if (["ROR", "DOR"].includes(typ)) {
+            setDynamicRateField("Stopa Ref. NBP", state.lastFormData.dynamicRate || 5.75, "0.05", "20");
             state.lastFormData.isInflacja = false;
+        } else if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+            setDynamicRateField("Inflacja", state.lastFormData.dynamicRate || 4.90, "0.1", "50");
+            state.lastFormData.isInflacja = true;
         } else {
             document.getElementById("dynamicRateGroup").style.display = "none";
             state.lastFormData.isInflacja = false;
@@ -864,9 +865,7 @@
 
         elements.inflacjaZmiennaBtn.checked = state.lastFormData.inflacjaZmienna || false;
         elements.stopaZmiennaBtn.checked = state.lastFormData.stopaZmienna || false;
-        state.variableInflacjaChanges = state.lastFormData.variableInflacjaChanges ? [...state.lastFormData.variableInfl مهم
-
-acjaChanges] : [];
+        state.variableInflacjaChanges = state.lastFormData.variableInflacjaChanges ? [...state.lastFormData.variableInflacjaChanges] : [];
         state.variableStopaChanges = state.lastFormData.variableStopaChanges ? [...state.lastFormData.variableStopaChanges] : [];
         updateVariableInputs();
     }
@@ -1082,7 +1081,7 @@ acjaChanges] : [];
         const miesiace = config.okres;
         const dynamicRate = parseFloat(elements.dynamicRate.value) / 100 || (["COI", "EDO", "ROS", "ROD"].includes(typ) ? 0.0490 : 0.0575);
         const isInflacja = ["COI", "EDO", "ROS", "ROD"].includes(typ);
-        const inflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
+        const inflacjaZmienna = elements.inflacjaZmiennaBtn.checked && isInflacja;
         const stopaZmienna = elements.stopaZmiennaBtn.checked && ["ROR", "DOR"].includes(typ);
         const inflacja = isInflacja ? dynamicRate : 0;
         const stopaRel = !isInflacja ? dynamicRate : 0.0575;
@@ -1365,6 +1364,11 @@ acjaChanges] : [];
         if (typeof pdfMake === "undefined") {
             console.error("Biblioteka PDFMake nie została załadowana.");
             alert("Błąd: Biblioteka PDFMake nie jest załadowana.");
+            return;
+        }
+
+        if (!state.harmonogramData.length) {
+            alert("Najpierw oblicz wyniki inwestycji, klikając 'Oblicz'.");
             return;
         }
 
