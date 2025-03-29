@@ -7,16 +7,56 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <style>
-        body { font-family: 'Arial', sans-serif; padding: 20px; background-color: #f5f6f5; }
-        .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 10px; }
-        .form-section, .result-section { margin-bottom: 20px; }
+        body {
+            background-color: #f5f6f5;
+            font-family: 'Arial', sans-serif;
+            padding: 10px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto 0;
+            background: #FFFFFF;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .form-section, .result-section { padding: 10px; }
         .result-section { display: none; }
-        .chart-container { display: flex; justify-content: center; gap: 20px; }
-        .chart { width: 150px; height: 150px; }
-        .harmonogram table { width: 100%; border-collapse: collapse; }
-        .harmonogram th, .harmonogram td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        .btn-primary { background-color: #C2B280; border: none; color: #000; }
-        .btn-primary:hover { background-color: #b0a070; }
+        .form-group { margin-bottom: 15px; }
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .chart { width: 120px; height: 120px; }
+        .harmonogram table {
+            margin: 0 auto;
+            width: auto;
+            border-collapse: collapse;
+        }
+        .harmonogram th, .harmonogram td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+        .harmonogram th {
+            background: linear-gradient(90deg, #C2B280, #b0a070);
+            color: #000000;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #C2B280, #b0a070);
+            border: none;
+            color: #000000;
+            padding: 8px 20px;
+            border-radius: 25px;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #b0a070, #C2B280);
+            color: #000000;
+        }
+        #generatePdfBtn { position: absolute; top: 0; right: 10px; }
     </style>
 </head>
 <body>
@@ -24,12 +64,12 @@
         <div class="form-section" id="formSection">
             <h4>Kalkulator Obligacji Skarbu Państwa</h4>
             <form id="obligacjeForm">
-                <div class="mb-3">
-                    <label for="kwota" class="form-label">Kwota inwestycji (zł)</label>
+                <div class="form-group">
+                    <label for="kwota">Kwota inwestycji</label>
                     <input type="number" class="form-control" id="kwota" min="100" step="100" value="10000">
                 </div>
-                <div class="mb-3">
-                    <label for="typObligacji" class="form-label">Typ obligacji</label>
+                <div class="form-group">
+                    <label for="typObligacji">Typ obligacji</label>
                     <select class="form-control" id="typObligacji">
                         <option value="OTS" selected>3-miesięczne (OTS)</option>
                         <option value="ROR">12-miesięczne (ROR)</option>
@@ -43,8 +83,10 @@
             </form>
         </div>
         <div class="result-section" id="resultSection">
-            <h4 id="resultHeader">Podsumowanie wyników</h4>
-            <button id="generatePdfBtn" class="btn btn-primary btn-sm">Generuj PDF</button>
+            <div class="result-header" style="position: relative;">
+                <h4 id="resultHeader">Podsumowanie wyników</h4>
+                <button id="generatePdfBtn" class="btn btn-primary btn-sm">Generuj PDF</button>
+            </div>
             <button class="btn btn-secondary mb-3" onclick="showForm()">Powrót do edycji</button>
             <div class="chart-container">
                 <div class="chart">
@@ -85,6 +127,7 @@ console.log("Skrypt JavaScript został załadowany");
 
 let chart;
 let harmonogramData = [];
+let lastFormData = { kwota: 10000, typObligacji: "OTS" };
 
 const obligacjeConfig = {
     "OTS": { okres: 3, oprocentowanie: 3.00, zmienne: false, kapitalizacja: false },
@@ -98,6 +141,8 @@ const obligacjeConfig = {
 function showForm() {
     document.getElementById("formSection").style.display = "block";
     document.getElementById("resultSection").style.display = "none";
+    document.getElementById("kwota").value = lastFormData.kwota;
+    document.getElementById("typObligacji").value = lastFormData.typObligacji;
 }
 
 function obliczObligacje() {
@@ -108,10 +153,14 @@ function obliczObligacje() {
     const miesiace = config.okres;
     const podatekBelki = 0.19;
 
+    lastFormData = { kwota: kwota, typObligacji: typ };
+
     if (kwota < 100 || miesiace <= 0) {
         alert("Proszę podać poprawną kwotę (min. 100 zł).");
         return;
     }
+
+    document.getElementById("resultHeader").textContent = `Wynik inwestycji dla obligacji ${typ}`;
 
     let kapital = kwota;
     let odsetkiCalkowite = 0;
@@ -186,7 +235,7 @@ function obliczObligacje() {
 
 document.getElementById("obliczBtn").addEventListener("click", obliczObligacje);
 
-// Funkcja generowania PDF
+// Poprawiona funkcja generowania PDF
 document.getElementById("generatePdfBtn").addEventListener("click", function() {
     console.log("Przycisk Generuj PDF został kliknięty");
 
@@ -204,7 +253,7 @@ document.getElementById("generatePdfBtn").addEventListener("click", function() {
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const typ = document.getElementById("typObligacji").value;
+    const typ = lastFormData.typObligacji;
     const headerText = `Wynik inwestycji dla obligacji ${typ}`;
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 10;
@@ -251,4 +300,5 @@ document.getElementById("generatePdfBtn").addEventListener("click", function() {
 
     // Zapis pliku
     doc.save(`Wynik_inwestycji_${typ}.pdf`);
+    console.log("PDF został wygenerowany i zapisany.");
 });
