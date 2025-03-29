@@ -1330,7 +1330,8 @@
                 format: 'a4'
             });
 
-            doc.setFont("times");
+            // Ustawienie fontu obsługującego polskie znaki
+            doc.setFont("helvetica", "normal");
             doc.setFontSize(16);
 
             const typ = state.lastFormData.typObligacji;
@@ -1383,8 +1384,8 @@
                 head: [headers],
                 body: tableData,
                 startY: 20 + opisLines.length * 5 + summary.length * 5 + 10,
-                styles: { font: "times", fontSize: 8, cellPadding: 2 },
-                headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0] },
+                styles: { font: "helvetica", fontSize: 8, cellPadding: 2, halign: 'center' },
+                headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0], halign: 'center' },
                 alternateRowStyles: { fillColor: [245, 245, 245] }
             });
 
@@ -1395,29 +1396,19 @@
                 doc.text(ikeIkzeLines, 10, doc.lastAutoTable.finalY + 5);
             }
 
-            const chartCanvas = document.getElementById("obligacjeChart");
-            const chartImage = chartCanvas.toDataURL("image/png");
-            const chartWidth = 60;
-            const chartHeight = 60;
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const chartX = (pageWidth - chartWidth) / 2;
-            let currentY = doc.lastAutoTable.finalY + (state.isIkeIkzeMode ? 15 : 10);
-
-            doc.setFontSize(12);
-            doc.text("Wykres kołowy wyników inwestycji", 10, currentY + 5);
-            doc.addImage(chartImage, "PNG", chartX, currentY + 10, chartWidth, chartHeight);
-
-            currentY += chartHeight + 20;
-            if (currentY + 60 > doc.internal.pageSize.getHeight()) {
-                doc.addPage();
-                currentY = 10;
-            }
-
+            // Dodanie tylko wykresu liniowego do PDF
             const lineChartCanvas = document.getElementById("obligacjeChartLine");
             const lineChartImage = lineChartCanvas.toDataURL("image/png");
             const lineChartWidth = 180;
             const lineChartHeight = 100;
+            const pageWidth = doc.internal.pageSize.getWidth();
             const lineChartX = (pageWidth - lineChartWidth) / 2;
+            let currentY = doc.lastAutoTable.finalY + (state.isIkeIkzeMode ? 15 : 10);
+
+            if (currentY + lineChartHeight + 20 > doc.internal.pageSize.getHeight()) {
+                doc.addPage();
+                currentY = 10;
+            }
 
             doc.setFontSize(12);
             doc.text("Wykres liniowy wartości inwestycji w czasie", 10, currentY + 5);
