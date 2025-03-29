@@ -1178,15 +1178,63 @@
             }
 
             document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
+            document.querySelector('.result-wrapper-chart .legend-item[data-index="0"] .color-box').setAttribute('data-tooltip', `Kapitał: ${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
             document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
+            document.querySelector('.result-wrapper-chart .legend-item[data-index="1"] .color-box').setAttribute('data-tooltip', `Odsetki: ${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
             const podatekCalkowity = odsetkiCalkowite * (state.isIkeIkzeMode ? 0 : 0.19);
             document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
+            document.querySelector('.result-wrapper-chart .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
             document.getElementById("okresInwestycji").textContent = miesiace;
             document.querySelector('.result-wrapper-chart .highlight.yellow').setAttribute('data-hover', `${miesiace} miesięcy`);
             document.getElementById("zyskNetto").textContent = `${zyskNettoCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.querySelector('.result-wrapper-chart .highlight.green').setAttribute('data-hover', `${zyskNettoCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
 
+            if (state.chart) state.chart.destroy();
             if (state.chartLine) state.chartLine.destroy();
+
+            const ctx = elements.obligacjeChart.getContext("2d");
+            state.chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Kapitał', 'Odsetki', 'Podatek'],
+                    datasets: [{
+                        data: [kwota, odsetkiCalkowite, podatekCalkowity],
+                        backgroundColor: ['#28a745', '#007bff', '#dc3545'],
+                        borderWidth: 1,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            document.querySelectorAll('.result-wrapper-chart .legend-item').forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    state.chart.setActiveElements([{ datasetIndex: 0, index: index }]);
+                    state.chart.update();
+                    const currentLegend = document.querySelector(`#legend${['Kapital', 'Odsetki', 'Podatek'][index]}`);
+                    if (currentLegend) currentLegend.style.opacity = 0;
+                    const valueElements = document.querySelectorAll('#valueKapital, #valueOdsetki, #valuePodatek');
+                    valueElements.forEach((value, idx) => {
+                        if (idx === index) value.textContent = `${['Kapitał', 'Odsetki', 'Podatek'][idx]}: ${value.textContent}`;
+                    });
+                });
+
+                item.addEventListener('mouseleave', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    state.chart.setActiveElements([]);
+                    state.chart.update();
+                    const currentLegend = document.querySelector(`#legend${['Kapital', 'Odsetki', 'Podatek'][index]}`);
+                    if (currentLegend) currentLegend.style.opacity = 1;
+                    document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
+                    document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
+                    document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
+                });
+            });
 
             let tabela = document.getElementById("harmonogramTabela");
             tabela.innerHTML = "";
@@ -1282,8 +1330,7 @@
                 format: 'a4'
             });
 
-            // Włączenie obsługi UTF-8 i polskich znaków poprzez dodanie fontu
-            doc.setFont("helvetica", "normal");
+            doc.setFont("times");
             doc.setFontSize(16);
 
             const typ = state.lastFormData.typObligacji;
@@ -1336,8 +1383,8 @@
                 head: [headers],
                 body: tableData,
                 startY: 20 + opisLines.length * 5 + summary.length * 5 + 10,
-                styles: { font: "helvetica", fontSize: 8, cellPadding: 2, halign: 'center' },
-                headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0], halign: 'center' },
+                styles: { font: "times", fontSize: 8, cellPadding: 2 },
+                headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0] },
                 alternateRowStyles: { fillColor: [245, 245, 245] }
             });
 
@@ -1348,18 +1395,29 @@
                 doc.text(ikeIkzeLines, 10, doc.lastAutoTable.finalY + 5);
             }
 
+            const chartCanvas = document.getElementById("obligacjeChart");
+            const chartImage = chartCanvas.toDataURL("image/png");
+            const chartWidth = 60;
+            const chartHeight = 60;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const chartX = (pageWidth - chartWidth) / 2;
+            let currentY = doc.lastAutoTable.finalY + (state.isIkeIkzeMode ? 15 : 10);
+
+            doc.setFontSize(12);
+            doc.text("Wykres kołowy wyników inwestycji", 10, currentY + 5);
+            doc.addImage(chartImage, "PNG", chartX, currentY + 10, chartWidth, chartHeight);
+
+            currentY += chartHeight + 20;
+            if (currentY + 60 > doc.internal.pageSize.getHeight()) {
+                doc.addPage();
+                currentY = 10;
+            }
+
             const lineChartCanvas = document.getElementById("obligacjeChartLine");
             const lineChartImage = lineChartCanvas.toDataURL("image/png");
             const lineChartWidth = 180;
             const lineChartHeight = 100;
-            const pageWidth = doc.internal.pageSize.getWidth();
             const lineChartX = (pageWidth - lineChartWidth) / 2;
-            let currentY = doc.lastAutoTable.finalY + (state.isIkeIkzeMode ? 15 : 10);
-
-            if (currentY + lineChartHeight + 20 > doc.internal.pageSize.getHeight()) {
-                doc.addPage();
-                currentY = 10;
-            }
 
             doc.setFontSize(12);
             doc.text("Wykres liniowy wartości inwestycji w czasie", 10, currentY + 5);
