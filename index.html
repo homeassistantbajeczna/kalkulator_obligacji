@@ -696,7 +696,10 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    console.log("Skrypt JavaScript został załadowany");
+
     let chart, chartLine;
     let harmonogramData = [];
     let isIkeIkzeMode = false;
@@ -748,7 +751,7 @@
         "COI": "* <strong>COI (4-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,30% w pierwszym roku</strong>, w kolejnych <strong>3 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 1,50%</strong>. Wypłata odsetek następuje <strong>po każdym roku</strong> inwestycji, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>COI</strong> są idealne dla <strong>średnio i długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
         "EDO": "* <strong>EDO (10-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,55% w pierwszym roku</strong>, w kolejnych <strong>9 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>10 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>EDO</strong> są idealne dla <strong>długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
         "ROS": "* <strong>ROS (6-letnie)</strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,50% w pierwszym roku</strong>, w kolejnych <strong>5 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>6 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROS</strong> są idealne dla <strong>rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
-        "ROD": "* <strong>ROD (12-letnie) </strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,80% w pierwszym roku</strong>, w kolejnych <strong>11 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,50%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>12 latach</strong> inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROD</strong> są idealne dla <strong>długoterminowych rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>."  
+        "ROD": "* <strong>ROD (12-letnie) </strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,80% w pierwszym roku</strong>, w kolejnych <strong>11 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,50%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>12 latach</strong> inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROD</strong> są idealne dla <strong>długoterminowych rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>."
     };
 
     const nazwyObligacji = {
@@ -1057,6 +1060,7 @@
     }
 
     function obliczObligacje() {
+        console.log("Funkcja obliczObligacje została wywołana");
         const kwota = parseFloat(document.getElementById("kwota").value) || 0;
         const typ = document.getElementById("typObligacji").value;
         const config = obligacjeConfig[typ];
@@ -1068,6 +1072,8 @@
         const inflacja = isInflacja ? dynamicRate : 0;
         const stopaRel = !isInflacja ? dynamicRate : 0.0575;
         const podatekBelki = isIkeIkzeMode ? 0 : 0.19;
+
+        console.log("Kwota:", kwota, "Typ:", typ, "Dynamic Rate:", dynamicRate);
 
         lastFormData = {
             kwota: kwota,
@@ -1504,7 +1510,7 @@
         doc.save(`Wynik_inwestycji_${nazwaObligacji.replace(/\s/g, "_")}.pdf`);
     });
 
-    document.getElementById("obliczBtn").addEventListener("click", obliczObligacji);
+    document.getElementById("obliczBtn").addEventListener("click", obliczObligacje);
     document.getElementById("inflacjaZmiennaBtn").addEventListener("change", updateVariableInputs);
     document.getElementById("stopaZmiennaBtn").addEventListener("change", updateVariableInputs);
     document.getElementById("addVariableBtn").addEventListener("click", addVariableChange);
