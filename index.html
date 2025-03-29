@@ -7,6 +7,509 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f6f5;
+            font-family: 'Montserrat', sans-serif;
+            padding: 10px;
+        }
+        .logo-container {
+            background-color: #e9ecef;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto 0;
+            background: #FFFFFF;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .header-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .header-row h4 {
+            font-size: 1.2em;
+            color: #333333;
+            font-weight: 700;
+            margin: 0;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            font-size: 0.8em;
+            color: #333333;
+            cursor: pointer;
+        }
+        .checkbox-label input {
+            display: none;
+        }
+        .checkbox-custom {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #C2B280;
+            background-color: #fff;
+            margin-right: 5px;
+            display: inline-block;
+            position: relative;
+        }
+        .checkbox-label input:checked + .checkbox-custom {
+            background-color: #C2B280;
+        }
+        .checkbox-label input:checked + .checkbox-custom::after {
+            content: '✔';
+            color: #000;
+            font-size: 12px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .checkbox-label.header-checkbox {
+            position: absolute;
+            top: 0;
+            right: 10px;
+        }
+        .form-section {
+            padding: 10px;
+            position: relative;
+        }
+        .form-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 0;
+            max-width: 150px;
+        }
+        .form-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+            color: #333333;
+        }
+        .form-control, .form-select, .form-range {
+            height: 22px;
+            font-size: 0.7em;
+            padding: 2px;
+            text-align: center;
+        }
+        .form-select {
+            max-width: 100px;
+            appearance: none;
+            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQ0lEQVR42mNgwAfKy8Q/Y//+Ii//3jVAYQzsIFyQ0dOaWq992zxcnN5+9NmyZACV40DmGhPZtzwUAxhUaoLntdha0DqQbtz4E9DzN6XgI0P2VYFlQrUwoQDIgbChLE/0awXiwV5rhugPX6A8BSsYFDqU+rEFdkGZA7+G9HMqaAU6l+0w+NdJD7ADhzhR/4KDZnWOw0QKrVqYc1G+1Dczfx8DR0uv+QJqDRvQxdizFAQAwsy39EZhAAAwAAJ4+Q1XFlAAAAABJRU5ErkJggg==') no-repeat right 5px center;
+        }
+        .form-range {
+            margin-top: 2px;
+            height: 8px;
+            background: #d3d3d3;
+            border-radius: 5px;
+        }
+        .form-range::-webkit-slider-thumb {
+            background: #C2B280;
+            border: none;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+        .form-range::-moz-range-thumb {
+            background: #C2B280;
+            border: none;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            cursor: pointer;
+        }
+        .input-group-text {
+            font-size: 0.7em;
+            padding: 2px 5px;
+        }
+        .sub-info {
+            font-size: 0.4em;
+            color: #333333;
+            margin-top: 2px;
+            text-align: left;
+        }
+        .opis-container {
+            margin-top: 20px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .obligacje-opis, .harmonogram-opis {
+            font-size: 0.6em;
+            color: #333333;
+            text-align: center;
+            max-width: 400px;
+            margin: 10px auto 0;
+            line-height: 1.4;
+        }
+        .data-container {
+            text-align: right;
+            margin-top: 5px;
+        }
+        .data-info {
+            font-size: 0.8em;
+            color: #C2B280;
+        }
+        .data-date {
+            font-size: 0.8em;
+        }
+        .result-section {
+            display: none;
+            padding: 10px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #FFFFFF;
+        }
+        .result-header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .result-header h4 {
+            font-size: 1.2em;
+            color: #333333;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: visible;
+        }
+        .chart {
+            flex: 0 0 auto;
+            width: 120px;
+            height: 120px;
+            position: relative;
+            z-index: 25;
+        }
+        .chart-legend {
+            flex: 0 0 auto;
+            max-width: 200px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .chart-legend .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 0.7em;
+            color: #333333;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            padding-left: 8px;
+        }
+        .chart-legend .color-box {
+            width: 90px;
+            height: 18px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 500;
+            line-height: 18px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            color: #fff;
+            margin-right: 6px;
+        }
+        .chart-legend .color-box .value {
+            display: block;
+        }
+        .chart-legend .color-box:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: #fff;
+            font-size: 0.8em;
+            line-height: 18px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 30;
+        }
+        .chart-legend .color-box:hover .value {
+            display: none;
+        }
+        .chart-legend .legend-text {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            font-size: 0.7em;
+        }
+        .summary-footer {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .summary-footer .highlight {
+            font-size: 0.8em;
+            padding: 4px 6px;
+            border-radius: 5px;
+            position: relative;
+            cursor: pointer;
+        }
+        .highlight.yellow {
+            background-color: #17a2b8;
+            color: #ffffff;
+        }
+        .highlight.yellow:hover {
+            color: transparent;
+        }
+        .highlight.yellow:hover::after {
+            content: attr(data-hover);
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #ffffff;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .highlight.green {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+        .highlight.green:hover {
+            color: transparent;
+        }
+        .highlight.green:hover::after {
+            content: attr(data-hover);
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #ffffff;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .harmonogram {
+            margin-top: 20px;
+            font-size: 0.8em;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .harmonogram table {
+            margin: 0 auto;
+            width: auto;
+            max-width: 1000px;
+            display: table;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background: #f9f9f9;
+        }
+        .harmonogram th {
+            background: linear-gradient(90deg, #C2B280, #b0a070);
+            color: #000000;
+            padding: 12px;
+            text-align: center;
+            vertical-align: middle;
+            font-weight: 500;
+            border-bottom: 2px solid #ddd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .harmonogram td {
+            padding: 10px;
+            text-align: center;
+            font-weight: 400;
+            border-bottom: 1px solid #eee;
+            background-color: #f9f9f9;
+            color: #000000;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .btn-toggle {
+            cursor: pointer;
+            font-size: 0.8em;
+            color: #007bff;
+            text-decoration: underline;
+            margin-bottom: 10px;
+        }
+        .btn-primary, .btn-secondary {
+            background: linear-gradient(135deg, #C2B280, #b0a070);
+            border: none;
+            color: #000000;
+            font-size: 0.9em;
+            padding: 8px 20px;
+            width: auto;
+            margin: 25px auto 0;
+            display: block;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+        .btn-primary:hover, .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #b0a070, #C2B280);
+            color: #000000;
+        }
+        .btn-sm {
+            font-size: 0.7em;
+            padding: 3px 10px;
+        }
+        #generatePdfBtn {
+            position: absolute;
+            top: 0;
+            right: 10px;
+        }
+        #harmonogramContent {
+            display: block;
+        }
+        .form-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            position: relative;
+        }
+        .form-wrapper {
+            flex: 1;
+            max-width: 400px;
+        }
+        .result-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        .harmonogram-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            position: relative;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .result-wrapper {
+            flex: 1;
+            max-width: 1000px;
+        }
+        .result-wrapper h5 {
+            font-size: 1em;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #333333;
+        }
+        .chart-container-line {
+            margin-top: 20px;
+            width: 100%;
+            height: 400px;
+        }
+        .chart-line {
+            width: 100%;
+            height: 100%;
+        }
+        .variable-rate-container {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .checkbox-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+        .variable-inputs {
+            margin-top: 10px;
+        }
+        .variable-input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .fields-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .variable-input-group .form-group {
+            max-width: 120px;
+        }
+        .remove-btn-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+        }
+        .variable-input-group .form-label {
+            text-align: left !important;
+            width: 100%;
+            padding-left: 0;
+        }
+        .variable-input-group .input-group {
+            justify-content: center;
+        }
+        .variable-input-group .btn-danger {
+            font-size: 0.7em;
+            padding: 2px 8px;
+            height: 22px;
+            line-height: 18px;
+            background: #dc3545;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .variable-input-group .btn-danger:hover {
+            background: #c82333;
+        }
+        #addVariableBtn {
+            background: linear-gradient(135deg, #C2B280, #b0a070);
+            color: #000;
+            font-size: 0.7em;
+            padding: 3px 10px;
+            border-radius: 15px;
+            margin: 0 auto;
+            display: block;
+        }
+        #addVariableBtn:hover {
+            background: linear-gradient(135deg, #b0a070, #C2B280);
+        }
+    </style>
 </head>
 <body>
     <div class="logo-container">
@@ -167,7 +670,7 @@
                                         <th id="zyskKolumnaNaglowek">Zysk netto</th>
                                         <th>Opłata za wykup</th>
                                         <th id="kolumnaStopaInflacja">Inflacja</th>
-                                        <th>Suma netto</th> <!-- Zmiana z "Kwota za cykl" na "Suma netto" -->
+                                        <th>Suma netto</th>
                                     </tr>
                                 </thead>
                                 <tbody id="harmonogramTabela"></tbody>
@@ -184,513 +687,8 @@
             </div>
         </div>
     </div>
-    <style>
-    body {
-        background-color: #f5f6f5;
-        font-family: 'Montserrat', sans-serif;
-        padding: 10px;
-    }
-    .logo-container {
-        background-color: #e9ecef;
-        padding: 15px;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    .logo {
-        max-width: 200px;
-        margin-bottom: 0;
-        cursor: pointer;
-    }
-    .container {
-        max-width: 1200px;
-        margin: 30px auto 0;
-        background: #FFFFFF;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-    .header-row {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 15px;
-        position: relative;
-    }
-    .header-row h4 {
-        font-size: 1.2em;
-        color: #333333;
-        font-weight: 700;
-        margin: 0;
-    }
-    .checkbox-label {
-        display: flex;
-        align-items: center;
-        font-size: 0.8em;
-        color: #333333;
-        cursor: pointer;
-    }
-    .checkbox-label input {
-        display: none;
-    }
-    .checkbox-custom {
-        width: 16px;
-        height: 16px;
-        border: 2px solid #C2B280;
-        background-color: #fff;
-        margin-right: 5px;
-        display: inline-block;
-        position: relative;
-    }
-    .checkbox-label input:checked + .checkbox-custom {
-        background-color: #C2B280;
-    }
-    .checkbox-label input:checked + .checkbox-custom::after {
-        content: '✔';
-        color: #000;
-        font-size: 12px;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-    .checkbox-label.header-checkbox {
-        position: absolute;
-        top: 0;
-        right: 10px;
-    }
-    .form-section {
-        padding: 10px;
-        position: relative;
-    }
-    .form-row {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 10px;
-        gap: 10px;
-        align-items: flex-start;
-    }
-    .form-group {
-        flex: 1;
-        min-width: 0;
-        max-width: 150px;
-    }
-    .form-label {
-        font-size: 0.7em;
-        text-transform: uppercase;
-        margin-bottom: 2px;
-        color: #333333;
-    }
-    .form-control, .form-select, .form-range {
-        height: 22px;
-        font-size: 0.7em;
-        padding: 2px;
-        text-align: center;
-    }
-    .form-select {
-        max-width: 100px;
-        appearance: none;
-        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQ0lEQVR42mNgwAfKy8Q/Y//+Ii//3jVAYQzsIFyQ0dOaWq992zxcnN5+9NmyZACV40DmGhPZtzwUAxhUaoLntdha0DqQbtz4E9DzN6XgI0P2VYFlQrUwoQDIgbChLE/0awXiwV5rhugPX6A8BSsYFDqU+rEFdkGZA7+G9HMqaAU6l+0w+NdJD7ADhzhR/4KDZnWOw0QKrVqYc1G+1Dczfx8DR0uv+QJqDRvQxdizFAQAwsy39EZhAAAwAAJ4+Q1XFlAAAAABJRU5ErkJggg==') no-repeat right 5px center;
-    }
-    .form-range {
-        margin-top: 2px;
-        height: 8px;
-        background: #d3d3d3;
-        border-radius: 5px;
-    }
-    .form-range::-webkit-slider-thumb {
-        background: #C2B280;
-        border: none;
-        border-radius: 50%;
-        width: 12px;
-        height: 12px;
-        cursor: pointer;
-        -webkit-appearance: none;
-    }
-    .form-range::-moz-range-thumb {
-        background: #C2B280;
-        border: none;
-        border-radius: 50%;
-        width: 12px;
-        height: 12px;
-        cursor: pointer;
-    }
-    .input-group-text {
-        font-size: 0.7em;
-        padding: 2px 5px;
-    }
-    .sub-info {
-        font-size: 0.4em;
-        color: #333333;
-        margin-top: 2px;
-        text-align: left;
-    }
-    .opis-container {
-        margin-top: 20px;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-    .obligacje-opis, .harmonogram-opis {
-        font-size: 0.6em;
-        color: #333333;
-        text-align: center;
-        max-width: 400px;
-        margin: 10px auto 0;
-        line-height: 1.4;
-    }
-    .data-container {
-        text-align: right;
-        margin-top: 5px;
-    }
-    .data-info {
-        font-size: 0.8em;
-        color: #C2B280;
-    }
-    .data-date {
-        font-size: 0.8em;
-    }
-    .result-section {
-        display: none;
-        padding: 10px;
-        max-width: 1200px;
-        margin: 0 auto;
-        background: #FFFFFF;
-    }
-    .result-header {
-        text-align: center;
-        margin-bottom: 20px;
-        position: relative;
-    }
-    .result-header h4 {
-        font-size: 1.2em;
-        color: #333333;
-        font-weight: 700;
-        display: inline-block;
-    }
-    .chart-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 20px;
-        position: relative;
-        overflow: visible;
-    }
-    .chart {
-        flex: 0 0 auto;
-        width: 120px;
-        height: 120px;
-        position: relative;
-        z-index: 25;
-    }
-    .chart-legend {
-        flex: 0 0 auto;
-        max-width: 200px;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    .chart-legend .legend-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 6px;
-        font-size: 0.7em;
-        color: #333333;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-        padding-left: 8px;
-    }
-    .chart-legend .color-box {
-        width: 90px;
-        height: 18px;
-        border-radius: 5px;
-        text-align: center;
-        font-weight: 500;
-        line-height: 18px;
-        font-size: 0.8em;
-        white-space: nowrap;
-        overflow: hidden;
-        position: relative;
-        color: #fff;
-        margin-right: 6px;
-    }
-    .chart-legend .color-box .value {
-        display: block;
-    }
-    .chart-legend .color-box:hover::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        color: #fff;
-        font-size: 0.8em;
-        line-height: 18px;
-        text-align: center;
-        background-color: rgba(0, 0, 0, 0.8);
-        z-index: 30;
-    }
-    .chart-legend .color-box:hover .value {
-        display: none;
-    }
-    .chart-legend .legend-text {
-        opacity: 1;
-        transition: opacity 0.3s ease;
-        font-size: 0.7em;
-    }
-    .summary-footer {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin-top: 10px;
-    }
-    .summary-footer .highlight {
-        font-size: 0.8em;
-        padding: 4px 6px;
-        border-radius: 5px;
-        position: relative;
-        cursor: pointer;
-    }
-    .highlight.yellow {
-        background-color: #17a2b8;
-        color: #ffffff;
-    }
-    .highlight.yellow:hover {
-        color: transparent;
-    }
-    .highlight.yellow:hover::after {
-        content: attr(data-hover);
-        font-weight: bold;
-        font-size: 1.1em;
-        color: #ffffff;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .highlight.green {
-        background-color: #28a745;
-        color: #ffffff;
-    }
-    .highlight.green:hover {
-        color: transparent;
-    }
-    .highlight.green:hover::after {
-        content: attr(data-hover);
-        font-weight: bold;
-        font-size: 1.1em;
-        color: #ffffff;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .harmonogram {
-        margin-top: 20px;
-        font-size: 0.8em;
-        background-color: #f9f9f9;
-        border-radius: 10px;
-        padding: 10px;
-    }
-    .harmonogram table {
-        margin: 0 auto;
-        width: auto;
-        max-width: 1000px;
-        display: table;
-        border-collapse: separate;
-        border-spacing: 0;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        background: #f9f9f9;
-    }
-    .harmonogram th {
-        background: linear-gradient(90deg, #C2B280, #b0a070);
-        color: #000000;
-        padding: 12px;
-        text-align: center;
-        vertical-align: middle;
-        font-weight: 500;
-        border-bottom: 2px solid #ddd;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .harmonogram td {
-        padding: 10px;
-        text-align: center;
-        font-weight: 400;
-        border-bottom: 1px solid #eee;
-        background-color: #f9f9f9;
-        color: #000000;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .btn-toggle {
-        cursor: pointer;
-        font-size: 0.8em;
-        color: #007bff;
-        text-decoration: underline;
-        margin-bottom: 10px;
-    }
-    .btn-primary, .btn-secondary {
-        background: linear-gradient(135deg, #C2B280, #b0a070);
-        border: none;
-        color: #000000;
-        font-size: 0.9em;
-        padding: 8px 20px;
-        width: auto;
-        margin: 25px auto 0;
-        display: block;
-        border-radius: 25px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
-    }
-    .btn-primary:hover, .btn-secondary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        background: linear-gradient(135deg, #b0a070, #C2B280);
-        color: #000000;
-    }
-    .btn-sm {
-        font-size: 0.7em;
-        padding: 3px 10px;
-    }
-    #generatePdfBtn {
-        position: absolute;
-        top: 0;
-        right: 10px;
-    }
-    #harmonogramContent {
-        display: block;
-    }
-    .form-container {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        position: relative;
-    }
-    .form-wrapper {
-        flex: 1;
-        max-width: 400px;
-    }
-    .result-container {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-        position: relative;
-    }
-    .harmonogram-container {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 20px;
-        position: relative;
-        background-color: #f9f9f9;
-        border-radius: 10px;
-        padding: 10px;
-    }
-    .result-wrapper {
-        flex: 1;
-        max-width: 1000px;
-    }
-    .result-wrapper h5 {
-        font-size: 1em;
-        text-align: center;
-        margin-bottom: 10px;
-        color: #333333;
-    }
-    .chart-container-line {
-        margin-top: 20px;
-        width: 100%;
-        height: 400px;
-    }
-    .chart-line {
-        width: 100%;
-        height: 100%;
-    }
-    .variable-rate-container {
-        margin-top: 15px;
-        text-align: center;
-    }
-    .checkbox-row {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin-bottom: 10px;
-    }
-    .variable-inputs {
-        margin-top: 10px;
-    }
-    .variable-input-group {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 10px;
-        align-items: center; /* Zmiana z center na flex-start dla wyrównania do lewej */
-    }
-    .fields-wrapper {
-        display: flex;
-        justify-content: center; /* Zmiana z center na flex-start dla wyrównania do lewej */
-        gap: 10px;
-    }
-    .variable-input-group .form-group {
-        max-width: 120px;
-    }
-    .remove-btn-wrapper {
-        display: flex;
-        justify-content: center; /* Zmiana z center na flex-start dla wyrównania do lewej */
-        margin-top: 5px;
-    }
-    /* Nowy styl dla nagłówków */
-.variable-input-group .form-label {
-    text-align: left !important; /* Wyrównanie nagłówków do lewej */
-    width: 100%; /* Upewniamy się, że nagłówek zajmuje pełną szerokość */
-    padding-left: 0; /* Usuwamy domyślne paddingi, jeśli są */
-    }
-
-    /* Upewniamy się, że pola wejściowe są wyśrodkowane */
-    .variable-input-group .input-group {
-    justify-content: center; /* Wyśrodkowanie pól wejściowych */
-    }
-        
-    .variable-input-group .btn-danger {
-        font-size: 0.7em;
-        padding: 2px 8px;
-        height: 22px;
-        line-height: 18px;
-        background: #dc3545;
-        border: none;
-        border-radius: 5px;
-        color: #fff;
-    }
-    .variable-input-group .btn-danger:hover {
-        background: #c82333;
-    }
-    #addVariableBtn {
-        background: linear-gradient(135deg, #C2B280, #b0a070);
-        color: #000;
-        font-size: 0.7em;
-        padding: 3px 10px;
-        border-radius: 15px;
-        margin: 0 auto;
-        display: block;
-    }
-    #addVariableBtn:hover {
-        background: linear-gradient(135deg, #b0a070, #C2B280);
-    }
-</style>
+</body>
+</html>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
@@ -746,7 +744,7 @@
         "COI": "* <strong>COI (4-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,30% w pierwszym roku</strong>, w kolejnych <strong>3 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 1,50%</strong>. Wypłata odsetek następuje <strong>po każdym roku</strong> inwestycji, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>COI</strong> są idealne dla <strong>średnio i długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
         "EDO": "* <strong>EDO (10-letnie)</strong>: obligacje <strong>indeksowane inflacją</strong>, <strong>6,55% w pierwszym roku</strong>, w kolejnych <strong>9 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>10 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>EDO</strong> są idealne dla <strong>długoterminowych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
         "ROS": "* <strong>ROS (6-letnie)</strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,50% w pierwszym roku</strong>, w kolejnych <strong>5 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,00%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>6 latach inwestycji</strong>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>2%</strong> wartości obligacji (<strong>2 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROS</strong> są idealne dla <strong>rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>.",
-        "ROD": "* <strong>ROD (12-letnie) </strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,80% w pierwszym roku</strong>, w kolejnych <strong>11 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,50%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>12 latach</strong> inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROD</strong> są idealne dla <strong>długoterminowych rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>."  
+        "ROD": "* <strong>ROD (12-letnie) </strong>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <strong>800+</strong>. Obligacje <strong>indeksowane inflacją</strong>, <strong>6,80% w pierwszym roku</strong>, w kolejnych <strong>11 latach</strong> oprocentowanie wynosi <strong>wartość inflacji + 2,50%</strong>. Wypłata odsetek następuje <strong>przy wykupie</strong> obligacji po <strong>12 latach</strong> inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <strong>3%</strong> wartości obligacji (<strong>3 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <strong>Roczna kapitalizacja odsetek</strong> zwiększa efektywności inwestycji. Obligacje <strong>ROD</strong> są idealne dla <strong>długoterminowych rodzinnych inwestycji</strong> oraz dla <strong>ochrony przed wzrostem inflacji</strong>."
     };
 
     const nazwyObligacji = {
@@ -774,6 +772,20 @@
 
     document.getElementById("typObligacji").addEventListener("change", updateDynamicRateField);
     document.getElementById("ikeIkzeBtn").addEventListener("change", updateDynamicRateField);
+
+    // Dodaj zdarzenia dla checkboxów, aby aktualizować lastFormData
+    document.getElementById("inflacjaZmiennaBtn").addEventListener("change", function() {
+        lastFormData.inflacjaZmienna = this.checked;
+        updateVariableInputs();
+    });
+
+    document.getElementById("stopaZmiennaBtn").addEventListener("change", function() {
+        lastFormData.stopaZmienna = this.checked;
+        updateVariableInputs();
+    });
+
+    document.getElementById("obliczBtn").addEventListener("click", obliczObligacje);
+    document.getElementById("addVariableBtn").addEventListener("click", addVariableChange);
 
     function updateDynamicRateField() {
         const dynamicRateGroup = document.getElementById("dynamicRateGroup");
@@ -852,6 +864,7 @@
         inflacjaZmiennaLabel.style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
         stopaZmiennaLabel.style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
 
+        // Zachowaj stan checkboxów z lastFormData
         document.getElementById("inflacjaZmiennaBtn").checked = lastFormData.inflacjaZmienna || false;
         document.getElementById("stopaZmiennaBtn").checked = lastFormData.stopaZmienna || false;
         variableInflacjaChanges = lastFormData.variableInflacjaChanges ? [...lastFormData.variableInflacjaChanges] : [];
@@ -888,12 +901,6 @@
         document.getElementById("obligacjeOpis").innerHTML = opis;
         document.getElementById("obligacjeOpisPodsumowanie").innerHTML = opis;
     }
-
-    updateIloscObligacji();
-    updateLata();
-    updateOprocentowanieInfo();
-    updateOpisObligacji();
-    updateDynamicRateField();
 
     function toggleHarmonogram(sectionId) {
         const content = document.getElementById(sectionId);
@@ -1335,18 +1342,23 @@
         doc.text(opisLines, 10, 20);
 
         const summary = [
-            `Kapitał: ${lastFormData.kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-            `Odsetki: ${parseFloat(document.getElementById("valueOdsetki").textContent.replace(" zł", "").replace(/\s/g, "")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-            `Podatek: ${parseFloat(document.getElementById("valuePodatek").textContent.replace(" zł", "").replace(/\s/g, "")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+            `Kapitał: ${parseFloat(lastFormData.kwota).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+            `Odsetki: ${parseFloat(document.getElementById("valueOdsetki").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+            `Podatek: ${parseFloat(document.getElementById("valuePodatek").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
             `Okres inwestycji: ${lastFormData.okres} miesięcy`,
-            `Zysk netto: ${parseFloat(document.getElementById("zyskNetto").textContent.replace(/\s/g, "")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
+            `Zysk netto: ${parseFloat(document.getElementById("zyskNetto").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
         ];
-        doc.text("Podsumowanie:", 10, 20 + opisLines.length * 5 + 5);
-        doc.text(summary, 10, 20 + opisLines.length * 5 + 10);
 
-        const headers = ["OTS", "ROR", "DOR"].includes(typ) ? 
-            ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", ["ROR", "DOR"].includes(typ) ? "Stopa Ref. NBP" : "Inflacja", "Suma netto"] :
-            ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
+        doc.setFontSize(12);
+        doc.text("Podsumowanie:", 10, 20 + opisLines.length * 5 + 5);
+        doc.setFontSize(10);
+        summary.forEach((line, index) => {
+            doc.text(line, 10, 20 + opisLines.length * 5 + 10 + index * 5);
+        });
+
+        const headers = ["OTS", "ROR", "DOR"].includes(typ) ?
+            ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", "Zysk netto", "Opłata za wykup", "Stopa Ref. NBP", "Suma netto"] :
+            ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
         if (["OTS", "TOS"].includes(typ)) headers.splice(8, 1);
 
         const tableData = harmonogramData.map(wiersz => {
@@ -1366,26 +1378,25 @@
         });
 
         doc.autoTable({
-            startY: 20 + opisLines.length * 5 + 35,
             head: [headers],
             body: tableData,
+            startY: 20 + opisLines.length * 5 + summary.length * 5 + 10,
             styles: { fontSize: 8, cellPadding: 2 },
             headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0] },
-            columnStyles: { 0: { cellWidth: 15 } }
+            alternateRowStyles: { fillColor: [245, 245, 245] }
         });
 
-        const harmonogramOpis = document.getElementById("harmonogramOpis").textContent;
-        if (harmonogramOpis) {
+        if (isIkeIkzeMode) {
             doc.setFontSize(8);
-            const opisLinesHarmonogram = doc.splitTextToSize(harmonogramOpis, 190);
-            doc.text(opisLinesHarmonogram, 10, doc.lastAutoTable.finalY + 10);
+            doc.text("* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 10, doc.lastAutoTable.finalY + 5);
         }
 
-        doc.save(`Wynik_inwestycji_${nazwaObligacji.replace(/\s/g, "_")}.pdf`);
+        doc.save(`Wynik_inwestycji_${nazwaObligacji.replace(/\s+/g, "_")}.pdf`);
     });
 
-    document.getElementById("obliczBtn").addEventListener("click", obliczObligacje);
-    document.getElementById("inflacjaZmiennaBtn").addEventListener("change", updateVariableInputs);
-    document.getElementById("stopaZmiennaBtn").addEventListener("change", updateVariableInputs);
-    document.getElementById("addVariableBtn").addEventListener("click", addVariableChange);
+    updateIloscObligacji();
+    updateLata();
+    updateOprocentowanieInfo();
+    updateOpisObligacji();
+    updateDynamicRateField();
 </script>
