@@ -42,6 +42,7 @@
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            box-sizing: border-box;
         }
         button {
             padding: 10px 20px;
@@ -60,11 +61,13 @@
         .result-wrapper-chart {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-top: 20px;
+            gap: 20px;
         }
         .chart-container {
-            width: 50%;
+            width: 48%;
+            text-align: center;
         }
         .chart {
             width: 200px;
@@ -75,6 +78,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            margin-top: 10px;
         }
         .legend-item {
             display: flex;
@@ -121,6 +125,12 @@
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
+        }
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
         }
     </style>
 </head>
@@ -182,7 +192,7 @@
             <h2 id="resultHeader"></h2>
             <div class="result-wrapper-chart">
                 <div class="chart-container">
-                    <canvas id="obligacjeChart"></canvas>
+                    <canvas id="obligacjeChart" class="chart"></canvas>
                     <div class="chart-legend">
                         <div class="legend-item" data-index="0">
                             <div class="color-box" style="background-color: #28a745;" data-tooltip="Kapitał"></div>
@@ -225,8 +235,10 @@
                 <tbody id="harmonogramTabela"></tbody>
             </table>
             <div class="harmonogram-opis" id="harmonogramOpis"></div>
-            <button id="generatePdfBtn">Generuj PDF</button>
-            <button id="powrotBtn">Powrót</button>
+            <div class="button-group">
+                <button id="generatePdfBtn">Generuj PDF</button>
+                <button id="powrotBtn">Powrót</button>
+            </div>
         </div>
     </div>
 
@@ -340,10 +352,7 @@
             elements.dynamicRate.value = isInflacja ? "4.90" : (isStopa ? "5.75" : "");
         }
 
-        elements.kwota.addEventListener("input", () => {
-            updateIloscObligacji();
-        });
-
+        elements.kwota.addEventListener("input", updateIloscObligacji);
         elements.typObligacji.addEventListener("change", () => {
             updateIloscObligacji();
             updateLata();
@@ -354,11 +363,9 @@
             state.variableStopaChanges = [];
             elements.variableRateInputs.innerHTML = "";
         });
-
         elements.ikeIkzeMode.addEventListener("change", () => {
             state.isIkeIkzeMode = elements.ikeIkzeMode.checked;
         });
-
         elements.addVariableRate.addEventListener("click", () => {
             const typ = elements.typObligacji.value;
             const isInflacja = ["COI", "EDO", "ROS", "ROD"].includes(typ);
@@ -400,19 +407,16 @@
                 div.remove();
             });
         });
-
         elements.inflacjaZmiennaBtn.addEventListener("change", () => {
             elements.variableRateInputs.innerHTML = "";
             state.variableInflacjaChanges = [];
             if (!elements.inflacjaZmiennaBtn.checked) elements.stopaZmiennaBtn.checked = false;
         });
-
         elements.stopaZmiennaBtn.addEventListener("change", () => {
             elements.variableRateInputs.innerHTML = "";
             state.variableStopaChanges = [];
             if (!elements.stopaZmiennaBtn.checked) elements.inflacjaZmiennaBtn.checked = false;
         });
-
         elements.obliczBtn.addEventListener("click", obliczObligacje);
         elements.powrotBtn.addEventListener("click", () => {
             elements.formSection.style.display = "block";
@@ -420,7 +424,6 @@
             if (state.chart) state.chart.destroy();
             if (state.chartLine) state.chartLine.destroy();
         });
-
         elements.generatePdfBtn.addEventListener("click", generatePdf);
 
         function obliczObligacje() {
