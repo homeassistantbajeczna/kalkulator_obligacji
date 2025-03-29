@@ -25,7 +25,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <style>
+<style>
     body {
         background-color: #f5f6f5;
         font-family: 'Montserrat', sans-serif;
@@ -1287,10 +1287,14 @@
             tabela.innerHTML += rowHTML;
         });
 
+        // Poprawiony pełny tekst pod tabelą dla IKE/IKZE
+        const harmonogramOpis = document.getElementById("harmonogramOpis");
         if (state.isIkeIkzeMode) {
-            document.getElementById("harmonogramOpis").innerHTML = "* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego.";
+            harmonogramOpis.innerHTML = "* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego.";
+            harmonogramOpis.style.display = "block"; // Upewniamy się, że opis jest widoczny
         } else {
-            document.getElementById("harmonogramOpis").textContent = "";
+            harmonogramOpis.innerHTML = ""; // Pełne wyczyszczenie, zamiast .textContent, aby uniknąć resztek HTML
+            harmonogramOpis.style.display = "none";
         }
 
         const maxKwotaPoCyklu = Math.max(...state.harmonogramData.map(wiersz => parseFloat(wiersz.kwotaPoZakonczeniuCyklu)));
@@ -1341,6 +1345,7 @@
         elements.formSection.style.display = "none";
         elements.resultSection.style.display = "block";
         elements.generatePdfBtn.disabled = false; // Aktywacja przycisku po obliczeniach
+        console.log("GeneratePdfBtn enabled:", elements.generatePdfBtn.disabled); // Debugowanie stanu przycisku
         state.isCalculating = false;
         console.log("ObliczObligacje completed");
     }
@@ -1349,7 +1354,7 @@
         console.log("Starting generatePdf");
         if (typeof pdfMake === "undefined") {
             console.error("Biblioteka PDFMake nie została załadowana.");
-            alert("Błąd: Biblioteka PDFMake nie jest załadowana.");
+            alert("Błąd: Biblioteka PDFMake nie jest załadowana. Sprawdź, czy skrypt PDFMake jest poprawnie dołączony w HTML.");
             return;
         }
 
