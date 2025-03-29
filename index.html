@@ -7,15 +7,23 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Dodajemy PDFMake zamiast jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
+    <!-- Biblioteki jsPDF -->
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+    <!-- Dodajemy niestandardowy font DejaVu Sans -->
+    <script src="dejavusans.js"></script>
     <style>
-        /* Twój istniejący CSS - bez zmian */
+        /* Twój oryginalny CSS - bez zmian */
         body {
             background-color: #f5f6f5;
             font-family: 'Montserrat', sans-serif;
             padding: 10px;
+        }
+        .logo-container {
+            background-color: #e9ecef;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
         }
         /* ... reszta Twojego CSS pozostaje taka sama ... */
     </style>
@@ -91,7 +99,7 @@
                                 <div class="sub-info" id="oprocentowanieInfo"></div>
                             </div>
                         </div>
-                        <!-- Reszta formularza bez zmian -->
+                        <!-- Reszta formularza jak w Twoim kodzie -->
                         <div class="form-row">
                             <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;">Oblicz</button>
                         </div>
@@ -105,20 +113,84 @@
                 <div class="data-info"><strong>Dane z dnia:</strong> <span class="data-date"><strong>01.03.2025r.</strong></span></div>
             </div>
         </div>
-        <div class="result-section" id="resultSection" style="display: none;">
+        <div class="result-section" id="resultSection">
             <div class="result-header">
                 <h4 id="resultHeader">Podsumowanie wyników</h4>
                 <button id="generatePdfBtn" class="btn btn-primary btn-sm">Generuj PDF</button>
             </div>
             <button class="btn btn-secondary mb-3" onclick="showForm()">Powrót do edycji</button>
-            <!-- Reszta sekcji wyników bez zmian -->
+            <div class="result-container">
+                <div class="result-wrapper">
+                    <div class="chart-container">
+                        <div class="chart">
+                            <canvas id="obligacjeChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item" data-index="0">
+                                <div class="color-box" style="background-color: #28a745;" data-tooltip="">
+                                    <span class="value" id="valueKapital">-</span>
+                                </div>
+                                <span class="legend-text" id="legendKapital">Kapitał</span>
+                            </div>
+                            <div class="legend-item" data-index="1">
+                                <div class="color-box" style="background-color: #007bff;" data-tooltip="">
+                                    <span class="value" id="valueOdsetki">-</span>
+                                </div>
+                                <span class="legend-text" id="legendOdsetki">Odsetki</span>
+                            </div>
+                            <div class="legend-item" data-index="2">
+                                <div class="color-box" style="background-color: #dc3545;" data-tooltip="">
+                                    <span class="value" id="valuePodatek">-</span>
+                                </div>
+                                <span class="legend-text" id="legendPodatek">Podatek</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <span class="highlight yellow" data-hover="3 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span> mc-y</span>
+                        <span class="highlight green" data-hover="">Zysk netto: <span id="zyskNetto">-</span> zł</span>
+                    </div>
+                    <div class="obligacje-opis" id="obligacjeOpisPodsumowanie"></div>
+                </div>
+            </div>
+            <div class="harmonogram-container">
+                <div class="result-wrapper">
+                    <div class="harmonogram">
+                        <h5 class="btn-toggle" onclick="toggleHarmonogram('harmonogramContent')">Harmonogram odsetek ▼</h5>
+                        <div id="harmonogramContent">
+                            <table class="table table-striped">
+                                <thead id="harmonogramNaglowek">
+                                    <tr>
+                                        <th id="pierwszaKolumnaNaglowek">Rok</th>
+                                        <th>Wartość inwestycji</th>
+                                        <th>Oproc.</th>
+                                        <th>Odsetki</th>
+                                        <th>Suma odsetek</th>
+                                        <th>Podatek</th>
+                                        <th id="zyskKolumnaNaglowek">Zysk netto</th>
+                                        <th>Opłata za wykup</th>
+                                        <th id="kolumnaStopaInflacja">Inflacja</th>
+                                        <th>Suma netto</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="harmonogramTabela"></tbody>
+                            </table>
+                            <div class="harmonogram-opis" id="harmonogramOpis"></div>
+                        </div>
+                    </div>
+                    <div class="chart-container-line">
+                        <div class="chart-line">
+                            <canvas id="obligacjeChartLine"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </body>
 </html>
 <script>
 console.log("Skrypt JavaScript został załadowany");
-
 let chart, chartLine;
 let harmonogramData = [];
 let isIkeIkzeMode = false;
@@ -159,9 +231,9 @@ const obligacjeConfig = {
 };
 
 const opisyObligacji = {
-    "OTS": "* <strong>OTS (3-miesięczne) </strong>: stałe oprocentowanie <strong>3,00%</strong> na okres <strong>3-miesięcy</strong>...",
-    "ROR": "* <strong>ROR (12-miesięczne) </strong>: <strong>oprocentowanie zmienne</strong>, w pierwszym miesiącu <strong>5,75%</strong>...",
-    // Reszta opisów jak w Twoim kodzie
+    "OTS": "* <strong>OTS (3-miesięczne) </strong>: stałe oprocentowanie <strong>3,00%</strong> na okres <strong>3-miesięcy</strong>, wypłata odsetek nastąpi <strong>przy wykupie</strong> obligacji. Wcześniejszy odkup powoduje nienaliczenie odsetek, natomiast <strong>nie ma opłat za wcześniejszy odkup</strong>. Obligacje <strong>OTS</strong> są idealne dla <strong>krótkoterminowych inwestycji</strong>.",
+    "ROR": "* <strong>ROR (12-miesięczne) </strong>: <strong>oprocentowanie zmienne</strong>, w pierwszym miesiącu <strong>5,75%</strong>, w pozostałych <strong>11 miesiącach</strong> oprocentowanie oparte na <strong>stopie referencyjnej NBP + 0%</strong>. Wypłata odsetek następuje <strong>co miesiąc</strong>, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <strong>0,5%</strong> wartości obligacji (<strong>0,5 zł</strong> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <strong>ROR</strong> przeznaczone są dla <strong>krótko i średnioterminowych inwestorów</strong>.",
+    // ... reszta Twoich opisów ...
 };
 
 const nazwyObligacji = {
@@ -169,12 +241,150 @@ const nazwyObligacji = {
     "COI": "4-letnich (COI)", "EDO": "10-letnich (EDO)", "ROS": "6-letnich (ROS)", "ROD": "12-letnich (ROD)"
 };
 
-// Funkcje obsługi formularza i obliczeń - bez zmian
+// Twoje oryginalne funkcje
 document.getElementById("dynamicRateRange").addEventListener("input", function() {
     document.getElementById("dynamicRate").value = this.value;
 });
 
-// Reszta funkcji jak updateDynamicRateField, updateIloscObligacji itd. pozostaje taka sama
+document.getElementById("dynamicRate").addEventListener("input", function() {
+    document.getElementById("dynamicRateRange").value = this.value;
+});
+
+document.getElementById("kwotaRange").addEventListener("input", function() {
+    document.getElementById("kwota").value = this.value;
+    updateIloscObligacji();
+});
+
+document.getElementById("kwota").addEventListener("input", function() {
+    document.getElementById("kwotaRange").value = this.value;
+    updateIloscObligacji();
+});
+
+document.getElementById("typObligacji").addEventListener("change", updateDynamicRateField);
+document.getElementById("ikeIkzeBtn").addEventListener("change", updateDynamicRateField);
+
+function updateDynamicRateField() {
+    const dynamicRateGroup = document.getElementById("dynamicRateGroup");
+    const dynamicRateLabel = document.getElementById("dynamicRateLabel");
+    const dynamicRateInput = document.getElementById("dynamicRate");
+    const dynamicRateRange = document.getElementById("dynamicRateRange");
+
+    isIkeIkzeMode = document.getElementById("ikeIkzeBtn").checked;
+    const select = document.getElementById("typObligacji");
+    const previousTyp = select.value;
+
+    if (isIkeIkzeMode) {
+        select.innerHTML = `
+            <option value="ROR">12-miesięczne (ROR)</option>
+            <option value="DOR">24-miesięczne (DOR)</option>
+            <option value="TOS" selected>3-letnie (TOS)</option>
+            <option value="COI">4-letnie (COI)</option>
+            <option value="EDO">10-letnie (EDO)</option>
+        `;
+    } else {
+        select.innerHTML = `
+            <option value="OTS" selected>3-miesięczne (OTS)</option>
+            <option value="ROR">12-miesięczne (ROR)</option>
+            <option value="DOR">24-miesięczne (DOR)</option>
+            <option value="TOS">3-letnie (TOS)</option>
+            <option value="COI">4-letnie (COI)</option>
+            <option value="EDO">10-letnie (EDO)</option>
+            <option value="ROS">6-letnie (ROS)</option>
+            <option value="ROD">12-letnie (ROD)</option>
+        `;
+    }
+
+    const availableOptions = Array.from(select.options).map(opt => opt.value);
+    if (!availableOptions.includes(previousTyp)) {
+        select.value = isIkeIkzeMode ? "TOS" : "OTS";
+    } else {
+        select.value = previousTyp;
+    }
+
+    const typ = select.value;
+    const config = obligacjeConfig[typ];
+
+    document.getElementById("okres").value = config.okres;
+    document.getElementById("oprocentowanie").value = config.oprocentowanie;
+    updateLata();
+    updateOprocentowanieInfo();
+    updateOpisObligacji();
+
+    if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+        dynamicRateLabel.textContent = "Inflacja";
+        dynamicRateInput.value = lastFormData.isInflacja ? (lastFormData.dynamicRate || 4.90) : 4.90;
+        dynamicRateRange.value = lastFormData.isInflacja ? (lastFormData.dynamicRate || 4.90) : 4.90;
+        dynamicRateGroup.style.display = "block";
+        lastFormData.isInflacja = true;
+    } else if (["ROR", "DOR"].includes(typ)) {
+        dynamicRateLabel.textContent = "Stopa Ref. NBP";
+        dynamicRateInput.value = lastFormData.isInflacja ? 5.75 : (lastFormData.dynamicRate || 5.75);
+        dynamicRateRange.value = lastFormData.isInflacja ? 5.75 : (lastFormData.dynamicRate || 5.75);
+        dynamicRateGroup.style.display = "block";
+        lastFormData.isInflacja = false;
+    } else {
+        dynamicRateGroup.style.display = "none";
+        lastFormData.isInflacja = false;
+    }
+}
+
+function updateIloscObligacji() {
+    const kwota = parseFloat(document.getElementById("kwota").value) || 0;
+    const ilosc = Math.floor(kwota / 100);
+    document.getElementById("iloscObligacji").textContent = `Ilość obligacji: ${ilosc}`;
+}
+
+function updateLata() {
+    const miesiace = parseInt(document.getElementById("okres").value) || 0;
+    const lata = (miesiace / 12).toFixed(0);
+    document.getElementById("lata").textContent = `Ilość lat: ${miesiace >= 12 ? lata : 0}`;
+}
+
+function updateOprocentowanieInfo() {
+    const typ = document.getElementById("typObligacji").value;
+    const config = obligacjeConfig[typ];
+    let info = config.zmienne ? 
+        (config.indeksowaneInflacja ? 
+            `Pierwszy rok: ${config.oprocentowanie}%, kolejne: inflacja + ${config.marza}%` : 
+            `Pierwszy miesiąc: ${config.oprocentowanie}%, kolejne: stopa NBP + ${config.marza}%`) : 
+        `Stałe: ${config.oprocentowanie}%`;
+    document.getElementById("oprocentowanieInfo").textContent = info;
+}
+
+function updateOpisObligacji() {
+    const typ = document.getElementById("typObligacji").value;
+    const opis = opisyObligacji[typ] || "";
+    document.getElementById("obligacjeOpis").innerHTML = opis;
+    document.getElementById("obligacjeOpisPodsumowanie").innerHTML = opis;
+}
+
+updateIloscObligacji();
+updateLata();
+updateOprocentowanieInfo();
+updateOpisObligacji();
+updateDynamicRateField();
+
+function toggleHarmonogram(sectionId) {
+    const content = document.getElementById(sectionId);
+    const toggleBtn = content.previousElementSibling;
+    content.style.display = content.style.display === "none" ? "block" : "none";
+    toggleBtn.textContent = content.style.display === "none" ? "Harmonogram odsetek ►" : "Harmonogram odsetek ▼";
+}
+
+function showForm() {
+    document.getElementById("formSection").style.display = "block";
+    document.getElementById("resultSection").style.display = "none";
+
+    document.getElementById("kwota").value = lastFormData.kwota;
+    document.getElementById("kwotaRange").value = lastFormData.kwota;
+    document.getElementById("dynamicRate").value = lastFormData.dynamicRate;
+    document.getElementById("dynamicRateRange").value = lastFormData.dynamicRate;
+    document.getElementById("okres").value = lastFormData.okres;
+    document.getElementById("oprocentowanie").value = lastFormData.oprocentowanie;
+    document.getElementById("ikeIkzeBtn").checked = lastFormData.ikeIkze;
+    isIkeIkzeMode = lastFormData.ikeIkze;
+    document.getElementById("typObligacji").value = lastFormData.typObligacji;
+}
 
 function obliczObligacje() {
     console.log("Funkcja obliczObligacje została wywołana");
@@ -184,6 +394,8 @@ function obliczObligacje() {
     const miesiace = config.okres;
     const dynamicRate = parseFloat(document.getElementById("dynamicRate").value) / 100 || (["COI", "EDO", "ROS", "ROD"].includes(typ) ? 0.0490 : 0.0575);
     const isInflacja = ["COI", "EDO", "ROS", "ROD"].includes(typ);
+    const inflacja = isInflacja ? dynamicRate : 0;
+    const stopaRel = !isInflacja ? dynamicRate : 0.0575;
     const podatekBelki = isIkeIkzeMode ? 0 : 0.19;
 
     lastFormData = {
@@ -192,13 +404,30 @@ function obliczObligacje() {
         dynamicRate: dynamicRate * 100,
         okres: miesiace,
         oprocentowanie: config.oprocentowanie,
-        ikeIkze: isIkeIkzeMode
+        ikeIkze: isIkeIkzeMode,
+        isInflacja: isInflacja
     };
 
     if (kwota < 100 || miesiace <= 0) {
         alert("Proszę wypełnić wszystkie wymagane pola poprawnymi wartościami.");
         return;
     }
+
+    document.getElementById("resultHeader").textContent = `Wynik inwestycji dla obligacji ${nazwyObligacji[typ]}${isIkeIkzeMode ? " (IKE/IKZE)" : ""}`;
+    const pierwszaKolumnaNaglowek = document.getElementById("pierwszaKolumnaNaglowek");
+    const kolumnaStopaInflacja = document.getElementById("kolumnaStopaInflacja");
+    const zyskKolumnaNaglowek = document.getElementById("zyskKolumnaNaglowek");
+
+    if (["OTS", "ROR", "DOR"].includes(typ)) {
+        pierwszaKolumnaNaglowek.textContent = "Miesiąc";
+        kolumnaStopaInflacja.textContent = ["ROR", "DOR"].includes(typ) ? "Stopa Ref. NBP" : "Inflacja";
+        kolumnaStopaInflacja.style.display = ["OTS"].includes(typ) ? "none" : "table-cell";
+    } else {
+        pierwszaKolumnaNaglowek.textContent = "Rok";
+        kolumnaStopaInflacja.textContent = "Inflacja";
+        kolumnaStopaInflacja.style.display = ["TOS"].includes(typ) ? "none" : "table-cell";
+    }
+    zyskKolumnaNaglowek.textContent = isIkeIkzeMode ? "Zysk" : "Zysk netto";
 
     let kapital = kwota;
     let odsetkiCalkowite = 0;
@@ -209,7 +438,15 @@ function obliczObligacje() {
     let liczbaCykli = ["OTS", "ROR", "DOR"].includes(typ) ? miesiace : miesiace / 12;
 
     for (let i = 1; i <= liczbaCykli; i++) {
-        let oprocentowanieRoczne = i === 1 ? config.oprocentowanie / 100 : (dynamicRate + (config.marza || 0) / 100);
+        let oprocentowanieRoczne;
+        if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+            oprocentowanieRoczne = i === 1 ? config.oprocentowanie / 100 : (inflacja + config.marza / 100);
+        } else if (["ROR", "DOR"].includes(typ)) {
+            oprocentowanieRoczne = i === 1 ? config.oprocentowanie / 100 : (stopaRel + config.marza / 100);
+        } else {
+            oprocentowanieRoczne = config.oprocentowanie / 100;
+        }
+
         let oprocentowanieMiesieczne = oprocentowanieRoczne / 12;
         let miesiecyWCyklu = ["OTS", "ROR", "DOR"].includes(typ) ? 1 : 12;
         let odsetkiCykl = kapital * oprocentowanieMiesieczne * miesiecyWCyklu;
@@ -230,6 +467,8 @@ function obliczObligacje() {
         let kwotaPoCyklu = isIkeIkzeMode ? (config.kapitalizacja ? wartoscInwestycji : kwota + zyskNettoCalkowity) : 
             (config.kapitalizacja ? (wartoscInwestycji - skumulowaneOdsetki * 0.19) : kwota + zyskNettoCalkowity);
 
+        let oplataZaWykup = i < liczbaCykli ? kwota * config.oplataWykup : 0;
+
         harmonogram.push({
             okres: i,
             wartoscInwestycji: wartoscInwestycji.toFixed(2),
@@ -238,8 +477,8 @@ function obliczObligacje() {
             skumulowaneOdsetki: skumulowaneOdsetki.toFixed(2),
             podatek: podatekCykl.toFixed(2),
             zyskNetto: odsetkiNettoCykl.toFixed(2),
-            oplataZaWykup: (i < liczbaCykli ? kwota * config.oplataWykup : 0).toFixed(2),
-            stopaRefLubInflacja: isInflacja ? (dynamicRate * 100).toFixed(2) + "%" : "-",
+            oplataZaWykup: oplataZaWykup.toFixed(2),
+            stopaRefLubInflacja: ["COI", "EDO", "ROS", "ROD"].includes(typ) ? (inflacja * 100).toFixed(2) + "%" : (["ROR", "DOR"].includes(typ) ? (stopaRel * 100).toFixed(2) + "%" : "-"),
             kwotaPoZakonczeniuCyklu: kwotaPoCyklu.toFixed(2)
         });
     }
@@ -253,7 +492,94 @@ function obliczObligacje() {
     document.getElementById("okresInwestycji").textContent = miesiace;
     document.getElementById("zyskNetto").textContent = `${zyskNettoCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2 })}`;
 
-    // Reszta kodu generowania wykresów i tabeli pozostaje taka sama
+    if (chart) chart.destroy();
+    if (chartLine) chartLine.destroy();
+
+    const ctx = document.getElementById("obligacjeChart").getContext("2d");
+    chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Kapitał', 'Odsetki', 'Podatek'],
+            datasets: [{
+                data: [kwota, odsetkiCalkowite, podatekCalkowity],
+                backgroundColor: ['#28a745', '#007bff', '#dc3545'],
+                borderWidth: 1,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    let tabela = document.getElementById("harmonogramTabela");
+    tabela.innerHTML = "";
+    harmonogram.forEach(wiersz => {
+        let rowHTML = `
+            <tr>
+                <td>${wiersz.okres}</td>
+                <td>${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                <td>${wiersz.oprocentowanieNaCykl}</td>
+                <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                <td>${isIkeIkzeMode ? "0,00 zł*" : parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}</td>
+                <td>${parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+                <td>${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+        `;
+        if (!["OTS", "TOS"].includes(typ)) {
+            rowHTML += `<td>${wiersz.stopaRefLubInflacja}</td>`;
+        }
+        rowHTML += `
+                <td>${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
+            </tr>
+        `;
+        tabela.innerHTML += rowHTML;
+    });
+
+    if (isIkeIkzeMode) {
+        document.getElementById("harmonogramOpis").innerHTML = "* Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong>...";
+    } else {
+        document.getElementById("harmonogramOpis").textContent = "";
+    }
+
+    const ctxLine = document.getElementById("obligacjeChartLine").getContext("2d");
+    chartLine = new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: harmonogram.map(wiersz => ["OTS", "ROR", "DOR"].includes(typ) ? `Miesiąc ${wiersz.okres}` : `Rok ${wiersz.okres}`),
+            datasets: [
+                {
+                    label: 'Zainwestowana kwota',
+                    data: harmonogram.map(() => kwota),
+                    borderColor: '#8B7D47',
+                    backgroundColor: 'rgba(139, 125, 71, 0.1)',
+                    fill: false,
+                    tension: 0,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Kwota po zakończeniu cyklu',
+                    data: harmonogram.map(wiersz => parseFloat(wiersz.kwotaPoZakonczeniuCyklu)),
+                    borderColor: '#D4C791',
+                    backgroundColor: 'rgba(212, 199, 145, 0.2)',
+                    fill: true,
+                    tension: 0.1,
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { title: { display: true, text: ["OTS", "ROR", "DOR"].includes(typ) ? 'Okres (miesiące)' : 'Okres (lata)' } },
+                y: { title: { display: true, text: 'Wartość (PLN)' } }
+            }
+        }
+    });
+
     document.getElementById("formSection").style.display = "none";
     document.getElementById("resultSection").style.display = "block";
 }
@@ -264,23 +590,108 @@ document.getElementById("obliczBtn").addEventListener("click", obliczObligacje);
 document.getElementById("generatePdfBtn").addEventListener("click", function() {
     console.log("Przycisk Generuj PDF został kliknięty");
 
-    if (!harmonogramData.length) {
-        alert("Najpierw kliknij 'Oblicz', aby wygenerować dane.");
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert("Błąd: Biblioteka jsPDF nie jest załadowana.");
+        console.error("jsPDF nie jest dostępne.");
         return;
     }
 
+    if (!harmonogramData.length) {
+        alert("Najpierw kliknij 'Oblicz', aby wygenerować dane.");
+        console.warn("harmonogramData jest puste.");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const typ = lastFormData.typObligacji;
     const nazwaObligacji = nazwyObligacji[typ];
     const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${isIkeIkzeMode ? " (IKE/IKZE)" : ""}`;
-    const opis = opisyObligacji[typ].replace(/<[^>]+>/g, ""); // Usuwamy tagi HTML
+    const opis = opisyObligacji[typ] || "";
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 10;
 
-    // Przygotowanie danych tabeli
+    // Ustawiamy font DejaVuSans zamiast Times
+    doc.setFont("DejaVuSans", "normal");
+
+    // Funkcja do dodawania stopki
+    const addFooter = () => {
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text(`Data: 01.03.2025r.`, 10, pageHeight - 10);
+            doc.text(`Strona ${i} z ${pageCount}`, pageWidth - 30, pageHeight - 10);
+        }
+    };
+
+    // Nagłówek
+    doc.setFontSize(16);
+    doc.setTextColor(0);
+    doc.setFont("DejaVuSans", "bold"); // DejaVuSans bold, jeśli dostępny, inaczej normal
+    const headerWidth = doc.getTextWidth(headerText);
+    doc.text(headerText, (pageWidth - headerWidth) / 2, yPosition);
+    yPosition += 10;
+
+    // Opis obligacji
+    doc.setFontSize(10);
+    doc.setFont("DejaVuSans", "normal");
+    const opisLines = doc.splitTextToSize(opis.replace(/<[^>]+>/g, ""), pageWidth - 20);
+    doc.text(opisLines, 10, yPosition);
+    yPosition += opisLines.length * 5 + 5;
+
+    // Podsumowanie
+    doc.setFontSize(12);
+    doc.setFont("DejaVuSans", "bold");
+    doc.text("Podsumowanie:", 10, yPosition);
+    yPosition += 5;
+
+    const summary = [
+        `Kapitał: ${lastFormData.kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+        `Odsetki: ${parseFloat(document.getElementById("valueOdsetki").textContent.replace(" zł", "").replace(/\s/g, "")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+        `Podatek: ${parseFloat(document.getElementById("valuePodatek").textContent.replace(" zł", "").replace(/\s/g, "")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+        `Okres inwestycji: ${lastFormData.okres} miesięcy`,
+        `Zysk netto: ${parseFloat(document.getElementById("zyskNetto").textContent.replace(/\s/g, "")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
+    ];
+    doc.setFontSize(10);
+    doc.setFont("DejaVuSans", "normal");
+    summary.forEach((line) => {
+        doc.text(line, 10, yPosition);
+        yPosition += 5;
+    });
+    yPosition += 5;
+
+    // Wykres kołowy
+    const chartCanvas = document.getElementById("obligacjeChart");
+    if (chartCanvas) {
+        try {
+            const chartImg = chartCanvas.toDataURL("image/png");
+            const chartWidth = 60;
+            const chartHeight = (chartCanvas.height / chartCanvas.width) * chartWidth;
+            doc.addImage(chartImg, "PNG", (pageWidth - chartWidth) / 2, yPosition, chartWidth, chartHeight);
+            yPosition += chartHeight + 10;
+        } catch (e) {
+            console.warn("Nie udało się dodać wykresu kołowego do PDF-a:", e);
+            doc.setFontSize(10);
+            doc.text("Wykres kołowy niedostępny w PDF.", (pageWidth - doc.getTextWidth("Wykres kołowy niedostępny w PDF.")) / 2, yPosition);
+            yPosition += 10;
+        }
+    }
+
+    // Tabela harmonogramu
+    doc.setFontSize(12);
+    doc.setFont("DejaVuSans", "bold");
+    doc.text("Harmonogram odsetek:", 10, yPosition);
+    yPosition += 5;
+
     const headers = ["OTS", "ROR", "DOR"].includes(typ) ?
-        ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Stopa/Inflacja", "Suma netto"] :
+        ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", ["ROR", "DOR"].includes(typ) ? "Stopa Ref. NBP" : "Inflacja", "Suma netto"] :
         ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
     if (["OTS", "TOS"].includes(typ)) headers.splice(8, 1);
 
-    const tableBody = harmonogramData.map(wiersz => {
+    const tableData = harmonogramData.map(wiersz => {
         const row = [
             wiersz.okres,
             `${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
@@ -296,55 +707,76 @@ document.getElementById("generatePdfBtn").addEventListener("click", function() {
         return row;
     });
 
-    // Definicja dokumentu PDFMake
-    const docDefinition = {
-        content: [
-            { text: headerText, style: 'header', alignment: 'center' },
-            { text: opis, style: 'subheader', margin: [0, 10, 0, 10] },
-            { text: 'Podsumowanie:', style: 'subheader' },
-            {
-                ul: [
-                    `Kapitał: ${lastFormData.kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                    `Odsetki: ${parseFloat(document.getElementById("valueOdsetki").textContent.replace(" zł", "").replace(/\s/g, "")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                    `Podatek: ${parseFloat(document.getElementById("valuePodatek").textContent.replace(" zł", "").replace(/\s/g, "")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                    `Okres inwestycji: ${lastFormData.okres} miesięcy`,
-                    `Zysk netto: ${parseFloat(document.getElementById("zyskNetto").textContent.replace(/\s/g, "")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
-                ],
-                margin: [0, 0, 0, 10]
-            },
-            { text: 'Harmonogram odsetek:', style: 'subheader', margin: [0, 10, 0, 5] },
-            {
-                table: {
-                    headerRows: 1,
-                    widths: headers.map(() => 'auto'),
-                    body: [headers, ...tableBody]
-                }
-            }
-        ],
-        styles: {
-            header: { fontSize: 18, bold: true },
-            subheader: { fontSize: 14, bold: true }
+    doc.autoTable({
+        startY: yPosition,
+        head: [headers],
+        body: tableData,
+        styles: { font: "DejaVuSans", fontSize: 8, cellPadding: 1.5, overflow: "linebreak" },
+        headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0], fontStyle: "bold" },
+        bodyStyles: { textColor: [0, 0, 0] },
+        alternateRowStyles: { fillColor: [240, 240, 240] },
+        columnStyles: {
+            0: { cellWidth: 10 },
+            1: { cellWidth: 25 },
+            2: { cellWidth: 15 },
+            3: { cellWidth: 20 },
+            4: { cellWidth: 20 },
+            5: { cellWidth: 15 },
+            6: { cellWidth: 20 },
+            7: { cellWidth: 20 },
+            8: { cellWidth: 15 },
+            9: { cellWidth: 20 }
         },
-        footer: function(currentPage, pageCount) {
-            return { text: `Data: 01.03.2025r. | Strona ${currentPage} z ${pageCount}`, alignment: 'center', fontSize: 8 };
+        margin: { top: 10, left: 10, right: 10 },
+        didDrawPage: () => {
+            addFooter();
         }
-    };
+    });
 
-    // Dodanie wykresów jako obrazy
-    const chartCanvas = document.getElementById("obligacjeChart");
-    if (chartCanvas) {
-        const chartImg = chartCanvas.toDataURL("image/png");
-        docDefinition.content.splice(4, 0, { image: chartImg, width: 150, alignment: 'center', margin: [0, 10, 0, 10] });
+    yPosition = doc.lastAutoTable.finalY + 10;
+
+    // Opis harmonogramu
+    const harmonogramOpis = document.getElementById("harmonogramOpis").textContent;
+    if (harmonogramOpis) {
+        doc.setFontSize(8);
+        doc.setFont("DejaVuSans", "normal");
+        const opisLinesHarmonogram = doc.splitTextToSize(harmonogramOpis, pageWidth - 20);
+        doc.text(opisLinesHarmonogram, 10, yPosition);
+        yPosition += opisLinesHarmonogram.length * 4 + 5;
     }
+
+    // Wykres liniowy
+    if (yPosition + 60 > pageHeight - 20) {
+        doc.addPage();
+        yPosition = 20;
+    }
+
+    doc.setFontSize(12);
+    doc.setFont("DejaVuSans", "bold");
+    doc.text("Wykres wartości inwestycji:", 10, yPosition);
+    yPosition += 5;
 
     const chartLineCanvas = document.getElementById("obligacjeChartLine");
     if (chartLineCanvas) {
-        const chartLineImg = chartLineCanvas.toDataURL("image/png");
-        docDefinition.content.push({ image: chartLineImg, width: 400, alignment: 'center', margin: [0, 10, 0, 10] });
+        try {
+            const chartLineImg = chartLineCanvas.toDataURL("image/png");
+            const chartLineWidth = 180;
+            const chartLineHeight = (chartLineCanvas.height / chartLineCanvas.width) * chartLineWidth;
+            doc.addImage(chartLineImg, "PNG", (pageWidth - chartLineWidth) / 2, yPosition, chartLineWidth, chartLineHeight);
+            yPosition += chartLineHeight + 10;
+        } catch (e) {
+            console.warn("Nie udało się dodać wykresu liniowego do PDF-a:", e);
+            doc.setFontSize(10);
+            doc.text("Wykres liniowy niedostępny w PDF.", (pageWidth - doc.getTextWidth("Wykres liniowy niedostępny w PDF.")) / 2, yPosition);
+            yPosition += 10;
+        }
     }
 
-    // Generowanie i zapis PDF-a
-    pdfMake.createPdf(docDefinition).download(`Wynik_inwestycji_${nazwaObligacji.replace(/\s/g, "_")}.pdf`);
+    // Finalna stopka
+    addFooter();
+
+    // Zapis pliku
+    doc.save(`Wynik_inwestycji_${nazwaObligacji.replace(/\s/g, "_")}.pdf`);
     console.log("PDF został wygenerowany i zapisany.");
 });
 </script>
