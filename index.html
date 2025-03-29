@@ -25,6 +25,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
+
+
+
+
+
 <style>
     body {
         background-color: #f5f6f5;
@@ -533,6 +539,11 @@
         background: linear-gradient(135deg, #b0a070, #C2B280);
     }
 </style>
+
+
+
+
+
 <div class="logo-container">
     <a href="https://finance-brothers.pl">
         <img src="cropped-logo-FB-1.png" alt="Finance Brothers Logo" class="logo d-block mx-auto">
@@ -815,60 +826,60 @@
     }
 
     function updateDynamicRateField() {
-        state.isIkeIkzeMode = elements.ikeIkzeBtn.checked;
-        const select = elements.typObligacji;
-        const previousTyp = select.value;
+    state.isIkeIkzeMode = elements.ikeIkzeBtn.checked;
+    const select = elements.typObligacji;
+    const previousTyp = select.value;
 
-        select.innerHTML = state.isIkeIkzeMode ? `
-            <option value="ROR">12-miesięczne (ROR)</option>
-            <option value="DOR">24-miesięczne (DOR)</option>
-            <option value="TOS" selected>3-letnie (TOS)</option>
-            <option value="COI">4-letnie (COI)</option>
-            <option value="EDO">10-letnie (EDO)</option>
-        ` : `
-            <option value="OTS" selected>3-miesięczne (OTS)</option>
-            <option value="ROR">12-miesięczne (ROR)</option>
-            <option value="DOR">24-miesięczne (DOR)</option>
-            <option value="TOS">3-letnie (TOS)</option>
-            <option value="COI">4-letnie (COI)</option>
-            <option value="EDO">10-letnie (EDO)</option>
-            <option value="ROS">6-letnie (ROS)</option>
-            <option value="ROD">12-letnich (ROD)</option>
-        `;
+    select.innerHTML = state.isIkeIkzeMode ? `
+        <option value="ROR">12-miesięczne (ROR)</option>
+        <option value="DOR">24-miesięczne (DOR)</option>
+        <option value="TOS" selected>3-letnie (TOS)</option>
+        <option value="COI">4-letnie (COI)</option>
+        <option value="EDO">10-letnie (EDO)</option>
+    ` : `
+        <option value="OTS" selected>3-miesięczne (OTS)</option>
+        <option value="ROR">12-miesięczne (ROR)</option>
+        <option value="DOR">24-miesięczne (DOR)</option>
+        <option value="TOS">3-letnie (TOS)</option>
+        <option value="COI">4-letnie (COI)</option>
+        <option value="EDO">10-letnie (EDO)</option>
+        <option value="ROS">6-letnie (ROS)</option>
+        <option value="ROD">12-letnich (ROD)</option>
+    `;
 
-        const availableOptions = Array.from(select.options).map(opt => opt.value);
-        select.value = availableOptions.includes(previousTyp) ? previousTyp : (state.isIkeIkzeMode ? "TOS" : "OTS");
+    const availableOptions = Array.from(select.options).map(opt => opt.value);
+    select.value = availableOptions.includes(previousTyp) ? previousTyp : (state.isIkeIkzeMode ? "TOS" : "OTS");
 
-        const typ = select.value;
-        const config = obligacjeConfig[typ];
+    const typ = select.value;
+    const config = obligacjeConfig[typ];
 
-        elements.okres.value = config.okres;
-        elements.oprocentowanie.value = config.oprocentowanie;
-        updateLata();
-        updateOprocentowanieInfo();
-        updateOpisObligacji();
+    elements.okres.value = config.okres;
+    elements.oprocentowanie.value = config.oprocentowanie;
+    updateLata();
+    updateOprocentowanieInfo();
+    updateOpisObligacji();
 
-        // Poprawiona domyślna wartość inflacji na 4,9%
-        if (["ROR", "DOR"].includes(typ)) {
-            setDynamicRateField("Stopa Ref. NBP", state.lastFormData.dynamicRate || 5.75, "0.05", "20");
-            state.lastFormData.isInflacja = false;
-        } else if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-            setDynamicRateField("Inflacja", state.lastFormData.dynamicRate || 4.90, "0.1", "50");
-            state.lastFormData.isInflacja = true;
-        } else {
-            document.getElementById("dynamicRateGroup").style.display = "none";
-            state.lastFormData.isInflacja = false;
-        }
-
-        document.getElementById("inflacjaZmiennaLabel").style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
-        document.getElementById("stopaZmiennaLabel").style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
-
-        elements.inflacjaZmiennaBtn.checked = state.lastFormData.inflacjaZmienna || false;
-        elements.stopaZmiennaBtn.checked = state.lastFormData.stopaZmienna || false;
-        state.variableInflacjaChanges = state.lastFormData.variableInflacjaChanges ? [...state.lastFormData.variableInflacjaChanges] : [];
-        state.variableStopaChanges = state.lastFormData.variableStopaChanges ? [...state.lastFormData.variableStopaChanges] : [];
-        updateVariableInputs();
+    // Poprawiona logika domyślnej wartości inflacji
+    if (["ROR", "DOR"].includes(typ)) {
+        setDynamicRateField("Stopa Ref. NBP", state.lastFormData.dynamicRate || 5.75, "0.05", "20");
+        state.lastFormData.isInflacja = false;
+    } else if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+        setDynamicRateField("Inflacja", state.lastFormData.dynamicRate && state.lastFormData.isInflacja ? state.lastFormData.dynamicRate : 4.90, "0.1", "50");
+        state.lastFormData.isInflacja = true;
+    } else {
+        document.getElementById("dynamicRateGroup").style.display = "none";
+        state.lastFormData.isInflacja = false;
     }
+
+    document.getElementById("inflacjaZmiennaLabel").style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
+    document.getElementById("stopaZmiennaLabel").style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
+
+    elements.inflacjaZmiennaBtn.checked = state.lastFormData.inflacjaZmienna || false;
+    elements.stopaZmiennaBtn.checked = state.lastFormData.stopaZmienna || false;
+    state.variableInflacjaChanges = state.lastFormData.variableInflacjaChanges ? [...state.lastFormData.variableInflacjaChanges] : [];
+    state.variableStopaChanges = state.lastFormData.variableStopaChanges ? [...state.lastFormData.variableStopaChanges] : [];
+    updateVariableInputs();
+}
 
     function updateIloscObligacji() {
         const kwota = parseFloat(elements.kwota.value) || 0;
@@ -1068,6 +1079,18 @@
     }
 </script>
 <script>
+    // Inicjalizacja fontów (po załadowaniu pdfmake i vfs_fonts)
+    if (typeof pdfMake !== "undefined" && typeof pdfMake.vfs !== "undefined") {
+        pdfMake.fonts = {
+            Roboto: {
+                normal: 'Roboto-Regular.ttf',
+                bold: 'Roboto-Medium.ttf',
+                italics: 'Roboto-Italic.ttf',
+                bolditalics: 'Roboto-MediumItalic.ttf'
+            }
+        };
+    }
+
     function obliczObligacje() {
         console.log("Starting obliczObligacje");
         if (state.isCalculating) {
@@ -1287,7 +1310,6 @@
             tabela.innerHTML += rowHTML;
         });
 
-        // Poprawiony pełny tekst pod tabelą dla IKE/IKZE
         const harmonogramOpis = document.getElementById("harmonogramOpis");
         if (state.isIkeIkzeMode) {
             harmonogramOpis.innerHTML = "* Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>.";
@@ -1344,8 +1366,8 @@
 
         elements.formSection.style.display = "none";
         elements.resultSection.style.display = "block";
-        elements.generatePdfBtn.disabled = false; // Aktywacja przycisku
-        console.log("GeneratePdfBtn enabled:", !elements.generatePdfBtn.disabled); // Logowanie stanu
+        elements.generatePdfBtn.disabled = false;
+        console.log("GeneratePdfBtn enabled:", !elements.generatePdfBtn.disabled);
         state.isCalculating = false;
         console.log("ObliczObligacje completed");
     }
@@ -1445,8 +1467,13 @@
             }
         };
 
-        pdfMake.createPdf(docDefinition).download(`Wynik_inwestycji_${nazwaObligacji.replace(/\s+/g, "_")}.pdf`);
-        console.log("PDF generated");
+        try {
+            pdfMake.createPdf(docDefinition).download(`Wynik_inwestycji_${nazwaObligacji.replace(/\s+/g, "_")}.pdf`);
+            console.log("PDF generated successfully");
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+            alert("Błąd podczas generowania PDF. Sprawdź konsolę dla szczegółów.");
+        }
     }
 
     updateDynamicRateField();
