@@ -725,10 +725,6 @@ const maxVariableChanges = {
     "ROD": 11
 };
 
-const { jsPDF } = window.jspdf || {};
-if (!jsPDF) console.error("Biblioteka jsPDF nie została załadowana.");
-else if (!jsPDF.prototype.autoTable) console.warn("Plugin autoTable nie został załadowany.");
-
 const obligacjeConfig = {
     "OTS": { okres: 3, oprocentowanie: 3.00, zmienne: false, kapitalizacja: false, oplataWykup: 0.00 },
     "ROR": { okres: 12, oprocentowanie: 5.75, zmienne: true, marza: 0.00, kapitalizacja: false, oplataWykup: 0.005 },
@@ -756,6 +752,7 @@ const nazwyObligacji = {
     "COI": "4-letnich (COI)", "EDO": "10-letnich (EDO)", "ROS": "6-letnich (ROS)", "ROD": "12-letnich (ROD)"
 };
 
+// Event Listeners
 document.getElementById("dynamicRateRange").addEventListener("input", function() {
     document.getElementById("dynamicRate").value = this.value;
 });
@@ -1326,7 +1323,7 @@ document.getElementById("inflacjaZmiennaBtn").addEventListener("change", updateV
 document.getElementById("stopaZmiennaBtn").addEventListener("change", updateVariableInputs);
 document.getElementById("addVariableBtn").addEventListener("click", addVariableChange);
 
-document.getElementById("generatePdfBtn").addEventListener("click", async function() {
+document.getElementById("generatePdfBtn").addEventListener("click", function() {
     console.log("Przycisk Generuj PDF został kliknięty");
 
     if (!window.jspdf || !window.jspdf.jsPDF) {
