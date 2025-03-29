@@ -1290,10 +1290,10 @@
         // Poprawiony pełny tekst pod tabelą dla IKE/IKZE
         const harmonogramOpis = document.getElementById("harmonogramOpis");
         if (state.isIkeIkzeMode) {
-            harmonogramOpis.innerHTML = "* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego.";
-            harmonogramOpis.style.display = "block"; // Upewniamy się, że opis jest widoczny
+            harmonogramOpis.innerHTML = "* Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>.";
+            harmonogramOpis.style.display = "block";
         } else {
-            harmonogramOpis.innerHTML = ""; // Pełne wyczyszczenie, zamiast .textContent, aby uniknąć resztek HTML
+            harmonogramOpis.innerHTML = "";
             harmonogramOpis.style.display = "none";
         }
 
@@ -1344,8 +1344,8 @@
 
         elements.formSection.style.display = "none";
         elements.resultSection.style.display = "block";
-        elements.generatePdfBtn.disabled = false; // Aktywacja przycisku po obliczeniach
-        console.log("GeneratePdfBtn enabled:", elements.generatePdfBtn.disabled); // Debugowanie stanu przycisku
+        elements.generatePdfBtn.disabled = false; // Aktywacja przycisku
+        console.log("GeneratePdfBtn enabled:", !elements.generatePdfBtn.disabled); // Logowanie stanu
         state.isCalculating = false;
         console.log("ObliczObligacje completed");
     }
@@ -1426,7 +1426,11 @@
                     },
                     margin: [0, 10, 0, 10]
                 },
-                state.isIkeIkzeMode ? { text: "* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego.", style: 'footerNote', margin: [0, 5, 0, 10] } : {},
+                state.isIkeIkzeMode ? { 
+                    text: "* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
+                    style: 'footerNote', 
+                    margin: [0, 5, 0, 10] 
+                } : {},
                 { text: "Wykres liniowy wartości inwestycji w czasie", style: 'sectionHeader', margin: [0, 10, 0, 5], pageBreak: tableData.length > 10 ? 'before' : 'none' },
                 { image: lineChartImage, width: 500, height: 250, alignment: 'center', margin: [0, 5, 0, 0] }
             ],
