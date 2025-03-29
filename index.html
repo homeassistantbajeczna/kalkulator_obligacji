@@ -124,538 +124,306 @@
         }
     </style>
 </head>
-
-    
-
 <body>
-    <div class="logo-container">
-        <a href="https://finance-brothers.pl">
-            <img src="cropped-logo-FB-1.png" alt="Finance Brothers Logo" class="logo d-block mx-auto">
-        </a>
-    </div>
     <div class="container">
+        <h1>Kalkulator Obligacji Skarbowych</h1>
+        
         <div class="form-section" id="formSection">
-            <div class="header-row">
-                <h4>Kalkulator Obligacji Skarbu Państwa</h4>
-                <label class="checkbox-label header-checkbox" for="ikeIkzeBtn">
-                    <input type="checkbox" id="ikeIkzeBtn">
-                    <span class="checkbox-custom"></span>
-                    Inwestycje w IKE lub IKZE
-                </label>
+            <div class="form-group">
+                <label for="kwota">Kwota inwestycji (PLN):</label>
+                <input type="number" id="kwota" min="100" step="100" value="1000">
             </div>
-            <div class="form-container">
-                <div class="form-wrapper">
-                    <form id="obligacjeForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="kwota" class="form-label">Kwota inwestycji</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="kwota" min="100" max="5000000" step="100" value="10000">
-                                    <span class="input-group-text">zł</span>
-                                </div>
-                                <input type="range" class="form-range" id="kwotaRange" min="100" max="5000000" step="100" value="10000">
-                                <div class="sub-info" id="iloscObligacji">Ilość obligacji: 100</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="typObligacji" class="form-label">Typ obligacji*</label>
-                                <select class="form-control" id="typObligacji">
-                                    <option value="OTS" selected>3-miesięczne (OTS)</option>
-                                    <option value="ROR">12-miesięczne (ROR)</option>
-                                    <option value="DOR">24-miesięczne (DOR)</option>
-                                    <option value="TOS">3-letnie (TOS)</option>
-                                    <option value="COI">4-letnie (COI)</option>
-                                    <option value="EDO">10-letnie (EDO)</option>
-                                    <option value="ROS">6-letnie (ROS)</option>
-                                    <option value="ROD">12-letnie (ROD)</option>
-                                </select>
-                                <div class="sub-info"></div>
-                            </div>
-                            <div class="form-group" id="dynamicRateGroup" style="display: none;">
-                                <label for="dynamicRate" class="form-label" id="dynamicRateLabel">Stopa Ref. NBP</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="dynamicRate" min="0" max="50" step="0.05" value="4.90">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <input type="range" class="form-range" id="dynamicRateRange" min="0" max="50" step="0.05" value="4.90">
-                                <div class="sub-info"></div>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="okres" class="form-label">Okres inwestycji</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="okres" min="3" max="144" step="1" value="3" readonly>
-                                    <span class="input-group-text">mc-y</span>
-                                </div>
-                                <div class="sub-info" id="lata"></div>
-                            </div>
-                            <div class="form-group">
-                                <label for="oprocentowanie" class="form-label">Oprocentowanie</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="oprocentowanie" min="0.1" max="25" step="0.1" value="3" readonly>
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <div class="sub-info" id="oprocentowanieInfo"></div>
-                            </div>
-                        </div>
-                        <div class="variable-rate-container">
-                            <div class="checkbox-row" id="variableCheckboxRow">
-                                <label class="checkbox-label" id="inflacjaZmiennaLabel" for="inflacjaZmiennaBtn" style="display: none;">
-                                    <input type="checkbox" id="inflacjaZmiennaBtn">
-                                    <span class="checkbox-custom"></span>
-                                    Inflacja zmienna
-                                </label>
-                                <label class="checkbox-label" id="stopaZmiennaLabel" for="stopaZmiennaBtn" style="display: none;">
-                                    <input type="checkbox" id="stopaZmiennaBtn">
-                                    <span class="checkbox-custom"></span>
-                                    Zmienna Stopa Ref. NBP
-                                </label>
-                            </div>
-                            <div class="variable-inputs" id="variableInputs" style="display: none;">
-                                <div class="variable-inputs-wrapper" id="variableInputsWrapper"></div>
-                                <button type="button" class="btn btn-secondary btn-sm" id="addVariableBtn" style="display: none;" aria-label="Dodaj kolejne zmienne oprocentowanie">Dodaj kolejne</button>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;" aria-label="Oblicz wyniki inwestycji">Oblicz</button>
-                        </div>
-                    </form>
-                </div>
+            <div class="form-group">
+                <label for="typObligacji">Typ obligacji:</label>
+                <select id="typObligacji">
+                    <option value="OTS">3-miesięczne (OTS)</option>
+                    <option value="ROR">1-roczne (ROR)</option>
+                    <option value="DOR">2-letnie (DOR)</option>
+                    <option value="TOS">3-letnie (TOS)</option>
+                    <option value="COI">4-letnie (COI)</option>
+                    <option value="EDO">10-letnie (EDO)</option>
+                    <option value="ROS">6-letnie (ROS)</option>
+                    <option value="ROD">12-letnie (ROD)</option>
+                </select>
             </div>
-            <div class="opis-container">
-                <div class="obligacje-opis" id="obligacjeOpis"></div>
+            <div class="form-group">
+                <label>Ilość sztuk:</label>
+                <span id="iloscObligacji"></span>
             </div>
-            <div class="data-container">
-                <div class="data-info"><strong>Dane z dnia:</strong> <span class="data-date"><strong>01.03.2025r.</strong></span></div>
+            <div class="form-group">
+                <label>Okres inwestycji:</label>
+                <span id="lata"></span>
             </div>
+            <div class="form-group">
+                <label>Oprocentowanie:</label>
+                <span id="oprocentowanieInfo"></span>
+            </div>
+            <div class="form-group">
+                <label>Opis:</label>
+                <div id="opisObligacji"></div>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" id="ikeIkzeMode"> IKE/IKZE (bez podatku Belki)</label>
+            </div>
+            <div class="form-group" id="dynamicRateGroup" style="display: none;">
+                <label for="dynamicRate">Inflacja lub stopa referencyjna NBP (%):</label>
+                <input type="number" id="dynamicRate" step="0.01" min="0">
+            </div>
+            <div class="variable-rate-section" id="variableRateSection">
+                <label><input type="checkbox" id="inflacjaZmiennaBtn"> Zmienna inflacja</label>
+                <label><input type="checkbox" id="stopaZmiennaBtn"> Zmienna stopa referencyjna</label>
+                <div id="variableRateInputs"></div>
+                <button id="addVariableRate">Dodaj zmianę</button>
+            </div>
+            <button id="obliczBtn">Oblicz</button>
         </div>
+
         <div class="result-section" id="resultSection">
-            <div class="result-header">
-                <h4 id="resultHeader">Podsumowanie wyników</h4>
-                <button id="generatePdfBtn" class="btn btn-primary btn-sm" aria-label="Generuj PDF z wynikami">Generuj PDF</button>
-            </div>
-            <button class="btn btn-secondary mb-3" onclick="showForm()" aria-label="Powrót do edycji formularza">Powrót do edycji</button>
-            <div class="result-container">
-                <div class="result-wrapper-chart">
-                    <div class="chart-container">
-                        <div class="chart">
-                            <canvas id="obligacjeChart" aria-label="Wykres kołowy wyników inwestycji"></canvas>
+            <h2 id="resultHeader"></h2>
+            <div class="result-wrapper-chart">
+                <div class="chart-container">
+                    <canvas id="obligacjeChart"></canvas>
+                    <div class="chart-legend">
+                        <div class="legend-item" data-index="0">
+                            <div class="color-box" style="background-color: #28a745;" data-tooltip="Kapitał"></div>
+                            <span id="legendKapital">Kapitał</span>
                         </div>
-                        <div class="chart-legend">
-                            <div class="legend-item" data-index="0">
-                                <div class="color-box" style="background-color: #28a745;" data-tooltip="">
-                                    <span class="value" id="valueKapital">-</span>
-                                </div>
-                                <span class="legend-text" id="legendKapital">Kapitał</span>
-                            </div>
-                            <div class="legend-item" data-index="1">
-                                <div class="color-box" style="background-color: #007bff;" data-tooltip="">
-                                    <span class="value" id="valueOdsetki">-</span>
-                                </div>
-                                <span class="legend-text" id="legendOdsetki">Odsetki</span>
-                            </div>
-                            <div class="legend-item" data-index="2">
-                                <div class="color-box" style="background-color: #dc3545;" data-tooltip="">
-                                    <span class="value" id="valuePodatek">-</span>
-                                </div>
-                                <span class="legend-text" id="legendPodatek">Podatek</span>
-                            </div>
+                        <div class="legend-item" data-index="1">
+                            <div class="color-box" style="background-color: #007bff;" data-tooltip="Odsetki"></div>
+                            <span id="legendOdsetki">Odsetki</span>
+                        </div>
+                        <div class="legend-item" data-index="2">
+                            <div class="color-box" style="background-color: #dc3545;" data-tooltip="Podatek"></div>
+                            <span id="legendPodatek">Podatek</span>
                         </div>
                     </div>
-                    <div class="summary-footer">
-                        <span class="highlight yellow" data-hover="3 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span> mc-y</span>
-                        <span class="highlight green" data-hover="">Zysk netto: <span id="zyskNetto">-</span> zł</span>
-                    </div>
-                    <div class="obligacje-opis" id="obligacjeOpisPodsumowanie"></div>
+                    <p><strong>Kwota:</strong> <span id="valueKapital"></span></p>
+                    <p><strong>Odsetki:</strong> <span id="valueOdsetki"></span></p>
+                    <p><strong>Podatek:</strong> <span id="valuePodatek"></span></p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="obligacjeChartLine"></canvas>
+                    <p>Okres inwestycji: <span class="highlight yellow" id="okresInwestycji"></span></p>
+                    <p>Zysk netto: <span class="highlight green" id="zyskNetto"></span></p>
                 </div>
             </div>
-            <div class="harmonogram-container">
-                <div class="result-wrapper-harmonogram">
-                    <div class="harmonogram">
-                        <h5 class="btn-toggle" onclick="toggleHarmonogram('harmonogramContent')" aria-label="Przełącz widoczność harmonogramu odsetek">Harmonogram odsetek ▼</h5>
-                        <div id="harmonogramContent">
-                            <table class="table table-striped">
-                                <thead id="harmonogramNaglowek">
-                                    <tr>
-                                        <th id="pierwszaKolumnaNaglowek">Rok</th>
-                                        <th>Wartość inwestycji</th>
-                                        <th>Oproc.</th>
-                                        <th>Odsetki</th>
-                                        <th>Suma odsetek</th>
-                                        <th>Podatek</th>
-                                        <th id="zyskKolumnaNaglowek">Zysk netto</th>
-                                        <th>Opłata za wykup</th>
-                                        <th id="kolumnaStopaInflacja">Inflacja</th>
-                                        <th>Suma netto</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="harmonogramTabela"></tbody>
-                            </table>
-                            <div class="harmonogram-opis" id="harmonogramOpis"></div>
-                        </div>
-                    </div>
-                    <div class="chart-container-line">
-                        <div class="chart-line">
-                            <canvas id="obligacjeChartLine" aria-label="Wykres liniowy wartości inwestycji w czasie"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th id="pierwszaKolumnaNaglowek"></th>
+                        <th>Wartość inwestycji</th>
+                        <th>Oprocentowanie</th>
+                        <th>Odsetki brutto</th>
+                        <th>Skumulowane odsetki</th>
+                        <th>Podatek</th>
+                        <th id="zyskKolumnaNaglowek"></th>
+                        <th>Opłata za wykup</th>
+                        <th id="kolumnaStopaInflacja"></th>
+                        <th>Suma netto</th>
+                    </tr>
+                </thead>
+                <tbody id="harmonogramTabela"></tbody>
+            </table>
+            <div class="harmonogram-opis" id="harmonogramOpis"></div>
+            <button id="generatePdfBtn">Generuj PDF</button>
+            <button id="powrotBtn">Powrót</button>
         </div>
     </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         const elements = {
-            formSection: document.getElementById("formSection"),
-            resultSection: document.getElementById("resultSection"),
             kwota: document.getElementById("kwota"),
-            kwotaRange: document.getElementById("kwotaRange"),
             typObligacji: document.getElementById("typObligacji"),
+            iloscObligacji: document.getElementById("iloscObligacji"),
+            lata: document.getElementById("lata"),
+            oprocentowanieInfo: document.getElementById("oprocentowanieInfo"),
+            opisObligacji: document.getElementById("opisObligacji"),
+            ikeIkzeMode: document.getElementById("ikeIkzeMode"),
             dynamicRate: document.getElementById("dynamicRate"),
-            dynamicRateRange: document.getElementById("dynamicRateRange"),
-            okres: document.getElementById("okres"),
-            oprocentowanie: document.getElementById("oprocentowanie"),
-            ikeIkzeBtn: document.getElementById("ikeIkzeBtn"),
+            dynamicRateGroup: document.getElementById("dynamicRateGroup"),
+            variableRateSection: document.getElementById("variableRateSection"),
             inflacjaZmiennaBtn: document.getElementById("inflacjaZmiennaBtn"),
             stopaZmiennaBtn: document.getElementById("stopaZmiennaBtn"),
+            variableRateInputs: document.getElementById("variableRateInputs"),
+            addVariableRate: document.getElementById("addVariableRate"),
             obliczBtn: document.getElementById("obliczBtn"),
-            addVariableBtn: document.getElementById("addVariableBtn"),
+            formSection: document.getElementById("formSection"),
+            resultSection: document.getElementById("resultSection"),
             resultHeader: document.getElementById("resultHeader"),
             obligacjeChart: document.getElementById("obligacjeChart"),
             obligacjeChartLine: document.getElementById("obligacjeChartLine"),
-            generatePdfBtn: document.getElementById("generatePdfBtn")
+            generatePdfBtn: document.getElementById("generatePdfBtn"),
+            powrotBtn: document.getElementById("powrotBtn")
         };
 
         const state = {
+            isIkeIkzeMode: false,
+            isCalculating: false,
             chart: null,
             chartLine: null,
             harmonogramData: [],
-            isIkeIkzeMode: false,
+            lastFormData: null,
             variableInflacjaChanges: [],
-            variableStopaChanges: [],
-            lastFormData: {
-                kwota: 10000,
-                typObligacji: "OTS",
-                dynamicRate: 5.75,
-                okres: 3,
-                oprocentowanie: 3,
-                ikeIkze: false,
-                isInflacja: false,
-                inflacjaZmienna: false,
-                stopaZmienna: false,
-                variableInflacjaChanges: [],
-                variableStopaChanges: []
-            },
-            isCalculating: false
-        };
-
-        const maxVariableChanges = {
-            "ROR": 11,
-            "DOR": 23,
-            "COI": 3,
-            "EDO": 9,
-            "ROS": 5,
-            "ROD": 11
+            variableStopaChanges: []
         };
 
         const obligacjeConfig = {
-            "OTS": { okres: 3, oprocentowanie: 3.00, zmienne: false, kapitalizacja: false, oplataWykup: 0.00 },
-            "ROR": { okres: 12, oprocentowanie: 5.75, zmienne: true, marza: 0.00, kapitalizacja: false, oplataWykup: 0.005 },
-            "DOR": { okres: 24, oprocentowanie: 5.90, zmienne: true, marza: 0.15, kapitalizacja: false, oplataWykup: 0.007 },
-            "TOS": { okres: 36, oprocentowanie: 5.95, zmienne: false, kapitalizacja: true, oplataWykup: 0.01 },
-            "COI": { okres: 48, oprocentowanie: 6.30, zmienne: true, marza: 1.50, indeksowaneInflacja: true, kapitalizacja: false, oplataWykup: 0.02 },
-            "EDO": { okres: 120, oprocentowanie: 6.55, zmienne: true, marza: 2.00, indeksowaneInflacja: true, kapitalizacja: true, oplataWykup: 0.03 },
-            "ROS": { okres: 72, oprocentowanie: 6.50, zmienne: true, marza: 2.00, indeksowaneInflacja: true, kapitalizacja: true, oplataWykup: 0.02 },
-            "ROD": { okres: 144, oprocentowanie: 6.80, zmienne: true, marza: 2.50, indeksowaneInflacja: true, kapitalizacja: true, oplataWykup: 0.03 }
-        };
-
-        const opisyObligacji = {
-            "OTS": "* OTS (3-miesięczne): stałe oprocentowanie 3,00% na okres 3-miesięcy, wypłata odsetek nastąpi przy wykupie obligacji. Wcześniejszy odkup powoduje nienaliczenie odsetek, natomiast nie ma opłat za wcześniejszy odkup. Obligacje OTS są idealne dla krótkoterminowych inwestycji.",
-            "ROR": "* ROR (12-miesięczne): oprocentowanie zmienne, w pierwszym miesiącu 5,75%, w pozostałych 11 miesiącach oprocentowanie oparte na stopie referencyjnej NBP + 0%. Wypłata odsetek następuje co miesiąc, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości 0,5% wartości obligacji (0,5 zł za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje ROR przeznaczone są dla krótko i średnioterminowych inwestorów.",
-            "DOR": "* DOR (24-miesięczne): oprocentowanie zmienne, 5,90% w pierwszym miesiącu, w pozostałych 23 miesiącach oprocentowanie oparte na stopie referencyjnej NBP + 0,15%. Wypłata odsetek następuje co miesiąc, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości 0,7% wartości obligacji (0,7 zł za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje DOR przeznaczone są dla średnioterminowych inwestorów.",
-            "TOS": "* TOS (3-letnie): stałe oprocentowanie 5,95% na okres 3-lat, wypłata odsetek nastąpi przy wykupie obligacji po 3 latach inwestycji. Wcześniejszy odkup wiąże się z opłatą w wysokości 1% wartości obligacji (1 zł za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Roczna kapitalizacja odsetek zwiększa efektywności inwestycji. Obligacje TOS przeznaczone dla stabilnych średnioterminowych inwestycji.",
-            "COI": "* COI (4-letnie): obligacje indeksowane inflacją, 6,30% w pierwszym roku, w kolejnych 3 latach oprocentowanie wynosi wartość inflacji + 1,50%. Wypłata odsetek następuje po każdym roku inwestycji, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości 2% wartości obligacji (2 zł za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje COI są idealne dla średnio i długoterminowych inwestycji oraz dla ochrony przed wzrostem inflacji.",
-            "EDO": "* EDO (10-letnie): obligacje indeksowane inflacją, 6,55% w pierwszym roku, w kolejnych 9 latach oprocentowanie wynosi wartość inflacji + 2,00%. Wypłata odsetek następuje przy wykupie obligacji po 10 latach inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości 3% wartości obligacji (3 zł za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Roczna kapitalizacja odsetek zwiększa efektywności inwestycji. Obligacje EDO są idealne dla długoterminowych inwestycji oraz dla ochrony przed wzrostem inflacji.",
-            "ROS": "* ROS (6-letnie): rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu 800+. Obligacje indeksowane inflacją, 6,50% w pierwszym roku, w kolejnych 5 latach oprocentowanie wynosi wartość inflacji + 2,00%. Wypłata odsetek następuje przy wykupie obligacji po 6 latach inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości 2% wartości obligacji (2 zł za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Roczna kapitalizacja odsetek zwiększa efektywności inwestycji. Obligacje ROS są idealne dla rodzinnych inwestycji oraz dla ochrony przed wzrostem inflacji.",
-            "ROD": "* ROD (12-letnie): rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu 800+. Obligacje indeksowane inflacją, 6,80% w pierwszym roku, w kolejnych 11 latach oprocentowanie wynosi wartość inflacji + 2,50%. Wypłata odsetek następuje przy wykupie obligacji po 12 latach inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości 3% wartości obligacji (3 zł za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Roczna kapitalizacja odsetek zwiększa efektywności inwestycji. Obligacje ROD są idealne dla długoterminowych rodzinnych inwestycji oraz dla ochrony przed wzrostem inflacji."
+            OTS: { okres: 3, oprocentowanie: 3.00, marza: 0, kapitalizacja: false, oplataWykup: 0 },
+            ROR: { okres: 12, oprocentowanie: 5.25, marza: 0, kapitalizacja: false, oplataWykup: 0.0070 },
+            DOR: { okres: 24, oprocentowanie: 5.50, marza: 0.25, kapitalizacja: false, oplataWykup: 0.0070 },
+            TOS: { okres: 36, oprocentowanie: 5.85, marza: 0, kapitalizacja: false, oplataWykup: 0 },
+            COI: { okres: 48, oprocentowanie: 6.25, marza: 0.75, kapitalizacja: false, oplataWykup: 0.0070 },
+            EDO: { okres: 120, oprocentowanie: 6.50, marza: 1.25, kapitalizacja: true, oplataWykup: 0.0150 },
+            ROS: { okres: 72, oprocentowanie: 5.90, marza: 1.00, kapitalizacja: false, oplataWykup: 0.0100 },
+            ROD: { okres: 144, oprocentowanie: 6.10, marza: 1.50, kapitalizacja: true, oplataWykup: 0.0200 }
         };
 
         const nazwyObligacji = {
-            "OTS": "3-miesięcznych (OTS)", "ROR": "12-miesięcznych (ROR)", "DOR": "24-miesięcznych (DOR)", "TOS": "3-letnich (TOS)",
-            "COI": "4-letnich (COI)", "EDO": "10-letnich (EDO)", "ROS": "6-letnich (ROS)", "ROD": "12-letnich (ROD)"
+            OTS: "3-miesięcznych (OTS)",
+            ROR: "1-rocznych (ROR)",
+            DOR: "2-letnich (DOR)",
+            TOS: "3-letnich (TOS)",
+            COI: "4-letnich (COI)",
+            EDO: "10-letnich (EDO)",
+            ROS: "6-letnich (ROS)",
+            ROD: "12-letnich (ROD)"
         };
 
-        elements.dynamicRateRange.addEventListener("input", () => elements.dynamicRate.value = elements.dynamicRateRange.value);
-        elements.dynamicRate.addEventListener("input", () => elements.dynamicRateRange.value = elements.dynamicRate.value);
-        elements.kwotaRange.addEventListener("input", () => { elements.kwota.value = elements.kwotaRange.value; updateIloscObligacji(); });
-        elements.kwota.addEventListener("input", () => { elements.kwotaRange.value = elements.kwota.value; updateIloscObligacji(); });
-        elements.typObligacji.addEventListener("change", updateDynamicRateField);
-        elements.ikeIkzeBtn.addEventListener("change", updateDynamicRateField);
-        elements.inflacjaZmiennaBtn.addEventListener("change", () => { state.lastFormData.inflacjaZmienna = elements.inflacjaZmiennaBtn.checked; updateVariableInputs(); });
-        elements.stopaZmiennaBtn.addEventListener("change", () => { state.lastFormData.stopaZmienna = elements.stopaZmiennaBtn.checked; updateVariableInputs(); });
-        elements.obliczBtn.addEventListener("click", obliczObligacje);
-        elements.addVariableBtn.addEventListener("click", addVariableChange);
-        elements.generatePdfBtn.addEventListener("click", generatePdf);
-                function setDynamicRateField(label, value, step, max) {
-            const dynamicRateLabel = document.getElementById("dynamicRateLabel");
-            dynamicRateLabel.textContent = label;
-            elements.dynamicRate.value = value;
-            elements.dynamicRateRange.value = value;
-            elements.dynamicRate.step = step;
-            elements.dynamicRateRange.step = step;
-            elements.dynamicRate.max = max;
-            elements.dynamicRateRange.max = max;
-            document.getElementById("dynamicRateGroup").style.display = "block";
-        }
-
-        function updateDynamicRateField() {
-            state.isIkeIkzeMode = elements.ikeIkzeBtn.checked;
-            const select = elements.typObligacji;
-            const previousTyp = select.value;
-
-            select.innerHTML = state.isIkeIkzeMode ? `
-                <option value="ROR">12-miesięczne (ROR)</option>
-                <option value="DOR">24-miesięczne (DOR)</option>
-                <option value="TOS" selected>3-letnie (TOS)</option>
-                <option value="COI">4-letnie (COI)</option>
-                <option value="EDO">10-letnie (EDO)</option>
-            ` : `
-                <option value="OTS" selected>3-miesięczne (OTS)</option>
-                <option value="ROR">12-miesięczne (ROR)</option>
-                <option value="DOR">24-miesięczne (DOR)</option>
-                <option value="TOS">3-letnie (TOS)</option>
-                <option value="COI">4-letnie (COI)</option>
-                <option value="EDO">10-letnie (EDO)</option>
-                <option value="ROS">6-letnie (ROS)</option>
-                <option value="ROD">12-letnie (ROD)</option>
-            `;
-
-            const availableOptions = Array.from(select.options).map(opt => opt.value);
-            select.value = availableOptions.includes(previousTyp) ? previousTyp : (state.isIkeIkzeMode ? "TOS" : "OTS");
-
-            const typ = select.value;
-            const config = obligacjeConfig[typ];
-
-            elements.okres.value = config.okres;
-            elements.oprocentowanie.value = config.oprocentowanie;
-            updateLata();
-            updateOprocentowanieInfo();
-            updateOpisObligacji();
-
-            if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-                setDynamicRateField("Inflacja", state.lastFormData.isInflacja ? (state.lastFormData.dynamicRate || 4.90) : 4.90, "0.1", "50");
-                state.lastFormData.isInflacja = true;
-            } else if (["ROR", "DOR"].includes(typ)) {
-                setDynamicRateField("Stopa Ref. NBP", state.lastFormData.isInflacja ? 5.75 : (state.lastFormData.dynamicRate || 5.75), "0.05", "20");
-                state.lastFormData.isInflacja = false;
-            } else {
-                document.getElementById("dynamicRateGroup").style.display = "none";
-                state.lastFormData.isInflacja = false;
-            }
-
-            document.getElementById("inflacjaZmiennaLabel").style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
-            document.getElementById("stopaZmiennaLabel").style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
-
-            elements.inflacjaZmiennaBtn.checked = state.lastFormData.inflacjaZmienna || false;
-            elements.stopaZmiennaBtn.checked = state.lastFormData.stopaZmienna || false;
-            state.variableInflacjaChanges = state.lastFormData.variableInflacjaChanges ? [...state.lastFormData.variableInflacjaChanges] : [];
-            state.variableStopaChanges = state.lastFormData.variableStopaChanges ? [...state.lastFormData.variableStopaChanges] : [];
-            updateVariableInputs();
-        }
+        const opisyObligacji = {
+            OTS: "OTS (3-miesięczne): stałe oprocentowanie 3,00% na okres 3-miesiące, wypłata odsetek na koniec okresu. Wcześniejszy odkup powoduje nienaliczenie odsetek, natomiast nie ma opłat za wcześniejszy wykup. Idealne dla krótkoterminowych inwestycji.",
+            ROR: "ROR (1-roczne): zmienne oprocentowanie oparte na stopie referencyjnej NBP, pierwsza rata 5,25%, następnie stopa + 0% marży. Wypłata odsetek na koniec okresu, opłata za wcześniejszy wykup: 0,70 zł za sztukę.",
+            DOR: "DOR (2-letnie): zmienne oprocentowanie oparte na stopie referencyjnej NBP, pierwsza rata 5,50%, następnie stopa + 0,25% marży. Wypłata odsetek co 6 miesięcy, opłata za wcześniejszy wykup: 0,70 zł za sztukę.",
+            TOS: "TOS (3-letnie): stałe oprocentowanie 5,85% na okres 3 lat, wypłata odsetek na koniec okresu. Brak opłat za wcześniejszy wykup.",
+            COI: "COI (4-letnie): zmienne oprocentowanie oparte na inflacji, pierwsza rata 6,25%, następnie inflacja + 0,75% marży. Wypłata odsetek co roku, opłata za wcześniejszy wykup: 0,70 zł za sztukę.",
+            EDO: "EDO (10-letnie): zmienne oprocentowanie oparte na inflacji, pierwsza rata 6,50%, następnie inflacja + 1,25% marży. Kapitalizacja odsetek, wypłata na koniec okresu, opłata za wcześniejszy wykup: 1,50 zł za sztukę.",
+            ROS: "ROS (6-letnie): zmienne oprocentowanie oparte na inflacji, pierwsza rata 5,90%, następnie inflacja + 1,00% marży. Wypłata odsetek co roku, opłata za wcześniejszy wykup: 1,00 zł za sztukę. Dla rodzin 500+.",
+            ROD: "ROD (12-letnie): zmienne oprocentowanie oparte na inflacji, pierwsza rata 6,10%, następnie inflacja + 1,50% marży. Kapitalizacja odsetek, wypłata na koniec okresu, opłata za wcześniejszy wykup: 2,00 zł za sztukę. Dla rodzin 500+."
+        };
 
         function updateIloscObligacji() {
             const kwota = parseFloat(elements.kwota.value) || 0;
             const ilosc = Math.floor(kwota / 100);
-            document.getElementById("iloscObligacji").textContent = `Ilość obligacji: ${ilosc}`;
+            elements.iloscObligacji.textContent = `${ilosc} szt. (min. 1 szt., wielokrotność 100 zł)`;
         }
 
         function updateLata() {
-            const miesiace = parseInt(elements.okres.value) || 0;
-            const lata = (miesiace / 12).toFixed(0);
-            document.getElementById("lata").textContent = `Ilość lat: ${miesiace >= 12 ? lata : 0}`;
+            const typ = elements.typObligacji.value;
+            const miesiace = obligacjeConfig[typ].okres;
+            elements.lata.textContent = `${miesiace} miesięcy (${(miesiace / 12).toFixed(2)} lat)`;
         }
 
         function updateOprocentowanieInfo() {
             const typ = elements.typObligacji.value;
             const config = obligacjeConfig[typ];
-            let info = config.zmienne ? 
-                (config.indeksowaneInflacja ? 
-                    `Pierwszy rok: ${config.oprocentowanie}%, kolejne: inflacja + ${config.marza}%` : 
-                    `Pierwszy miesiąc: ${config.oprocentowanie}%, kolejne: stopa NBP + ${config.marza}%`) : 
-                `Stałe: ${config.oprocentowanie}%`;
-            document.getElementById("oprocentowanieInfo").textContent = info;
+            let info = `Pierwsza rata: ${config.oprocentowanie.toFixed(2)}%`;
+            if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+                info += `, kolejne: inflacja + ${config.marza.toFixed(2)}% marży`;
+            } else if (["ROR", "DOR"].includes(typ)) {
+                info += `, kolejne: stopa referencyjna NBP + ${config.marza.toFixed(2)}% marży`;
+            }
+            elements.oprocentowanieInfo.textContent = info;
         }
 
         function updateOpisObligacji() {
             const typ = elements.typObligacji.value;
-            const opis = opisyObligacji[typ] || "";
-            document.getElementById("obligacjeOpis").innerHTML = opis;
-            document.getElementById("obligacjeOpisPodsumowanie").innerHTML = opis;
+            elements.opisObligacji.innerHTML = opisyObligacji[typ] || "";
         }
 
-        function toggleHarmonogram(sectionId) {
-            const content = document.getElementById(sectionId);
-            const toggleBtn = content.previousElementSibling;
-            content.style.display = content.style.display === "none" ? "block" : "none";
-            toggleBtn.textContent = content.style.display === "none" ? "Harmonogram odsetek ►" : "Harmonogram odsetek ▼";
+        function updateDynamicRateField() {
+            const typ = elements.typObligacji.value;
+            const isInflacja = ["COI", "EDO", "ROS", "ROD"].includes(typ);
+            const isStopa = ["ROR", "DOR"].includes(typ);
+            elements.dynamicRateGroup.style.display = (isInflacja || isStopa) ? "block" : "none";
+            elements.variableRateSection.style.display = (isInflacja || isStopa) ? "block" : "none";
+            elements.inflacjaZmiennaBtn.style.display = isInflacja ? "inline" : "none";
+            elements.stopaZmiennaBtn.style.display = isStopa ? "inline" : "none";
+            elements.dynamicRate.value = isInflacja ? "4.90" : (isStopa ? "5.75" : "");
         }
 
-        function showForm() {
-            elements.formSection.style.display = "block";
-            elements.resultSection.style.display = "none";
+        elements.kwota.addEventListener("input", () => {
+            updateIloscObligacji();
+        });
 
-            elements.kwota.value = state.lastFormData.kwota;
-            elements.kwotaRange.value = state.lastFormData.kwota;
-            elements.dynamicRate.value = state.lastFormData.dynamicRate;
-            elements.dynamicRateRange.value = state.lastFormData.dynamicRate;
-            elements.okres.value = state.lastFormData.okres;
-            elements.oprocentowanie.value = state.lastFormData.oprocentowanie;
-            elements.ikeIkzeBtn.checked = state.lastFormData.ikeIkze;
-            state.isIkeIkzeMode = state.lastFormData.ikeIkze;
-            elements.typObligacji.value = state.lastFormData.typObligacji;
-            elements.inflacjaZmiennaBtn.checked = state.lastFormData.inflacjaZmienna || false;
-            elements.stopaZmiennaBtn.checked = state.lastFormData.stopaZmienna || false;
-            state.variableInflacjaChanges = state.lastFormData.variableInflacjaChanges ? [...state.lastFormData.variableInflacjaChanges] : [];
-            state.variableStopaChanges = state.lastFormData.variableStopaChanges ? [...state.lastFormData.variableStopaChanges] : [];
-
-            updateDynamicRateField();
+        elements.typObligacji.addEventListener("change", () => {
             updateIloscObligacji();
             updateLata();
             updateOprocentowanieInfo();
             updateOpisObligacji();
-        }
+            updateDynamicRateField();
+            state.variableInflacjaChanges = [];
+            state.variableStopaChanges = [];
+            elements.variableRateInputs.innerHTML = "";
+        });
 
-        function updateVariableInputs() {
+        elements.ikeIkzeMode.addEventListener("change", () => {
+            state.isIkeIkzeMode = elements.ikeIkzeMode.checked;
+        });
+
+        elements.addVariableRate.addEventListener("click", () => {
             const typ = elements.typObligacji.value;
-            const isInflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
-            const isStopaZmienna = elements.stopaZmiennaBtn.checked && ["ROR", "DOR"].includes(typ);
-            const variableInputs = document.getElementById("variableInputs");
-            const addVariableBtn = elements.addVariableBtn;
-            const wrapper = document.getElementById("variableInputsWrapper");
-            const config = obligacjeConfig[typ];
-            const maxCykl = ["ROR", "DOR"].includes(typ) ? config.okres : config.okres / 12;
+            const isInflacja = ["COI", "EDO", "ROS", "ROD"].includes(typ);
+            const container = elements.variableRateInputs;
+            const index = container.children.length + 1;
+            const div = document.createElement("div");
+            div.className = "variable-rate-input";
+            div.innerHTML = `
+                <label>Cykl ${index}:</label>
+                <input type="number" class="cykl" min="2" placeholder="Cykl">
+                <input type="number" class="wartosc" step="0.01" min="0" placeholder="${isInflacja ? 'Inflacja' : 'Stopa'} (%)">
+                <button class="remove">Usuń</button>
+            `;
+            container.appendChild(div);
 
-            if (isInflacjaZmienna || isStopaZmienna) {
-                variableInputs.style.display = "block";
-                addVariableBtn.style.display = "block";
+            const cyklInput = div.querySelector(".cykl");
+            const wartoscInput = div.querySelector(".wartosc");
+            const removeBtn = div.querySelector(".remove");
 
-                if ((isInflacjaZmienna && state.variableInflacjaChanges.length === 0) || (isStopaZmienna && state.variableStopaChanges.length === 0)) {
-                    addVariableChange();
+            function updateChanges() {
+                const cykl = parseInt(cyklInput.value) || 0;
+                const wartosc = parseFloat(wartoscInput.value) || 0;
+                const changes = isInflacja ? state.variableInflacjaChanges : state.variableStopaChanges;
+                const existingIndex = changes.findIndex(c => c.cykl === cykl);
+                if (existingIndex >= 0) {
+                    changes[existingIndex].wartosc = wartosc;
+                } else if (cykl > 1) {
+                    changes.push({ cykl, wartosc });
                 }
-
-                wrapper.innerHTML = "";
-                const changes = isInflacjaZmienna ? state.variableInflacjaChanges : state.variableStopaChanges;
-
-                changes.forEach((change, index) => {
-                    const inputGroup = document.createElement("div");
-                    inputGroup.className = "variable-input-group";
-
-                    const fieldsWrapper = document.createElement("div");
-                    fieldsWrapper.className = "fields-wrapper";
-
-                    const cyklGroup = document.createElement("div");
-                    cyklGroup.className = "form-group";
-                    cyklGroup.innerHTML = `
-                        <label class="form-label">Od ${["ROR", "DOR"].includes(typ) ? "miesiąca" : "roku"}</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control variable-cykl" min="1" max="${maxCykl}" step="1" value="${change.cykl}">
-                            <span class="input-group-text">${["ROR", "DOR"].includes(typ) ? "mc" : "rok"}</span>
-                        </div>
-                        <input type="range" class="form-range variable-cykl-range" min="1" max="${maxCykl}" step="1" value="${change.cykl}">
-                    `;
-
-                    const rateGroup = document.createElement("div");
-                    rateGroup.className = "form-group";
-                    rateGroup.innerHTML = `
-                        <label class="form-label">${isInflacjaZmienna ? "Inflacja" : "Stopa NBP"}</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control variable-rate" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
-                            <span class="input-group-text">%</span>
-                        </div>
-                        <input type="range" class="form-range variable-rate-range" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
-                    `;
-
-                    fieldsWrapper.appendChild(cyklGroup);
-                    fieldsWrapper.appendChild(rateGroup);
-                    inputGroup.appendChild(fieldsWrapper);
-
-                    if (index === changes.length - 1 && changes.length > 1) {
-                        const removeBtnWrapper = document.createElement("div");
-                        removeBtnWrapper.className = "remove-btn-wrapper";
-                        const removeBtn = document.createElement("button");
-                        removeBtn.className = "btn btn-danger btn-sm";
-                        removeBtn.textContent = "Usuń";
-                        removeBtn.onclick = () => removeVariableChange();
-                        removeBtnWrapper.appendChild(removeBtn);
-                        inputGroup.appendChild(removeBtnWrapper);
-                    }
-
-                    wrapper.appendChild(inputGroup);
-
-                    const cyklInput = inputGroup.querySelector(".variable-cykl");
-                    const cyklRange = inputGroup.querySelector(".variable-cykl-range");
-                    const rateInput = inputGroup.querySelector(".variable-rate");
-                    const rateRange = inputGroup.querySelector(".variable-rate-range");
-
-                    cyklInput.addEventListener("input", () => {
-                        let value = parseInt(cyklInput.value);
-                        if (value < 1 || value > maxCykl) cyklInput.value = Math.max(1, Math.min(maxCykl, value));
-                        cyklRange.value = cyklInput.value;
-                        changes[index].cykl = parseInt(cyklInput.value);
-                    });
-                    cyklRange.addEventListener("input", () => {
-                        cyklInput.value = cyklRange.value;
-                        changes[index].cykl = parseInt(cyklRange.value);
-                    });
-                    rateInput.addEventListener("input", () => {
-                        let value = parseFloat(rateInput.value);
-                        if (value < 0 || value > (isInflacjaZmienna ? 50 : 20)) rateInput.value = Math.max(0, Math.min(isInflacjaZmienna ? 50 : 20, value));
-                        rateRange.value = rateInput.value;
-                        changes[index].wartosc = parseFloat(rateInput.value);
-                    });
-                    rateRange.addEventListener("input", () => {
-                        rateInput.value = rateRange.value;
-                        changes[index].wartosc = parseFloat(rateInput.value);
-                    });
-                });
-
-                const maxChanges = maxVariableChanges[typ] || 0;
-                addVariableBtn.style.display = changes.length < maxChanges ? "block" : "none";
-            } else {
-                variableInputs.style.display = "none";
-                addVariableBtn.style.display = "none";
-                wrapper.innerHTML = "";
-            }
-        }
-
-        function addVariableChange() {
-            const typ = elements.typObligacji.value;
-            const isInflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
-            const changes = isInflacjaZmienna ? state.variableInflacjaChanges : state.variableStopaChanges;
-            const maxCykl = ["ROR", "DOR"].includes(typ) ? obligacjeConfig[typ].okres : obligacjeConfig[typ].okres / 12;
-            const maxChanges = maxVariableChanges[typ] || 0;
-
-            if (changes.length >= maxChanges) {
-                alert(`Osiągnięto maksymalną liczbę zmian dla obligacji ${typ} (${maxChanges}).`);
-                return;
             }
 
-            const lastCykl = changes.length > 0 ? changes[changes.length - 1].cykl : 1;
-            const newCykl = Math.min(lastCykl + 1, maxCykl);
-            changes.push({ cykl: newCykl, wartosc: isInflacjaZmienna ? 4.90 : 5.75 });
-            updateVariableInputs();
-        }
+            cyklInput.addEventListener("input", updateChanges);
+            wartoscInput.addEventListener("input", updateChanges);
+            removeBtn.addEventListener("click", () => {
+                const cykl = parseInt(cyklInput.value) || 0;
+                const changes = isInflacja ? state.variableInflacjaChanges : state.variableStopaChanges;
+                const index = changes.findIndex(c => c.cykl === cykl);
+                if (index >= 0) changes.splice(index, 1);
+                div.remove();
+            });
+        });
 
-        function removeVariableChange() {
-            const typ = elements.typObligacji.value;
-            const isInflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
-            const changes = isInflacjaZmienna ? state.variableInflacjaChanges : state.variableStopaChanges;
-            if (changes.length > 1) {
-                changes.pop();
-                updateVariableInputs();
-            }
-        }
-                function obliczObligacje() {
+        elements.inflacjaZmiennaBtn.addEventListener("change", () => {
+            elements.variableRateInputs.innerHTML = "";
+            state.variableInflacjaChanges = [];
+            if (!elements.inflacjaZmiennaBtn.checked) elements.stopaZmiennaBtn.checked = false;
+        });
+
+        elements.stopaZmiennaBtn.addEventListener("change", () => {
+            elements.variableRateInputs.innerHTML = "";
+            state.variableStopaChanges = [];
+            if (!elements.stopaZmiennaBtn.checked) elements.inflacjaZmiennaBtn.checked = false;
+        });
+
+        elements.obliczBtn.addEventListener("click", obliczObligacje);
+        elements.powrotBtn.addEventListener("click", () => {
+            elements.formSection.style.display = "block";
+            elements.resultSection.style.display = "none";
+            if (state.chart) state.chart.destroy();
+            if (state.chartLine) state.chartLine.destroy();
+        });
+
+        elements.generatePdfBtn.addEventListener("click", generatePdf);
+
+        function obliczObligacje() {
             if (state.isCalculating) return;
             state.isCalculating = true;
 
