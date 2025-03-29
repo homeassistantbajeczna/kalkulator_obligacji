@@ -1330,7 +1330,11 @@
                 format: 'a4'
             });
 
-            // Ustawienie fontu obsługującego polskie znaki
+            // Funkcja do kodowania tekstu z polskimi znakami
+            const encodeText = (text) => {
+                return doc.splitTextToSize(text.normalize('NFC'), 190); // Normalizacja UTF-8
+            };
+
             doc.setFont("helvetica", "normal");
             doc.setFontSize(16);
 
@@ -1339,9 +1343,9 @@
             const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}`;
             const opis = opisyObligacji[typ] || "";
 
-            doc.text(headerText, 10, 10);
+            doc.text(encodeText(headerText), 10, 10);
             doc.setFontSize(10);
-            const opisLines = doc.splitTextToSize(opis.replace(/<[^>]+>/g, ""), 190);
+            const opisLines = encodeText(opis.replace(/<[^>]+>/g, ""));
             doc.text(opisLines, 10, 20);
 
             const summary = [
@@ -1353,10 +1357,10 @@
             ];
 
             doc.setFontSize(12);
-            doc.text("Podsumowanie:", 10, 20 + opisLines.length * 5 + 5);
+            doc.text(encodeText("Podsumowanie:"), 10, 20 + opisLines.length * 5 + 5);
             doc.setFontSize(10);
             summary.forEach((line, index) => {
-                doc.text(line, 10, 20 + opisLines.length * 5 + 10 + index * 5);
+                doc.text(encodeText(line), 10, 20 + opisLines.length * 5 + 10 + index * 5);
             });
 
             const headers = ["OTS", "ROR", "DOR"].includes(typ) ?
@@ -1366,7 +1370,7 @@
 
             const tableData = state.harmonogramData.map(wiersz => {
                 const row = [
-                    wiersz.okres,
+                    wiersz.okres.toString(),
                     `${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
                     wiersz.oprocentowanieNaCykl,
                     `${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
@@ -1381,8 +1385,8 @@
             });
 
             doc.autoTable({
-                head: [headers],
-                body: tableData,
+                head: [headers.map(h => encodeText(h)[0])], // Kodowanie nagłówków
+                body: tableData.map(row => row.map(cell => encodeText(cell)[0])), // Kodowanie komórek
                 startY: 20 + opisLines.length * 5 + summary.length * 5 + 10,
                 styles: { font: "helvetica", fontSize: 8, cellPadding: 2, halign: 'center' },
                 headStyles: { fillColor: [194, 178, 128], textColor: [0, 0, 0], halign: 'center' },
@@ -1392,7 +1396,7 @@
             if (state.isIkeIkzeMode) {
                 doc.setFontSize(8);
                 const ikeIkzeText = "* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.";
-                const ikeIkzeLines = doc.splitTextToSize(ikeIkzeText, 190);
+                const ikeIkzeLines = encodeText(ikeIkzeText);
                 doc.text(ikeIkzeLines, 10, doc.lastAutoTable.finalY + 5);
             }
 
@@ -1411,7 +1415,7 @@
             }
 
             doc.setFontSize(12);
-            doc.text("Wykres liniowy wartości inwestycji w czasie", 10, currentY + 5);
+            doc.text(encodeText("Wykres liniowy wartości inwestycji w czasie"), 10, currentY + 5);
             doc.addImage(lineChartImage, "PNG", lineChartX, currentY + 10, lineChartWidth, lineChartHeight);
 
             doc.save(`Wynik_inwestycji_${nazwaObligacji.replace(/\s+/g, "_")}.pdf`);
