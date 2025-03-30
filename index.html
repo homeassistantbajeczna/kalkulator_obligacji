@@ -767,8 +767,14 @@
         lastFormData: {
             kwota: 10000,
             typObligacji: "OTS",
-            inflacja: 4.90,  // Domyślna wartość inflacji
-            stopaRefNBP: 5.75,  // Domyślna wartość stopy referencyjnej NBP
+            dynamicRates: {
+                "ROR": 5.75,  // Domyślna stopa referencyjna dla ROR
+                "DOR": 5.75,  // Domyślna stopa referencyjna dla DOR
+                "COI": 4.90,  // Domyślna inflacja dla COI
+                "EDO": 4.90,  // Domyślna inflacja dla EDO
+                "ROS": 4.90,  // Domyślna inflacja dla ROS
+                "ROD": 4.90   // Domyślna inflacja dla ROD
+            },
             okres: 3,
             oprocentowanie: 3,
             ikeIkze: false,
@@ -832,20 +838,12 @@
     elements.dynamicRateRange.addEventListener("input", () => { 
         elements.dynamicRate.value = elements.dynamicRateRange.value; 
         const typ = elements.typObligacji.value;
-        if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-            state.lastFormData.inflacja = parseFloat(elements.dynamicRate.value);
-        } else if (["ROR", "DOR"].includes(typ)) {
-            state.lastFormData.stopaRefNBP = parseFloat(elements.dynamicRate.value);
-        }
+        state.lastFormData.dynamicRates[typ] = parseFloat(elements.dynamicRate.value);
     });
     elements.dynamicRate.addEventListener("input", () => { 
         elements.dynamicRateRange.value = elements.dynamicRate.value; 
         const typ = elements.typObligacji.value;
-        if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-            state.lastFormData.inflacja = parseFloat(elements.dynamicRate.value);
-        } else if (["ROR", "DOR"].includes(typ)) {
-            state.lastFormData.stopaRefNBP = parseFloat(elements.dynamicRate.value);
-        }
+        state.lastFormData.dynamicRates[typ] = parseFloat(elements.dynamicRate.value);
     });
     elements.kwotaRange.addEventListener("input", () => { elements.kwota.value = elements.kwotaRange.value; updateIloscObligacji(); });
     elements.kwota.addEventListener("input", () => { elements.kwotaRange.value = elements.kwota.value; updateIloscObligacji(); });
@@ -903,14 +901,11 @@
         updateOprocentowanieInfo();
         updateOpisObligacji();
 
-        // Nowa logika z oddzielnymi wartościami dla inflacji i stopy referencyjnej NBP
         if (["ROR", "DOR"].includes(typ)) {
-            // Stopa referencyjna NBP dla ROR i DOR
-            const stopaRefValue = state.lastFormData.stopaRefNBP || 5.75;
+            const stopaRefValue = state.lastFormData.dynamicRates[typ] || 5.75;
             setDynamicRateField("Stopa Ref. NBP", stopaRefValue, "0.05", "20");
         } else if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-            // Inflacja dla COI, EDO, ROS, ROD
-            const inflacjaValue = state.lastFormData.inflacja || 4.90;
+            const inflacjaValue = state.lastFormData.dynamicRates[typ] || 4.90;
             setDynamicRateField("Inflacja", inflacjaValue, "0.1", "50");
         } else {
             document.getElementById("dynamicRateGroup").style.display = "none";
@@ -1164,8 +1159,9 @@
         const typ = elements.typObligacji.value;
         const config = obligacjeConfig[typ];
         const miesiace = config.okres;
-        const inflacja = (["COI", "EDO", "ROS", "ROD"].includes(typ) ? (parseFloat(elements.dynamicRate.value) || state.lastFormData.inflacja) : 4.90) / 100;
-        const stopaRefNBP = (["ROR", "DOR"].includes(typ) ? (parseFloat(elements.dynamicRate.value) || state.lastFormData.stopaRefNBP) : 5.75) / 100;
+        const dynamicRate = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ];
+        const inflacja = (["COI", "EDO", "ROS", "ROD"].includes(typ) ? dynamicRate : 4.90) / 100;
+        const stopaRefNBP = (["ROR", "DOR"].includes(typ) ? dynamicRate : 5.75) / 100;
         const isInflacja = ["COI", "EDO", "ROS", "ROD"].includes(typ);
         const inflacjaZmienna = elements.inflacjaZmiennaBtn.checked && isInflacja;
         const stopaZmienna = elements.stopaZmiennaBtn.checked && ["ROR", "DOR"].includes(typ);
@@ -1174,8 +1170,7 @@
         state.lastFormData = {
             kwota: kwota,
             typObligacji: typ,
-            inflacja: inflacja * 100,
-            stopaRefNBP: stopaRefNBP * 100,
+            dynamicRates: { ...state.lastFormData.dynamicRates, [typ]: dynamicRate },
             okres: miesiace,
             oprocentowanie: config.oprocentowanie,
             ikeIkze: state.isIkeIkzeMode,
