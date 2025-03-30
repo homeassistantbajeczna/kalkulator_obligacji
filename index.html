@@ -677,8 +677,8 @@
                     </div>
                 </div>
                 <div class="summary-footer">
-                    <span class="highlight yellow" data-hover="3 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span></span>
-                    <span class="highlight green" data-hover="">Zysk netto: <span id="zyskNetto">-</span></span>
+                    <span class="highlight yellow" data-hover="3 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span> </span>
+                    <span class="highlight green" data-hover="">Zysk netto: <span id="zyskNetto">-</span> </span>
                 </div>
                 <div class="obligacje-opis" id="obligacjeOpisPodsumowanie"></div>
             </div>
@@ -823,12 +823,6 @@
         "COI": "4-letnich (COI)", "EDO": "10-letnich (EDO)", "ROS": "6-letnich (ROS)", "ROD": "12-letnich (ROD)"
     };
 </script>
-
-
-
-
-
-
 
 
 
@@ -1134,7 +1128,23 @@
 
 
 
+
+
+
+
+
 <script>
+    if (typeof pdfMake !== "undefined" && typeof pdfMake.vfs !== "undefined") {
+        pdfMake.fonts = {
+            Roboto: {
+                normal: 'Roboto-Regular.ttf',
+                bold: 'Roboto-Medium.ttf',
+                italics: 'Roboto-Italic.ttf',
+                bolditalics: 'Roboto-MediumItalic.ttf'
+            }
+        };
+    }
+
     function obliczObligacje() {
         console.log("Starting obliczObligacje");
         if (state.isCalculating) {
@@ -1440,6 +1450,7 @@
         state.isCalculating = false;
         console.log("ObliczObligacje completed");
     }
+
     function generatePdf() {
         console.log("Starting generatePdf");
         if (typeof pdfMake === "undefined") {
