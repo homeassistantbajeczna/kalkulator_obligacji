@@ -839,8 +839,6 @@
 
 
 
-
-
 <script>
     elements.dynamicRateRange.addEventListener("input", () => { 
         elements.dynamicRate.value = elements.dynamicRateRange.value; 
@@ -1132,6 +1130,15 @@
 
 
 
+
+
+
+
+
+
+
+
+
 <script>
     if (typeof pdfMake !== "undefined" && typeof pdfMake.vfs !== "undefined") {
         pdfMake.fonts = {
@@ -1288,7 +1295,7 @@
         document.querySelector('.result-wrapper-chart .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
         
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
-        document.getElementById("okresInwestycji").textContent = miesiace;
+        document.getElementById("okresInwestycji").textContent = `${miesiace} ${jednostkaOkresu}`;
         document.querySelector('.result-wrapper-chart .highlight.yellow').setAttribute('data-hover', `${miesiace} ${jednostkaOkresu}`);
         document.getElementById("zyskNetto").textContent = `${zyskNettoCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         document.querySelector('.result-wrapper-chart .highlight.green').setAttribute('data-hover', `${zyskNettoCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
@@ -1366,9 +1373,9 @@
 
         const harmonogramOpis = document.getElementById("harmonogramOpis");
         if (state.isIkeIkzeMode) {
-            harmonogramOpis.innerHTML = "** Opłata za wszystkie zakupione Obligacje.<br>*** Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>.";
+            harmonogramOpis.innerHTML = "** Opłata maksymalna za wcześniejszy wykup jeżeli wartość narosłych odsetek jest większa od opłaty, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.<br>*** Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>.";
         } else {
-            harmonogramOpis.innerHTML = "** Opłata za wszystkie zakupione Obligacje.";
+            harmonogramOpis.innerHTML = "** Opłata maksymalna za wcześniejszy wykup jeżeli wartość narosłych odsetek jest większa od opłaty, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.";
         }
         harmonogramOpis.style.display = "block";
 
@@ -1515,11 +1522,11 @@
                     margin: [0, 10, 0, 10]
                 },
                 state.isIkeIkzeMode ? { 
-                    text: "** Opłata za wszystkie zakupione Obligacje.\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
+                    text: "** Opłata maksymalna za wcześniejszy wykup jeżeli wartość narosłych odsetek jest większa od opłaty, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
                     style: 'footerNote', 
                     margin: [0, 5, 0, 10] 
                 } : { 
-                    text: "\n** Opłata za wszystkie zakupione Obligacje.", 
+                    text: "\n** Opłata maksymalna za wcześniejszy wykup jeżeli wartość narosłych odsetek jest większa od opłaty, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.", 
                     style: 'footerNote', 
                     margin: [0, 5, 0, 10] 
                 },
@@ -1551,7 +1558,3 @@
 </script>
 </body>
 </html>
-
-
-
-
