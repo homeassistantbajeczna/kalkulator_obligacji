@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="logo-container">
+    <div class="logo-container">
     <a href="https://finance-brothers.pl">
         <img src="cropped-logo-FB-1.png" alt="Finance Brothers Logo" class="logo d-block mx-auto">
     </a>
@@ -1331,13 +1331,13 @@
                 datasets: [{
                     label: 'Wartość inwestycji',
                     data: state.harmonogramData.map(w => parseFloat(w.wartoscInwestycji)),
-                    borderColor: '#007bff',
+                    borderColor: '#C2B280', // Przywrócony oryginalny kolor
                     fill: false,
                     tension: 0.1
                 }, {
                     label: 'Suma netto',
                     data: state.harmonogramData.map(w => parseFloat(w.kwotaPoZakonczeniuCyklu)),
-                    borderColor: '#28a745',
+                    borderColor: '#b0a070', // Przywrócony oryginalny kolor
                     fill: false,
                     tension: 0.1
                 }]
@@ -1369,30 +1369,11 @@
 
         const typ = elements.typObligacji.value;
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
-        const naglowki = ["OTS", "ROR", "DOR"].includes(typ) ?
-            ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", ["ROR", "DOR"].includes(typ) ? "Stopa Ref. NBP" : "Inflacja", "Suma netto"] :
-            ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
-
-        const tableBody = [
-            naglowki.map(n => ({ text: n, style: 'tableHeader' })),
-            ...state.harmonogramData.map(w => [
-                w.okres,
-                `${parseFloat(w.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                w.oprocentowanieNaCykl + (w.changeApplied ? ' ★' : ''),
-                `${parseFloat(w.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `${parseFloat(w.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                state.isIkeIkzeMode ? "0,00 zł" : `${parseFloat(w.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `${parseFloat(w.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `${parseFloat(w.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                ["OTS", "TOS"].includes(typ) ? "-" : w.stopaRefLubInflacja,
-                `${parseFloat(w.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
-            ])
-        ];
 
         const docDefinition = {
             content: [
-                { text: `Kalkulator Obligacji Skarbu Państwa - Wyniki dla ${nazwyObligacji[typ]}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}`, style: 'header' },
-                { text: `Data: ${new Date().toLocaleDateString('pl-PL')}`, style: 'subheader' },
+                { text: `Kalkulator Obligacji Skarbu Państwa - Wyniki dla ${nazwyObligacji[typ]}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}**`, style: 'header' },
+                { text: `Data: ${new Date().toLocaleDateString('pl-PL')}`, style: 'subheader', alignment: 'right' },
                 {
                     columns: [
                         { text: `Kapitał: ${parseFloat(elements.kwota.value).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`, style: 'summary' },
@@ -1408,28 +1389,52 @@
                     table: {
                         headerRows: 1,
                         widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-                        body: tableBody
+                        body: [
+                            [
+                                ["OTS", "ROR", "DOR"].includes(typ) ? "Miesiąc" : "Rok",
+                                "Wartość inwestycji",
+                                "Oproc.",
+                                "Odsetki",
+                                "Suma odsetek",
+                                "Podatek",
+                                state.isIkeIkzeMode ? "Zysk" : "Zysk netto",
+                                "Opłata za wykup",
+                                ["ROR", "DOR"].includes(typ) ? "Stopa Ref. NBP" : "Inflacja",
+                                "Suma netto"
+                            ].map(n => ({ text: n, style: 'tableHeader' })),
+                            ...state.harmonogramData.map(w => [
+                                w.okres,
+                                `${parseFloat(w.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                                w.oprocentowanieNaCykl + (w.changeApplied ? ' ★' : ''),
+                                `${parseFloat(w.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                                `${parseFloat(w.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                                state.isIkeIkzeMode ? "0,00 zł" : `${parseFloat(w.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                                `${parseFloat(w.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                                `${parseFloat(w.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                                ["OTS", "TOS"].includes(typ) ? "-" : w.stopaRefLubInflacja,
+                                `${parseFloat(w.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
+                            ])
+                        ]
                     },
                     layout: {
-                        fillColor: function (rowIndex) { return (rowIndex === 0) ? '#C2B280' : (rowIndex % 2 === 0 ? '#f9f9f9' : '#ffffff'); },
-                        hLineColor: '#ddd',
-                        vLineColor: '#ddd'
-                    },
-                    margin: [0, 10, 0, 10]
+                        fillColor: function (rowIndex) { return (rowIndex === 0) ? '#C2B280' : null; }
+                    }
                 },
+                { text: '* Dane mogą się różnić w zależności od rzeczywistych wartości inflacji oraz stóp referencyjnych NBP w okresie trwania inwestycji.', style: 'footer' },
+                { text: '** Wyniki obliczeń są szacunkowe i nie stanowią oferty w rozumieniu prawa.', style: 'footer' },
                 { text: '★ - wskazuje cykl, w którym zmieniono oprocentowanie na podstawie wprowadzonych danych.', style: 'footer' },
-                { text: 'Dane z dnia: 01.03.2025r.', style: 'footer' },
-                { text: state.isIkeIkzeMode ? '***Zwolnienie z podatku w ramach IKE/IKZE' : '', style: 'footer' }
+                { text: state.isIkeIkzeMode ? '***Zwolnienie z podatku w ramach IKE/IKZE' : '', style: 'footer' },
+                { text: 'Dane z dnia: 01.03.2025r.', style: 'footer' }
             ],
             styles: {
                 header: { fontSize: 16, bold: true, margin: [0, 0, 0, 10], alignment: 'center' },
-                subheader: { fontSize: 10, margin: [0, 0, 0, 10], alignment: 'right' },
+                subheader: { fontSize: 10, margin: [0, 0, 0, 10] },
                 summary: { fontSize: 12, bold: true, margin: [0, 5, 0, 5] },
                 description: { fontSize: 10, margin: [0, 5, 0, 5] },
                 tableHeader: { fontSize: 10, bold: true, fillColor: '#C2B280', color: '#000000', alignment: 'center' },
-                footer: { fontSize: 8, italics: true, margin: [0, 5, 0, 0], alignment: 'left' }
+                footer: { fontSize: 8, italics: true, margin: [0, 5, 0, 0] }
             },
-            defaultStyle: { font: 'Roboto', fontSize: 10 }
+            defaultStyle: { font: 'Roboto' }
         };
 
         pdfMake.createPdf(docDefinition).download(`Wyniki_Obligacje_${typ}_${new Date().toISOString().slice(0, 10)}.pdf`);
