@@ -538,6 +538,15 @@
         <img src="cropped-logo-FB-1.png" alt="Finance Brothers Logo" class="logo d-block mx-auto">
     </a>
 </div>
+
+
+
+
+
+
+
+
+
 <div class="container">
     <div class="form-section" id="formSection">
         <div class="header-row">
@@ -708,6 +717,24 @@
         </div>
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const elements = {
@@ -790,6 +817,22 @@
         "COI": "4-letnich (COI)", "EDO": "10-letnich (EDO)", "ROS": "6-letnich (ROS)", "ROD": "12-letnich (ROD)"
     };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
     elements.dynamicRateRange.addEventListener("input", () => { elements.dynamicRate.value = elements.dynamicRateRange.value; console.log("DynamicRateRange:", elements.dynamicRateRange.value); });
     elements.dynamicRate.addEventListener("input", () => { elements.dynamicRateRange.value = elements.dynamicRate.value; console.log("DynamicRate:", elements.dynamicRate.value); });
     elements.kwotaRange.addEventListener("input", () => { elements.kwota.value = elements.kwotaRange.value; updateIloscObligacji(); });
@@ -814,61 +857,64 @@
         document.getElementById("dynamicRateGroup").style.display = "block";
     }
 
+    // Poprawiona funkcja z naniesionymi zmianami
     function updateDynamicRateField() {
-    state.isIkeIkzeMode = elements.ikeIkzeBtn.checked;
-    const select = elements.typObligacji;
-    const previousTyp = select.value;
+        state.isIkeIkzeMode = elements.ikeIkzeBtn.checked;
+        const select = elements.typObligacji;
+        const previousTyp = select.value;
 
-    select.innerHTML = state.isIkeIkzeMode ? `
-        <option value="ROR">12-miesięczne (ROR)</option>
-        <option value="DOR">24-miesięczne (DOR)</option>
-        <option value="TOS" selected>3-letnie (TOS)</option>
-        <option value="COI">4-letnie (COI)</option>
-        <option value="EDO">10-letnie (EDO)</option>
-    ` : `
-        <option value="OTS" selected>3-miesięczne (OTS)</option>
-        <option value="ROR">12-miesięczne (ROR)</option>
-        <option value="DOR">24-miesięczne (DOR)</option>
-        <option value="TOS">3-letnie (TOS)</option>
-        <option value="COI">4-letnie (COI)</option>
-        <option value="EDO">10-letnie (EDO)</option>
-        <option value="ROS">6-letnie (ROS)</option>
-        <option value="ROD">12-letnich (ROD)</option>
-    `;
+        select.innerHTML = state.isIkeIkzeMode ? `
+            <option value="ROR">12-miesięczne (ROR)</option>
+            <option value="DOR">24-miesięczne (DOR)</option>
+            <option value="TOS" selected>3-letnie (TOS)</option>
+            <option value="COI">4-letnie (COI)</option>
+            <option value="EDO">10-letnie (EDO)</option>
+        ` : `
+            <option value="OTS" selected>3-miesięczne (OTS)</option>
+            <option value="ROR">12-miesięczne (ROR)</option>
+            <option value="DOR">24-miesięczne (DOR)</option>
+            <option value="TOS">3-letnie (TOS)</option>
+            <option value="COI">4-letnie (COI)</option>
+            <option value="EDO">10-letnie (EDO)</option>
+            <option value="ROS">6-letnie (ROS)</option>
+            <option value="ROD">12-letnich (ROD)</option>
+        `;
 
-    const availableOptions = Array.from(select.options).map(opt => opt.value);
-    select.value = availableOptions.includes(previousTyp) ? previousTyp : (state.isIkeIkzeMode ? "TOS" : "OTS");
+        const availableOptions = Array.from(select.options).map(opt => opt.value);
+        select.value = availableOptions.includes(previousTyp) ? previousTyp : (state.isIkeIkzeMode ? "TOS" : "OTS");
 
-    const typ = select.value;
-    const config = obligacjeConfig[typ];
+        const typ = select.value;
+        const config = obligacjeConfig[typ];
 
-    elements.okres.value = config.okres;
-    elements.oprocentowanie.value = config.oprocentowanie;
-    updateLata();
-    updateOprocentowanieInfo();
-    updateOpisObligacji();
+        elements.okres.value = config.okres;
+        elements.oprocentowanie.value = config.oprocentowanie;
+        updateLata();
+        updateOprocentowanieInfo();
+        updateOpisObligacji();
 
-    // Poprawiona logika domyślnej wartości inflacji
-    if (["ROR", "DOR"].includes(typ)) {
-        setDynamicRateField("Stopa Ref. NBP", state.lastFormData.dynamicRate || 5.75, "0.05", "20");
-        state.lastFormData.isInflacja = false;
-    } else if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-        setDynamicRateField("Inflacja", state.lastFormData.dynamicRate && state.lastFormData.isInflacja ? state.lastFormData.dynamicRate : 4.90, "0.1", "50");
-        state.lastFormData.isInflacja = true;
-    } else {
-        document.getElementById("dynamicRateGroup").style.display = "none";
-        state.lastFormData.isInflacja = false;
+        // Poprawiona logika ustawiania wartości domyślnych
+        if (["ROR", "DOR"].includes(typ)) {
+            // Stopa referencyjna NBP dla ROR i DOR
+            setDynamicRateField("Stopa Ref. NBP", state.lastFormData.dynamicRate && !state.lastFormData.isInflacja ? state.lastFormData.dynamicRate : 5.75, "0.05", "20");
+            state.lastFormData.isInflacja = false;
+        } else if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+            // Inflacja dla COI, EDO, ROS, ROD
+            setDynamicRateField("Inflacja", state.lastFormData.dynamicRate && state.lastFormData.isInflacja ? state.lastFormData.dynamicRate : 4.90, "0.1", "50");
+            state.lastFormData.isInflacja = true;
+        } else {
+            document.getElementById("dynamicRateGroup").style.display = "none";
+            state.lastFormData.isInflacja = false;
+        }
+
+        document.getElementById("inflacjaZmiennaLabel").style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
+        document.getElementById("stopaZmiennaLabel").style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
+
+        elements.inflacjaZmiennaBtn.checked = state.lastFormData.inflacjaZmienna || false;
+        elements.stopaZmiennaBtn.checked = state.lastFormData.stopaZmienna || false;
+        state.variableInflacjaChanges = state.lastFormData.variableInflacjaChanges ? [...state.lastFormData.variableInflacjaChanges] : [];
+        state.variableStopaChanges = state.lastFormData.variableStopaChanges ? [...state.lastFormData.variableStopaChanges] : [];
+        updateVariableInputs();
     }
-
-    document.getElementById("inflacjaZmiennaLabel").style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
-    document.getElementById("stopaZmiennaLabel").style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
-
-    elements.inflacjaZmiennaBtn.checked = state.lastFormData.inflacjaZmienna || false;
-    elements.stopaZmiennaBtn.checked = state.lastFormData.stopaZmienna || false;
-    state.variableInflacjaChanges = state.lastFormData.variableInflacjaChanges ? [...state.lastFormData.variableInflacjaChanges] : [];
-    state.variableStopaChanges = state.lastFormData.variableStopaChanges ? [...state.lastFormData.variableStopaChanges] : [];
-    updateVariableInputs();
-}
 
     function updateIloscObligacji() {
         const kwota = parseFloat(elements.kwota.value) || 0;
@@ -986,7 +1032,6 @@
                 fieldsWrapper.appendChild(rateGroup);
                 inputGroup.appendChild(fieldsWrapper);
 
-                // Przycisk "Usuń" tylko dla ostatniego wiersza
                 if (index === changes.length - 1 && changes.length > 1) {
                     const removeBtnWrapper = document.createElement("div");
                     removeBtnWrapper.className = "remove-btn-wrapper";
@@ -1067,6 +1112,27 @@
         }
     }
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
     // Inicjalizacja fontów (po załadowaniu pdfmake i vfs_fonts)
     if (typeof pdfMake !== "undefined" && typeof pdfMake.vfs !== "undefined") {
