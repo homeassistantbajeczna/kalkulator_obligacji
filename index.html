@@ -1302,9 +1302,9 @@
         // ZMIANA: Zaktualizowano logikę wyświetlania harmonogramOpis
         const harmonogramOpis = document.getElementById("harmonogramOpis");
         if (state.isIkeIkzeMode) {
-            harmonogramOpis.innerHTML = "** Wartość za wszystkie zakupione Obligacje.\n*** Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>.";
+            harmonogramOpis.innerHTML = "** Opłata za wszystkie zakupione Obligacje.<br>*** Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>.";
         } else {
-            harmonogramOpis.innerHTML = "** Wartość za wszystkie zakupione Obligacje.";
+            harmonogramOpis.innerHTML = "** Opłata za wszystkie zakupione Obligacje.";
         }
         harmonogramOpis.style.display = "block";
 
@@ -1439,11 +1439,11 @@
                 },
                 // ZMIANA: Zaktualizowano logikę wyświetlania tekstu pod tabelą w PDF
                 state.isIkeIkzeMode ? { 
-                    text: "** Wartość za wszystkie zakupione Obligacje.\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
+                    text: "** Opłata za wszystkie zakupione Obligacje.<br>*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
                     style: 'footerNote', 
                     margin: [0, 5, 0, 10] 
                 } : { 
-                    text: "** Wartość za wszystkie zakupione Obligacje.", 
+                    text: "** Opłata za wszystkie zakupione Obligacje.", 
                     style: 'footerNote', 
                     margin: [0, 5, 0, 10] 
                 },
