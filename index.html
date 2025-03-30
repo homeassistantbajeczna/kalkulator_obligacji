@@ -1471,6 +1471,7 @@
         const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}*`;
         const opis = opisyObligacji[typ] || "";
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
+        const today = new Date().toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
         const summary = [
             `Kapitał: ${parseFloat(state.lastFormData.kwota).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
@@ -1481,8 +1482,8 @@
         ];
 
         const headers = ["OTS", "ROR", "DOR"].includes(typ) ?
-            ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", "Zysk netto", "Opłata za wykup", "Stopa Ref. NBP", "Suma netto"] :
-            ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
+            ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Stopa Ref. NBP", "Suma netto"] :
+            ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
         if (["OTS", "TOS"].includes(typ)) headers.splice(8, 1);
 
         const tableData = state.harmonogramData.map(wiersz => {
@@ -1504,61 +1505,102 @@
         const lineChartCanvas = document.getElementById("obligacjeChartLine");
         const lineChartImage = lineChartCanvas.toDataURL("image/png");
 
-        const docDefinition = {
-            pageSize: 'A4',
-            pageMargins: [20, 20, 20, 20],
-            defaultStyle: { font: 'Roboto' },
-            content: [
-                { text: headerText, style: 'header' },
-                { text: opis.replace(/<[^>]+>/g, ""), style: 'subheader', margin: [0, 10, 0, 10] },
-                { text: "Podsumowanie:", style: 'sectionHeader', margin: [0, 10, 0, 5] },
-                { ul: summary.map(item => ({ text: item, style: 'listItem' })), margin: [0, 0, 0, 10] },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: headers.map(() => '*'),
-                        body: [
-                            headers.map(h => ({ text: h, style: 'tableHeader' })),
-                            ...tableData.map(row => row.map(cell => ({ text: cell, style: 'tableCell' })))
-                        ]
-                    },
-                    layout: {
-                        fillColor: function (rowIndex) { return (rowIndex === 0) ? '#C2B280' : (rowIndex % 2 === 0 ? '#F5F5F5' : null); },
-                        hLineWidth: function () { return 0.5; },
-                        vLineWidth: function () { return 0.5; }
-                    },
-                    margin: [0, 10, 0, 10]
-                },
-                state.isIkeIkzeMode ? { 
-                    text: "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
-                    style: 'footerNote', 
-                    margin: [0, 5, 0, 10] 
-                } : { 
-                    text: "\n** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.", 
-                    style: 'footerNote', 
-                    margin: [0, 5, 0, 10] 
-                },
-                { text: "Wykres liniowy wartości inwestycji w czasie", style: 'sectionHeader', margin: [0, 10, 0, 5], pageBreak: tableData.length > 10 ? 'before' : 'none' },
-                { image: lineChartImage, width: 500, height: 250, alignment: 'center', margin: [0, 5, 0, 0] }
-            ],
-            styles: {
-                header: { fontSize: 16, bold: true, alignment: 'center', margin: [0, 0, 0, 10] },
-                subheader: { fontSize: 10, alignment: 'justify' },
-                sectionHeader: { fontSize: 12, bold: true },
-                listItem: { fontSize: 10, margin: [0, 2, 0, 2] },
-                tableHeader: { fontSize: 8, bold: true, alignment: 'center', color: '#000000', fillColor: '#C2B280' },
-                tableCell: { fontSize: 8, alignment: 'center' },
-                footerNote: { fontSize: 8, italics: true }
-            }
-        };
-
-        try {
-            pdfMake.createPdf(docDefinition).download(`Wynik_inwestycji_${nazwaObligacji.replace(/\s+/g, "_")}.pdf`);
-            console.log("PDF generated successfully");
-        } catch (error) {
-            console.error("Error generating PDF:", error);
-            alert("Błąd podczas generowania PDF. Sprawdź konsolę dla szczegółów.");
+        // Funkcja do załadowania logo jako base64
+        function getBase64ImageFromUrl(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous"; // W przypadku lokalnych plików nie zawsze potrzebne
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.width;
+                    canvas.height = this.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(this, 0, 0);
+                    const dataURL = canvas.toDataURL('image/png');
+                    resolve(dataURL);
+                };
+                img.onerror = reject;
+                img.src = url;
+            });
         }
+
+        // Generowanie PDF-a z logo
+        getBase64ImageFromUrl('cropped-logo-FB-1.png').then(logoBase64 => {
+            const docDefinition = {
+                pageSize: 'A4',
+                pageMargins: [20, 60, 20, 20],
+                defaultStyle: { font: 'Roboto' },
+                header: {
+                    columns: [
+                        {
+                            image: logoBase64,
+                            width: 100,
+                            alignment: 'center',
+                            margin: [0, 10, 0, 0]
+                        },
+                        {
+                            text: `Data: ${today}`,
+                            alignment: 'right',
+                            fontSize: 8,
+                            margin: [0, 10, 20, 0]
+                        }
+                    ]
+                },
+                content: [
+                    { text: headerText, style: 'header' },
+                    { text: opis.replace(/<[^>]+>/g, ""), style: 'subheader', margin: [0, 10, 0, 10] },
+                    { text: "Podsumowanie:", style: 'sectionHeader', margin: [0, 10, 0, 5] },
+                    { ul: summary.map(item => ({ text: item, style: 'listItem' })), margin: [0, 0, 0, 10] },
+                    {
+                        table: {
+                            headerRows: 1,
+                            widths: headers.map(() => '*'),
+                            body: [
+                                headers.map(h => ({ text: h, style: 'tableHeader' })),
+                                ...tableData.map(row => row.map(cell => ({ text: cell, style: 'tableCell' })))
+                            ]
+                        },
+                        layout: {
+                            fillColor: function (rowIndex) { return (rowIndex === 0) ? '#C2B280' : (rowIndex % 2 === 0 ? '#F5F5F5' : null); },
+                            hLineWidth: function () { return 0.5; },
+                            vLineWidth: function () { return 0.5; }
+                        },
+                        margin: [0, 10, 0, 10]
+                    },
+                    state.isIkeIkzeMode ? { 
+                        text: "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
+                        style: 'footerNote', 
+                        margin: [0, 5, 0, 10] 
+                    } : { 
+                        text: "\n** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.", 
+                        style: 'footerNote', 
+                        margin: [0, 5, 0, 10] 
+                    },
+                    { text: "Wykres liniowy wartości inwestycji w czasie", style: 'sectionHeader', margin: [0, 10, 0, 5], pageBreak: tableData.length > 10 ? 'before' : 'none' },
+                    { image: lineChartImage, width: 500, height: 250, alignment: 'center', margin: [0, 5, 0, 0] }
+                ],
+                styles: {
+                    header: { fontSize: 16, bold: true, alignment: 'center', margin: [0, 20, 0, 10] },
+                    subheader: { fontSize: 10, alignment: 'justify' },
+                    sectionHeader: { fontSize: 12, bold: true },
+                    listItem: { fontSize: 10, margin: [0, 2, 0, 2] },
+                    tableHeader: { fontSize: 8, bold: true, alignment: 'center', color: '#000000', fillColor: '#C2B280' },
+                    tableCell: { fontSize: 8, alignment: 'center' },
+                    footerNote: { fontSize: 8, italics: true }
+                }
+            };
+
+            try {
+                pdfMake.createPdf(docDefinition).download(`Wynik_inwestycji_${nazwaObligacji.replace(/\s+/g, "_")}_${today.replace(/\./g, '-')}.pdf`);
+                console.log("PDF generated successfully");
+            } catch (error) {
+                console.error("Error generating PDF:", error);
+                alert("Błąd podczas generowania PDF. Sprawdź konsolę dla szczegółów.");
+            }
+        }).catch(error => {
+            console.error("Błąd podczas ładowania logo:", error);
+            alert("Nie udało się załadować logo do PDF-a. Sprawdź, czy plik 'cropped-logo-FB-1.png' znajduje się w folderze głównym.");
+        });
     }
 
     updateDynamicRateField();
