@@ -896,11 +896,12 @@
 
         elements.okres.value = config.okres;
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
-        const okresUnitElement = document.querySelector('#okres ~ .input-group-text');
+        const inputGroup = elements.okres.closest('.input-group');
+        const okresUnitElement = inputGroup ? inputGroup.querySelector('.input-group-text') : null;
         if (okresUnitElement) {
             okresUnitElement.textContent = jednostkaOkresu;
         } else {
-            console.warn("Element '#okres ~ .input-group-text' nie istnieje w HTML-u.");
+            console.warn("Nie znaleziono elementu '.input-group-text' w obrębie '#okres'. Sprawdź strukturę HTML.");
         }
         elements.oprocentowanie.value = config.oprocentowanie;
         updateLata();
