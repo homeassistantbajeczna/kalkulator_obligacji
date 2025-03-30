@@ -901,6 +901,8 @@
         const config = obligacjeConfig[typ];
 
         elements.okres.value = config.okres;
+        const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
+        document.querySelector('#okresGroup .input-group-text').textContent = jednostkaOkresu;
         elements.oprocentowanie.value = config.oprocentowanie;
         updateLata();
         updateOprocentowanieInfo();
@@ -1134,11 +1136,6 @@
 
 
 
-
-
-
-
-
 <script>
     if (typeof pdfMake !== "undefined" && typeof pdfMake.vfs !== "undefined") {
         pdfMake.fonts = {
@@ -1197,7 +1194,7 @@
             return;
         }
 
-        elements.resultHeader.textContent = `Wynik inwestycji dla obligacji ${nazwyObligacji[typ]}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}`;
+        elements.resultHeader.textContent = `Wynik inwestycji dla obligacji ${nazwyObligacji[typ]}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}*`;
         const pierwszaKolumnaNaglowek = document.getElementById("pierwszaKolumnaNaglowek");
         const kolumnaStopaInflacja = document.getElementById("kolumnaStopaInflacja");
         const zyskKolumnaNaglowek = document.getElementById("zyskKolumnaNaglowek");
@@ -1291,8 +1288,8 @@
         document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         document.querySelector('.result-wrapper-chart .legend-item[data-index="1"] .color-box').setAttribute('data-tooltip', `Odsetki: ${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
         const podatekCalkowity = odsetkiCalkowite * (state.isIkeIkzeMode ? 0 : 0.19);
-        document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
-        document.querySelector('.result-wrapper-chart .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek: ${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
+        document.getElementById("valuePodatek").textContent = state.isIkeIkzeMode ? "0,00 zł***" : `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
+        document.querySelector('.result-wrapper-chart .legend-item[data-index="2"] .color-box').setAttribute('data-tooltip', `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
         
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
         document.getElementById("okresInwestycji").textContent = `${miesiace} ${jednostkaOkresu}`;
@@ -1343,7 +1340,7 @@
                 if (currentLegend) currentLegend.style.opacity = 1;
                 document.getElementById("valueKapital").textContent = `${kwota.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`;
                 document.getElementById("valueOdsetki").textContent = `${odsetkiCalkowite.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
-                document.getElementById("valuePodatek").textContent = `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
+                document.getElementById("valuePodatek").textContent = state.isIkeIkzeMode ? "0,00 zł***" : `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
             });
         });
 
@@ -1373,9 +1370,9 @@
 
         const harmonogramOpis = document.getElementById("harmonogramOpis");
         if (state.isIkeIkzeMode) {
-            harmonogramOpis.innerHTML = "** Opłata maksymalna za wcześniejszy wykup jeżeli wartość narosłych odsetek jest większa od opłaty, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.<br>*** Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>.";
+            harmonogramOpis.innerHTML = "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.<br>*** Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>.";
         } else {
-            harmonogramOpis.innerHTML = "** Opłata maksymalna za wcześniejszy wykup jeżeli wartość narosłych odsetek jest większa od opłaty, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.";
+            harmonogramOpis.innerHTML = "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.";
         }
         harmonogramOpis.style.display = "block";
 
@@ -1460,14 +1457,14 @@
 
         const typ = state.lastFormData.typObligacji;
         const nazwaObligacji = nazwyObligacji[typ];
-        const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}`;
+        const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}*`;
         const opis = opisyObligacji[typ] || "";
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
 
         const summary = [
             `Kapitał: ${parseFloat(state.lastFormData.kwota).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
             `Odsetki: ${parseFloat(document.getElementById("valueOdsetki").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-            `Podatek: ${state.isIkeIkzeMode ? "0,00" : parseFloat(document.getElementById("valuePodatek").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł***`,
+            `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : parseFloat(document.getElementById("valuePodatek").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
             `Okres inwestycji: ${state.lastFormData.okres} ${jednostkaOkresu}`,
             `Zysk netto: ${parseFloat(document.getElementById("zyskNetto").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
         ];
@@ -1522,11 +1519,11 @@
                     margin: [0, 10, 0, 10]
                 },
                 state.isIkeIkzeMode ? { 
-                    text: "** Opłata maksymalna za wcześniejszy wykup jeżeli wartość narosłych odsetek jest większa od opłaty, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
+                    text: "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
                     style: 'footerNote', 
                     margin: [0, 5, 0, 10] 
                 } : { 
-                    text: "\n** Opłata maksymalna za wcześniejszy wykup jeżeli wartość narosłych odsetek jest większa od opłaty, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.", 
+                    text: "\n** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.", 
                     style: 'footerNote', 
                     margin: [0, 5, 0, 10] 
                 },
