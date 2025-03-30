@@ -833,6 +833,12 @@
 
 
 
+
+
+
+
+
+
 <script>
     elements.dynamicRateRange.addEventListener("input", () => { 
         elements.dynamicRate.value = elements.dynamicRateRange.value; 
@@ -1128,23 +1134,7 @@
 
 
 
-
-
-
-
-
 <script>
-    if (typeof pdfMake !== "undefined" && typeof pdfMake.vfs !== "undefined") {
-        pdfMake.fonts = {
-            Roboto: {
-                normal: 'Roboto-Regular.ttf',
-                bold: 'Roboto-Medium.ttf',
-                italics: 'Roboto-Italic.ttf',
-                bolditalics: 'Roboto-MediumItalic.ttf'
-            }
-        };
-    }
-
     function obliczObligacje() {
         console.log("Starting obliczObligacje");
         if (state.isCalculating) {
@@ -1290,7 +1280,7 @@
         const valuePodatek = document.getElementById("valuePodatek");
         if (valuePodatek) valuePodatek.textContent = state.isIkeIkzeMode ? "0,00 zł***" : `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         const legendPodatek = document.querySelector('.result-wrapper-chart .legend-item[data-index="2"] .color-box');
-        if (legendPodatek) legendPodatek.setAttribute('data-tooltip', `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
+        if (legendPodatek) legendPodatek.setAttribute('data-tooltip', `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " zł"}`);
 
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
         const okresInwestycji = document.getElementById("okresInwestycji");
@@ -1450,7 +1440,6 @@
         state.isCalculating = false;
         console.log("ObliczObligacje completed");
     }
-
     function generatePdf() {
         console.log("Starting generatePdf");
         if (typeof pdfMake === "undefined") {
