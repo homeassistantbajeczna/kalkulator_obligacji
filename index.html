@@ -974,7 +974,7 @@
                 const rateGroup = document.createElement("div");
                 rateGroup.className = "form-group";
                 rateGroup.innerHTML = `
-                    <label class="form-label">${isInflacjaZmienna ? "Inflacja" : "Stopa NBP"}</label>
+                    <label class="form-label">${isInflacjaZmienna ? "Inflacja" : "Stopa Ref. NBP"}</label>
                     <div class="input-group">
                         <input type="number" class="form-control variable-rate" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
                         <span class="input-group-text">%</span>
@@ -1438,7 +1438,7 @@
                     margin: [0, 10, 0, 10]
                 },
                 state.isIkeIkzeMode ? { 
-                    text: "** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
+                    text: "* Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE.", 
                     style: 'footerNote', 
                     margin: [0, 5, 0, 10] 
                 } : {},
