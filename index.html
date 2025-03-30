@@ -896,6 +896,7 @@
 
         elements.okres.value = config.okres;
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
+        const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
         const okresUnitElement = document.querySelector('#okresGroup .input-group-text');
         if (okresUnitElement) {
             okresUnitElement.textContent = jednostkaOkresu;
@@ -1474,7 +1475,7 @@
         const summary = [
             `Kapitał: ${parseFloat(state.lastFormData.kwota).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
             `Odsetki: ${parseFloat(document.getElementById("valueOdsetki").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-            `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : parseFloat(document.getElementById("valuePodatek").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+            `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : parseFloat(document.getElementById("valuePodatek").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}`
             `Okres inwestycji: ${state.lastFormData.okres} ${jednostkaOkresu}`,
             `Zysk netto: ${parseFloat(document.getElementById("zyskNetto").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
         ];
