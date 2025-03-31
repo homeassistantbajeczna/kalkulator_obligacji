@@ -8,20 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <!-- Zastępujemy jsPDF na PDFMake -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
     <!-- Dodajemy Roboto dla polskich znaków -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
-    <script>
-        // Dodajemy font Roboto z polskimi znakami
-        pdfMake.fonts = {
-            Roboto: {
-                normal: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.woff2',
-                bold: 'https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fBBc4AMP6lQ.woff2',
-                italics: 'https://fonts.gstatic.com/s/roboto/v30/KFOkCnqEu92Fr1Mu51xIIzIXKMny.woff2',
-                bolditalics: 'https://fonts.gstatic.com/s/roboto/v30/KFOjCnqEu92Fr1MmWUlfBBc4AMP6lQ.woff2'
-            }
-        };
-    </script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -931,7 +919,9 @@
     function updateIloscObligacji() {
         const kwota = parseFloat(elements.kwota.value) || 0;
         const ilosc = Math.floor(kwota / 100);
-        document.getElementById("iloscObligacji").textContent = `Ilość obligacji: ${ilosc}`;
+        const iloscElement = document.getElementById("iloscObligacji");
+        if (iloscElement) iloscElement.textContent = `Ilość obligacji: ${ilosc}`;
+        else console.warn("Element #iloscObligacji nie znaleziony.");
     }
 
     function updateLata() {
@@ -989,107 +979,88 @@
     }
 
     function updateVariableInputs() {
-        const typ = elements.typObligacji.value;
-        const isInflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
-        const isStopaZmienna = elements.stopaZmiennaBtn.checked && ["ROR", "DOR"].includes(typ);
-        const variableInputs = document.getElementById("variableInputs");
-        const addVariableBtn = elements.addVariableBtn;
-        const wrapper = document.getElementById("variableInputsWrapper");
-        const config = obligacjeConfig[typ];
-        const maxCykl = ["ROR", "DOR"].includes(typ) ? config.okres : config.okres / 12;
+    const typ = elements.typObligacji.value;
+    const isInflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
+    const isStopaZmienna = elements.stopaZmiennaBtn.checked && ["ROR", "DOR"].includes(typ);
+    const variableInputs = document.getElementById("variableInputs");
+    const addVariableBtn = elements.addVariableBtn;
+    const wrapper = document.getElementById("variableInputsWrapper");
+    const maxCykl = ["ROR", "DOR"].includes(typ) ? obligacjeConfig[typ].okres : obligacjeConfig[typ].okres / 12;
 
-        if (isInflacjaZmienna || isStopaZmienna) {
-            variableInputs.style.display = "block";
-            addVariableBtn.style.display = "block";
+    if (isInflacjaZmienna || isStopaZmienna) {
+        variableInputs.style.display = "block";
+        addVariableBtn.style.display = "block";
 
-            if ((isInflacjaZmienna && state.variableInflacjaChanges.length === 0) || (isStopaZmienna && state.variableStopaChanges.length === 0)) {
-                addVariableChange();
+        if ((isInflacjaZmienna && state.variableInflacjaChanges.length === 0) || (isStopaZmienna && state.variableStopaChanges.length === 0)) {
+            addVariableChange();
+        }
+
+        const changes = isInflacjaZmienna ? state.variableInflacjaChanges : state.variableStopaChanges;
+        const existingGroups = Array.from(wrapper.children);
+
+        // Aktualizacja istniejących grup zamiast usuwania wszystkich
+        changes.forEach((change, index) => {
+            let inputGroup = existingGroups[index];
+            if (!inputGroup) {
+                inputGroup = document.createElement("div");
+                inputGroup.className = "variable-input-group";
+                wrapper.appendChild(inputGroup);
             }
 
-            wrapper.innerHTML = "";
-            const changes = isInflacjaZmienna ? state.variableInflacjaChanges : state.variableStopaChanges;
+            const cyklInput = inputGroup.querySelector(".variable-cykl") || document.createElement("input");
+            const rateInput = inputGroup.querySelector(".variable-rate") || document.createElement("input");
 
-            changes.forEach((change, index) => {
-                const inputGroup = document.createElement("div");
-                inputGroup.className = "variable-input-group";
-
-                const fieldsWrapper = document.createElement("div");
-                fieldsWrapper.className = "fields-wrapper";
-
-                const cyklGroup = document.createElement("div");
-                cyklGroup.className = "form-group";
-                cyklGroup.innerHTML = `
-                    <label class="form-label">Od</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control variable-cykl" min="1" max="${maxCykl}" step="1" value="${change.cykl}">
-                        <span class="input-group-text">${["ROR", "DOR"].includes(typ) ? "miesiąca" : "roku"}</span>
+            if (!inputGroup.innerHTML) {
+                inputGroup.innerHTML = `
+                    <div class="fields-wrapper">
+                        <div class="form-group">
+                            <label class="form-label">Od</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control variable-cykl" min="1" max="${maxCykl}" step="1" value="${change.cykl}">
+                                <span class="input-group-text">${["ROR", "DOR"].includes(typ) ? "miesiąca" : "roku"}</span>
+                            </div>
+                            <input type="range" class="form-range variable-cykl-range" min="1" max="${maxCykl}" step="1" value="${change.cykl}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">${isInflacjaZmienna ? "Inflacja" : "Stopa Ref. NBP"}</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control variable-rate" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <input type="range" class="form-range variable-rate-range" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
+                        </div>
                     </div>
-                    <input type="range" class="form-range variable-cykl-range" min="1" max="${maxCykl}" step="1" value="${change.cykl}">
+                    ${index === changes.length - 1 && changes.length > 1 ? '<div class="remove-btn-wrapper"><button class="btn btn-danger btn-sm">Usuń</button></div>' : ''}
                 `;
+            } else {
+                cyklInput.value = change.cykl;
+                rateInput.value = change.wartosc;
+            }
 
-                const rateGroup = document.createElement("div");
-                rateGroup.className = "form-group";
-                rateGroup.innerHTML = `
-                    <label class="form-label">${isInflacjaZmienna ? "Inflacja" : "Stopa Ref. NBP"}</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control variable-rate" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
-                        <span class="input-group-text">%</span>
-                    </div>
-                    <input type="range" class="form-range variable-rate-range" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
-                `;
-
-                fieldsWrapper.appendChild(cyklGroup);
-                fieldsWrapper.appendChild(rateGroup);
-                inputGroup.appendChild(fieldsWrapper);
-
-                if (index === changes.length - 1 && changes.length > 1) {
-                    const removeBtnWrapper = document.createElement("div");
-                    removeBtnWrapper.className = "remove-btn-wrapper";
-                    const removeBtn = document.createElement("button");
-                    removeBtn.className = "btn btn-danger btn-sm";
-                    removeBtn.textContent = "Usuń";
-                    removeBtn.onclick = () => removeVariableChange(index);
-                    removeBtnWrapper.appendChild(removeBtn);
-                    inputGroup.appendChild(removeBtnWrapper);
-                }
-
-                wrapper.appendChild(inputGroup);
-
-                const cyklInput = inputGroup.querySelector(".variable-cykl");
-                const cyklRange = inputGroup.querySelector(".variable-cykl-range");
-                const rateInput = inputGroup.querySelector(".variable-rate");
-                const rateRange = inputGroup.querySelector(".variable-rate-range");
-
+            // Dodaj listenery tylko raz
+            if (!cyklInput.dataset.listenerAdded) {
                 cyklInput.addEventListener("input", () => {
                     let value = parseInt(cyklInput.value);
                     if (value < 1 || value > maxCykl) cyklInput.value = Math.max(1, Math.min(maxCykl, value));
-                    cyklRange.value = cyklInput.value;
-                    changes[index].cykl = parseInt(cyklInput.value);
+                    changes[index].cykl = parseInt(cyklInput.nrvalue);
                 });
-                cyklRange.addEventListener("input", () => {
-                    cyklInput.value = cyklRange.value;
-                    changes[index].cykl = parseInt(cyklRange.value);
-                });
-                rateInput.addEventListener("input", () => {
-                    let value = parseFloat(rateInput.value);
-                    if (value < 0 || value > (isInflacjaZmienna ? 50 : 20)) rateInput.value = Math.max(0, Math.min(isInflacjaZmienna ? 50 : 20, value));
-                    rateRange.value = rateInput.value;
-                    changes[index].wartosc = parseFloat(rateInput.value);
-                });
-                rateRange.addEventListener("input", () => {
-                    rateInput.value = rateRange.value;
-                    changes[index].wartosc = parseFloat(rateRange.value);
-                });
-            });
+                cyklInput.dataset.listenerAdded = true;
+            }
+        });
 
-            const maxChanges = maxVariableChanges[typ] || 0;
-            addVariableBtn.style.display = changes.length < maxChanges ? "block" : "none";
-        } else {
-            variableInputs.style.display = "none";
-            addVariableBtn.style.display = "none";
-            wrapper.innerHTML = "";
+        // Usuń nadmiarowe grupy
+        while (existingGroups.length > changes.length) {
+            wrapper.removeChild(existingGroups.pop());
         }
+
+        const maxChanges = maxVariableChanges[typ] || 0;
+        addVariableBtn.style.display = changes.length < maxChanges ? "block" : "none";
+    } else {
+        variableInputs.style.display = "none";
+        addVariableBtn.style.display = "none";
+        wrapper.innerHTML = "";
     }
+}
 
     function addVariableChange() {
         const typ = elements.typObligacji.value;
@@ -1183,7 +1154,7 @@
             variableStopaChanges: [...state.variableStopaChanges]
         };
 
-        if (kwota < 100 || miesiace <= 0) {
+        if (kwota < 100 || miesiace <= 0 || (["ROR", "DOR", "COI", "EDO", "ROS", "ROD"].includes(typ) && (!dynamicRate || dynamicRate < 0))) {
             alert("Proszę wypełnić wszystkie wymagane pola poprawnymi wartościami.");
             state.isCalculating = false;
             return;
@@ -1305,6 +1276,11 @@
         if (state.chartLine) state.chartLine.destroy();
 
         const ctx = elements.obligacjeChart.getContext("2d");
+        if (!ctx) {
+            console.error("Nie można uzyskać kontekstu 2D dla wykresu kołowego.");
+            state.isCalculating = false;
+            return;
+        }
         state.chart = new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -1454,160 +1430,144 @@
     }
 
     function generatePdf() {
-        console.log("Starting generatePdf");
-        if (typeof pdfMake === "undefined") {
-            console.error("Biblioteka PDFMake nie została załadowana.");
-            alert("Błąd: Biblioteka PDFMake nie jest załadowana. Sprawdź, czy skrypt PDFMake jest poprawnie dołączony w HTML.");
-            return;
-        }
+    console.log("Starting generatePdf");
+    if (typeof pdfMake === "undefined") {
+        console.error("Biblioteka PDFMake nie została załadowana.");
+        alert("Błąd: Biblioteka PDFMake nie jest załadowana. Sprawdź, czy skrypt PDFMake jest poprawnie dołączony w HTML.");
+        return;
+    }
 
-        if (!state.harmonogramData.length) {
-            console.log("No harmonogram data available");
-            alert("Najpierw oblicz wyniki inwestycji, klikając 'Oblicz'.");
-            return;
-        }
+    if (!state.harmonogramData.length) {
+        console.log("No harmonogram data available");
+        alert("Najpierw oblicz wyniki inwestycji, klikając 'Oblicz'.");
+        return;
+    }
 
-        const typ = state.lastFormData.typObligacji;
-        const nazwaObligacji = nazwyObligacji[typ];
-        const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}*`;
-        const opis = opisyObligacji[typ] || "";
-        const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
-        const today = new Date().toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const typ = state.lastFormData.typObligacji;
+    const nazwaObligacji = nazwyObligacji[typ];
+    const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}*`;
+    const opis = opisyObligacji[typ] || "";
+    const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
+    const today = new Date().toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-        const summary = [
-            `Kapitał: ${parseFloat(state.lastFormData.kwota).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-            `Odsetki: ${parseFloat(document.getElementById("valueOdsetki").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-            `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : parseFloat(document.getElementById("valuePodatek").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}`,
-            `Okres inwestycji: ${state.lastFormData.okres} ${jednostkaOkresu}`,
-            `Zysk netto: ${parseFloat(document.getElementById("zyskNetto").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
+    const summary = [
+        `Kapitał: ${parseFloat(state.lastFormData.kwota).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+        `Odsetki: ${parseFloat(document.getElementById("valueOdsetki").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+        `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : parseFloat(document.getElementById("valuePodatek").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}`,
+        `Okres inwestycji: ${state.lastFormData.okres} ${jednostkaOkresu}`,
+        `Zysk netto: ${parseFloat(document.getElementById("zyskNetto").textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
+    ];
+
+    const headers = ["OTS", "ROR", "DOR"].includes(typ) ?
+        ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Stopa Ref. NBP", "Suma netto"] :
+        ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
+    if (["OTS", "TOS"].includes(typ)) headers.splice(8, 1);
+
+    const tableData = state.harmonogramData.map(wiersz => {
+        const row = [
+            wiersz.okres.toString(),
+            `${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+            wiersz.oprocentowanieNaCykl + (wiersz.changeApplied ? ' ★' : ''),
+            `${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+            `${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+            state.isIkeIkzeMode ? "0,00 zł***" : `${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+            `${parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+            `${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł**`
         ];
+        if (!["OTS", "TOS"].includes(typ)) row.push(wiersz.stopaRefLubInflacja);
+        row.push(`${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
+        return row;
+    });
 
-        const headers = ["OTS", "ROR", "DOR"].includes(typ) ?
-            ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Stopa Ref. NBP", "Suma netto"] :
-            ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
-        if (["OTS", "TOS"].includes(typ)) headers.splice(8, 1);
+    const lineChartCanvas = document.getElementById("obligacjeChartLine");
+    const lineChartImage = lineChartCanvas.toDataURL("image/png");
 
-        const tableData = state.harmonogramData.map(wiersz => {
-            const row = [
-                wiersz.okres.toString(),
-                `${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                wiersz.oprocentowanieNaCykl + (wiersz.changeApplied ? ' ★' : ''),
-                `${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                state.isIkeIkzeMode ? "0,00 zł***" : `${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `${parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł**`
-            ];
-            if (!["OTS", "TOS"].includes(typ)) row.push(wiersz.stopaRefLubInflacja);
-            row.push(`${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
-            return row;
-        });
-
-        const lineChartCanvas = document.getElementById("obligacjeChartLine");
-        const lineChartImage = lineChartCanvas.toDataURL("image/png");
-
-        // Funkcja do załadowania logo jako base64
-        function getBase64ImageFromUrl(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "Anonymous";
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = this.width;
-                    canvas.height = this.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(this, 0, 0);
-                    const dataURL = canvas.toDataURL('image/png');
-                    resolve(dataURL);
-                };
-                img.onerror = reject;
-                img.src = url;
-            });
-        }
-
-        // Generowanie PDF-a z logo
-        getBase64ImageFromUrl('cropped-logo-FB-1.png').then(logoBase64 => {
-            const hasStar = state.harmonogramData.some(wiersz => wiersz.changeApplied);
-            const starText = hasStar ? "★ - miejsce, w którym zmieniono oprocentowanie.\n" : "";
-            const baseText = "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.";
-            const ikeIkzeText = state.isIkeIkzeMode ? "\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE." : "";
-            const footerNoteText = `${starText}${baseText}${ikeIkzeText}`;
-
-            const docDefinition = {
-                pageSize: 'A4',
-                pageMargins: [20, 60, 20, 20],
-                defaultStyle: { font: 'Roboto' },
-                header: {
-                    columns: [
-                        {
-                            image: logoBase64,
-                            width: 100,
-                            alignment: 'center',
-                            margin: [0, 10, 0, 0]
-                        },
-                        {
-                            text: `Data: ${today}`,
-                            alignment: 'right',
-                            fontSize: 8,
-                            margin: [0, 10, 20, 0]
-                        }
-                    ]
-                },
-                content: [
-                    { text: headerText, style: 'header' },
-                    { text: opis.replace(/<[^>]+>/g, ""), style: 'subheader', margin: [0, 10, 0, 10] },
-                    { text: "Podsumowanie:", style: 'sectionHeader', margin: [0, 10, 0, 5] },
-                    { ul: summary.map(item => ({ text: item, style: 'listItem' })), margin: [0, 0, 0, 10] },
-                    {
-                        table: {
-                            headerRows: 1,
-                            widths: headers.map(() => '*'),
-                            body: [
-                                headers.map(h => ({ text: h, style: 'tableHeader' })),
-                                ...tableData.map(row => row.map(cell => ({ text: cell, style: 'tableCell' })))
-                            ]
-                        },
-                        layout: {
-                            fillColor: function (rowIndex) { return (rowIndex === 0) ? '#C2B280' : (rowIndex % 2 === 0 ? '#F5F5F5' : null); },
-                            hLineWidth: function () { return 0.5; },
-                            vLineWidth: function () { return 0.5; }
-                        },
-                        margin: [0, 10, 0, 10]
-                    },
-                    { 
-                        text: footerNoteText, 
-                        style: 'footerNote', 
-                        margin: [0, 5, 0, 10] 
-                    },
-                    { text: "Wykres liniowy wartości inwestycji w czasie", style: 'sectionHeader', margin: [0, 10, 0, 5], pageBreak: tableData.length > 10 ? 'before' : 'none' },
-                    { image: lineChartImage, width: 500, height: 250, alignment: 'center', margin: [0, 5, 0, 0] }
-                ],
-                styles: {
-                    header: { fontSize: 16, bold: true, alignment: 'center', margin: [0, 20, 0, 10] },
-                    subheader: { fontSize: 10, alignment: 'justify' },
-                    sectionHeader: { fontSize: 12, bold: true },
-                    listItem: { fontSize: 10, margin: [0, 2, 0, 2] },
-                    tableHeader: { fontSize: 8, bold: true, alignment: 'center', color: '#000000', fillColor: '#C2B280' },
-                    tableCell: { fontSize: 8, alignment: 'center' },
-                    footerNote: { fontSize: 8, italics: true }
-                }
+    // Funkcja do załadowania logo jako base64
+    function getBase64ImageFromUrl(url) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = this.width;
+                canvas.height = this.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(this, 0, 0);
+                const dataURL = canvas.toDataURL('image/png');
+                resolve(dataURL);
             };
-
-            try {
-                pdfMake.createPdf(docDefinition).download(`Wynik_inwestycji_${nazwaObligacji.replace(/\s+/g, "_")}_${today.replace(/\./g, '-')}.pdf`);
-                console.log("PDF generated successfully");
-            } catch (error) {
-                console.error("Error generating PDF:", error);
-                alert("Błąd podczas generowania PDF. Sprawdź konsolę dla szczegółów.");
-            }
-        }).catch(error => {
-            console.error("Błąd podczas ładowania logo:", error);
-            alert("Nie udało się załadować logo do PDF-a. Sprawdź, czy plik 'cropped-logo-FB-1.png' znajduje się w folderze głównym.");
+            img.onerror = reject;
+            img.src = url;
         });
     }
 
-    updateDynamicRateField();
-    updateIloscObligacji();
+    // Funkcja generująca PDF
+    const generateDoc = (logoBase64) => {
+        const hasStar = state.harmonogramData.some(wiersz => wiersz.changeApplied);
+        const starText = hasStar ? "★ - miejsce, w którym zmieniono oprocentowanie.\n" : "";
+        const baseText = "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.";
+        const ikeIkzeText = state.isIkeIkzeMode ? "\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE." : "";
+        const footerNoteText = `${starText}${baseText}${ikeIkzeText}`;
+
+        const docDefinition = {
+            pageSize: 'A4',
+            pageMargins: [20, 60, 20, 20],
+            defaultStyle: { font: 'Roboto' },
+            header: logoBase64 ? {
+                columns: [
+                    { image: logoBase64, width: 100, alignment: 'center', margin: [0, 10, 0, 0] },
+                    { text: `Data: ${today}`, alignment: 'right', fontSize: 8, margin: [0, 10, 20, 0] }
+                ]
+            } : { text: `Data: ${today}`, alignment: 'right', fontSize: 8, margin: [0, 10, 20, 0] },
+            content: [
+                { text: headerText, style: 'header' },
+                { text: opis.replace(/<[^>]+>/g, ""), style: 'subheader', margin: [0, 10, 0, 10] },
+                { text: "Podsumowanie:", style: 'sectionHeader', margin: [0, 10, 0, 5] },
+                { ul: summary.map(item => ({ text: item, style: 'listItem' })), margin: [0, 0, 0, 10] },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: headers.map(() => '*'),
+                        body: [
+                            headers.map(h => ({ text: h, style: 'tableHeader' })),
+                            ...tableData.map(row => row.map(cell => ({ text: cell, style: 'tableCell' })))
+                        ]
+                    },
+                    layout: {
+                        fillColor: function (rowIndex) { return (rowIndex === 0) ? '#C2B280' : (rowIndex % 2 === 0 ? '#F5F5F5' : null); },
+                        hLineWidth: function () { return 0.5; },
+                        vLineWidth: function () { return 0.5; }
+                    },
+                    margin: [0, 10, 0, 10]
+                },
+                { text: footerNoteText, style: 'footerNote', margin: [0, 5, 0, 10] },
+                { text: "Wykres liniowy wartości inwestycji w czasie", style: 'sectionHeader', margin: [0, 10, 0, 5], pageBreak: tableData.length > 10 ? 'before' : 'none' },
+                { image: lineChartImage, width: 500, height: 250, alignment: 'center', margin: [0, 5, 0, 0] }
+            ],
+            styles: {
+                header: { fontSize: 16, bold: true, alignment: 'center', margin: [0, 20, 0, 10] },
+                subheader: { fontSize: 10, alignment: 'justify' },
+                sectionHeader: { fontSize: 12, bold: true },
+                listItem: { fontSize: 10, margin: [0, 2, 0, 2] },
+                tableHeader: { fontSize: 8, bold: true, alignment: 'center', color: '#000000', fillColor: '#C2B280' },
+                tableCell: { fontSize: 8, alignment: 'center' },
+                footerNote: { fontSize: 8, italics: true }
+            }
+        };
+
+        pdfMake.createPdf(docDefinition).download(`Wynik_inwestycji_${nazwaObligacji.replace(/\s+/g, "_")}_${today.replace(/\./g, '-')}.pdf`);
+    };
+
+    // Generowanie PDF-a z obsługą błędów ładowania logo
+    getBase64ImageFromUrl('cropped-logo-FB-1.png')
+        .then(logoBase64 => generateDoc(logoBase64))
+        .catch(error => {
+            console.error("Błąd ładowania logo:", error);
+            alert("Nie udało się załadować logo – PDF zostanie wygenerowany bez logo.");
+            generateDoc(null);
+        });
+    }
+
 </script>
 </body>
 </html>
