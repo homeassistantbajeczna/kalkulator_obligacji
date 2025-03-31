@@ -1594,6 +1594,32 @@
             generateDoc(null);
         });
     }
+    // Zoomowanie
+    let currentZoom = 1; // Początkowa skala
+    const zoomStep = 0.1; // Krok zmiany skali
+    const minZoom = 0.5; // Minimalna skala
+    const maxZoom = 2; // Maksymalna skala
+
+    function updateZoom() {
+        const container = document.querySelector('.container');
+        container.style.transform = `scale(${currentZoom})`;
+        container.style.transformOrigin = 'top left'; // Punkt odniesienia w lewym górnym rogu
+        container.style.width = `${100 / currentZoom}%`; // Zachowanie szerokości strony
+    }
+
+    document.getElementById("zoomInBtn").addEventListener("click", () => {
+        if (currentZoom < maxZoom) {
+            currentZoom = Math.min(maxZoom, currentZoom + zoomStep);
+            updateZoom();
+        }
+    });
+
+    document.getElementById("zoomOutBtn").addEventListener("click", () => {
+        if (currentZoom > minZoom) {
+            currentZoom = Math.max(minZoom, currentZoom - zoomStep);
+            updateZoom();
+        }
+    });
 
 </script>
 </body>
