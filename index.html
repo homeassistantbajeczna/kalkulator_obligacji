@@ -24,6 +24,7 @@
         padding: 15px;
         text-align: center;
         margin-bottom: 20px;
+        position: relative;
     }
     .logo {
         max-width: 200px;
@@ -85,7 +86,7 @@
     }
     .checkbox-label.header-checkbox {
         position: absolute;
-        top: 0;
+        top: -20px;
         right: 10px;
     }
     .form-section {
@@ -174,11 +175,12 @@
         max-width: 1000px;
         margin: 10px auto 0;
         line-height: 1.4;
+        padding-left: 5em;
     }
     .data-container {
         text-align: right;
         margin-top: 5px;
-    }
+        
     .data-info {
         font-size: 0.8em;
         color: #C2B280;
@@ -359,7 +361,8 @@
         vertical-align: middle;
         font-weight: 500;
         border-bottom: 2px solid #ddd;
-        white-space: nowrap;
+        white-space: normal;
+        line-height: 1.2;
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -528,21 +531,37 @@
     #addVariableBtn:hover {
         background: linear-gradient(135deg, #b0a070, #C2B280);
     }
+    .zoom-controls .btn {
+        background: linear-gradient(135deg, #C2B280, #b0a070);
+        border: none;
+        color: #000000;
+        font-size: 0.9em;
+        padding: 2px 8px;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .zoom-controls .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, #b0a070, #C2B280);
+    }
 </style>
 <div class="logo-container">
     <a href="https://finance-brothers.pl">
         <img src="cropped-logo-FB-1.png" alt="Finance Brothers Logo" class="logo d-block mx-auto">
     </a>
+    <!-- Dodajemy przyciski zoom po prawej stronie -->
+    <div class="zoom-controls" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; gap: 5px;">
+        <button id="zoomInBtn" class="btn btn-sm" aria-label="Powiększ"> + </button>
+        <button id="zoomOutBtn" class="btn btn-sm" aria-label="Pomniejsz"> - </button>
+    </div>
 </div>
-
-
-
-
-
-
-
-
-
 <div class="container">
     <div class="form-section" id="formSection">
         <div class="header-row">
@@ -560,10 +579,10 @@
                         <div class="form-group">
                             <label for="kwota" class="form-label">Kwota inwestycji</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="kwota" min="100" max="5000000" step="100" value="10000">
+                                <input type="number" class="form-control" id="kwota" min="100" max="10000000" step="100" value="10000">
                                 <span class="input-group-text">zł</span>
                             </div>
-                            <input type="range" class="form-range" id="kwotaRange" min="100" max="5000000" step="100" value="10000">
+                            <input type="range" class="form-range" id="kwotaRange" min="100" max="10000000" step="100" value="10000">
                             <div class="sub-info" id="iloscObligacji">Ilość obligacji: 100</div>
                         </div>
                         <div class="form-group">
@@ -713,24 +732,6 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const elements = {
@@ -819,16 +820,6 @@
         "COI": "4-letnich (COI)", "EDO": "10-letnich (EDO)", "ROS": "6-letnich (ROS)", "ROD": "12-letnich (ROD)"
     };
 </script>
-
-
-
-
-
-
-
-
-
-
 <script>
     elements.dynamicRateRange.addEventListener("input", () => { 
         elements.dynamicRate.value = elements.dynamicRateRange.value; 
@@ -1123,12 +1114,6 @@
     updateDynamicRateField();
     updateIloscObligacji();
 </script>
-
-
-
-
-
-
 <script>
     if (typeof pdfMake !== "undefined" && typeof pdfMake.vfs !== "undefined") {
         pdfMake.fonts = {
@@ -1156,7 +1141,14 @@
             return;
         }
 
-        const kwota = parseFloat(elements.kwota.value) || 0;
+        let kwota = parseFloat(elements.kwota.value) || 0;
+        const maxKwota = 10000000; // Maksymalna wartość 10 000 000 zł
+        if (kwota > maxKwota) {
+            kwota = maxKwota;
+            elements.kwota.value = maxKwota;
+            elements.kwotaRange.value = maxKwota;
+            alert("Maksymalna wartość to 10 000 000 zł. Wartość została dostosowana.");
+        }
         const typ = elements.typObligacji.value;
         const config = obligacjeConfig[typ];
         const miesiace = config.okres;
@@ -1363,7 +1355,7 @@
                     <tr>
                         <td>${wiersz.okres}</td>
                         <td>${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
-                        <td>${wiersz.oprocentowanieNaCykl}${wiersz.changeApplied ? ' ★' : ''}</td>
+                        <td>${wiersz.changeApplied ? '★ ' : ''}${wiersz.oprocentowanieNaCykl}</td>
                         <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${state.isIkeIkzeMode ? "0,00 zł***" : parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}</td>
@@ -1384,7 +1376,7 @@
         const harmonogramOpis = document.getElementById("harmonogramOpis");
         if (harmonogramOpis) {
             const hasStar = state.harmonogramData.some(wiersz => wiersz.changeApplied);
-            const starText = hasStar ? "★ - miejsce, w którym zmieniono oprocentowanie.<br>" : "";
+            const starText = hasStar ? "★ Zmiana oprocentowania.<br>" : "";
             const baseText = "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.";
             const ikeIkzeText = state.isIkeIkzeMode ? "<br>*** Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>." : "";
             harmonogramOpis.innerHTML = `${starText}${baseText}${ikeIkzeText}`;
@@ -1554,7 +1546,7 @@
                 {
                     table: {
                         headerRows: 1,
-                        widths: headers.map(() => '*'),
+                        widths: 'auto',
                         body: [
                             headers.map(h => ({ text: h, style: 'tableHeader' })),
                             ...tableData.map(row => row.map(cell => ({ text: cell, style: 'tableCell' })))
@@ -1594,6 +1586,32 @@
             generateDoc(null);
         });
     }
+    // Zoomowanie
+    let currentZoom = 1; // Początkowa skala
+    const zoomStep = 0.1; // Krok zmiany skali
+    const minZoom = 0.5; // Minimalna skala
+    const maxZoom = 2; // Maksymalna skala
+
+    function updateZoom() {
+        const container = document.querySelector('.container');
+        container.style.transform = `scale(${currentZoom})`;
+        container.style.transformOrigin = 'top center'; // Punkt odniesienia w lewym górnym rogu
+        container.style.width = `${100 / currentZoom}%`; // Zachowanie szerokości strony
+    }
+
+    document.getElementById("zoomInBtn").addEventListener("click", () => {
+        if (currentZoom < maxZoom) {
+            currentZoom = Math.min(maxZoom, currentZoom + zoomStep);
+            updateZoom();
+        }
+    });
+
+    document.getElementById("zoomOutBtn").addEventListener("click", () => {
+        if (currentZoom > minZoom) {
+            currentZoom = Math.max(minZoom, currentZoom - zoomStep);
+            updateZoom();
+        }
+    });
 
 </script>
 </body>
