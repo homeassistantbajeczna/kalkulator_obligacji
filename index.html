@@ -944,7 +944,7 @@
         let info = config.zmienne ? 
             (config.indeksowaneInflacja ? 
                 `Pierwszy rok: ${config.oprocentowanie}%, kolejne: inflacja + ${config.marza}%` : 
-                `Pierwszy miesiąc: ${config.oprocentowanie}%, kolejne: stopa NBP + ${config.marza}%`) : 
+                `Pierwszy m-c: ${config.oprocentowanie}%, kolejne: stopa NBP + ${config.marza}%`) : 
             `Stałe: ${config.oprocentowanie}%`;
         document.getElementById("oprocentowanieInfo").textContent = info;
     }
