@@ -175,7 +175,7 @@
         max-width: 1000px;
         margin: 10px auto 0;
         line-height: 1.4;
-        padding-left: 10em;
+        padding-left: 8em;
     }
     .data-container {
         text-align: right;
@@ -263,22 +263,53 @@
         padding-left: 8px;
     }
     .chart-legend .color-box {
-        width: 90px;
-        height: 18px;
+        width: 130px;
+        height: 26px;
         border-radius: 5px;
         text-align: center;
-        font-weight: 500;
-        line-height: 18px;
-        font-size: 0.7em;
+        font-weight: bold; /* Pogrubienie */
+        line-height: 26px;
+        font-size: 14px; /* Powiększenie */
         white-space: nowrap;
         overflow: hidden;
         position: relative;
         color: #fff;
         margin-right: 6px;
     }
+    
+    .chart-legend .color-box[data-tooltip]:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: 50%; /* Wyśrodkowanie w pionie */
+        left: 50%; /* Wyśrodkowanie w poziomie */
+        transform: translate(-50%, -50%); /* Precyzyjne centrowanie */
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        font-size: 14px; /* Tej samej wielkości co reszta */
+        padding: 4px 8px;
+        border-radius: 3px;
+        z-index: 10;
+        white-space: nowrap;
+    }
+
     .chart-legend .color-box .value {
+        font-weight: bold;
+        font-size: 14px;
         display: block;
     }
+
+    .chart-legend .legend-text {
+        font-weight: bold;
+        font-size: 14px;
+        color: #333333;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    }
+
+    body.dark-mode .chart-legend .legend-text {
+        color: #e0e0e0;
+    }
+    
     .chart-legend .color-box:hover::after {
         content: attr(data-tooltip);
         position: absolute;
@@ -296,11 +327,10 @@
     .chart-legend .color-box:hover .value {
         display: none;
     }
-    .chart-legend .legend-text {
-        opacity: 1;
-        transition: opacity 0.3s ease;
-        font-size: 0.7em;
+    #siteLogo {
+        cursor: pointer;
     }
+    
     .summary-footer {
         display: flex;
         justify-content: center;
@@ -403,10 +433,12 @@
     /* Kolor czcionki "Harmonogram odsetek" */
     .harmonogram .btn-toggle {
         cursor: pointer;
-        font-size: 0.7em;
-        color: #000000; /* Tryb jasny */
+        font-size: 0.65em;
+        color: #000000;
         text-decoration: underline;
-        margin-bottom: 15px;
+        margin-bottom: 25px; /* Większy odstęp od tabelki (było 15px) */
+        position: relative;
+        top: -10px; /* Podniesienie tekstu w górę */
     }
     .btn-toggle {
         cursor: pointer;
@@ -542,7 +574,17 @@
         gap: 10px;
     }
     .variable-input-group .form-group {
-        max-width: 120px;
+        max-width: 180px; /* Taki sam rozmiar jak w głównych polach */
+        min-width: 0;
+    }
+    .variable-input-group .form-control,
+    .variable-input-group .form-range {
+        height: 22px; /* Taki sam jak w głównych polach */
+        font-size: 0.7em;
+        padding: 2px;
+        text-align: center;
+        max-width: 180px;
+        background: none;
     }
     .remove-btn-wrapper {
         display: flex;
@@ -550,10 +592,15 @@
         margin-top: 5px;
     }
     .variable-input-group .form-label {
-        text-align: left !important;
-        width: 100%;
-        padding-left: 0;
+        font-size: 0.7em; /* Taki sam jak w głównych polach */
+        text-transform: uppercase;
+        margin-bottom: 2px;
+        color: #333333;
     }
+    body.dark-mode .variable-input-group .form-label {
+        color: #e0e0e0; /* Spójność z trybem ciemnym */
+    }
+    
     .variable-input-group .input-group {
         justify-content: center;
     }
@@ -743,9 +790,7 @@
     }
 </style>
 <div class="logo-container">
-    <a href="https://finance-brothers.pl">
-        <img src="cropped-logo-FB-1.png" alt="Finance Brothers Logo" class="logo d-block mx-auto">
-    </a>
+    <img src="cropped-logo-FB-1.png" id="siteLogo" alt="Finance Brothers Logo" class="logo d-block mx-auto">
     <div class="zoom-controls" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; gap: 5px;">
         <button id="zoomInBtn" class="btn btn-sm" aria-label="Powiększ"> + </button>
         <button id="zoomOutBtn" class="btn btn-sm" aria-label="Pomniejsz"> - </button>
@@ -1632,8 +1677,8 @@
                             color: isDarkMode ? '#e0e0e0' : '#333333'
                         },
                         grid: {
-                            color: '#d3d3d3', // Jasny szary dla siatki osi X
-                            borderColor: isDarkMode ? '#e0e0e0' : '#333333' // Kolor krawędzi osi
+                            color: isDarkMode ? '#666666' : '#e0e0e0', // Ciemniejszy w ciemnym, jaśniejszy w jasnym
+                            borderColor: isDarkMode ? '#e0e0e0' : '#333333'
                         }
                     },
                     y: { 
@@ -1651,8 +1696,8 @@
                             color: isDarkMode ? '#e0e0e0' : '#333333'
                         },
                         grid: {
-                            color: '#d3d3d3', // Jasny szary dla siatki osi Y
-                            borderColor: isDarkMode ? '#e0e0e0' : '#333333' // Kolor krawędzi osi
+                            color: isDarkMode ? '#666666' : '#e0e0e0', // Ciemniejszy w ciemnym, jaśniejszy w jasnym
+                            borderColor: isDarkMode ? '#e0e0e0' : '#333333'
                         }
                     }
                 },
@@ -1674,7 +1719,7 @@
         state.isCalculating = false;
         console.log("ObliczObligacje completed");
     }
-    
+
     function generatePdf() {
         console.log("Starting generatePdf");
         if (typeof pdfMake === "undefined") {
@@ -1814,7 +1859,10 @@
                 generateDoc(null);
             });
     }
-    
+
+    document.getElementById('siteLogo').addEventListener('click', () => {
+        window.open('https://finance-brothers.pl', '_blank');
+    });
     // Zoomowanie
     let currentZoom = 1;
     const zoomStep = 0.1;
@@ -1879,6 +1927,8 @@
             state.chartLine.options.scales.y.title.color = isDarkMode ? '#e0e0e0' : '#333333';
             state.chartLine.options.scales.y.ticks.color = isDarkMode ? '#e0e0e0' : '#333333';
             state.chartLine.options.plugins.legend.labels.color = isDarkMode ? '#e0e0e0' : '#333333';
+            state.chartLine.options.scales.x.grid.color = isDarkMode ? '#666666' : '#e0e0e0';
+            state.chartLine.options.scales.y.grid.color = isDarkMode ? '#666666' : '#e0e0e0';
             state.chartLine.options.scales.x.grid.borderColor = isDarkMode ? '#e0e0e0' : '#333333';
             state.chartLine.options.scales.y.grid.borderColor = isDarkMode ? '#e0e0e0' : '#333333';
             state.chartLine.update();
