@@ -438,7 +438,6 @@
         text-decoration: underline;
         margin-bottom: 25px; /* Większy odstęp od tabelki (było 15px) */
         position: relative;
-        top: -10px; /* Podniesienie tekstu w górę */
     }
     .btn-toggle {
         cursor: pointer;
@@ -566,25 +565,29 @@
         display: flex;
         flex-direction: column;
         margin-bottom: 10px;
-        align-items: center;
+        align-items: flex-start;
     }
     .fields-wrapper {
         display: flex;
         justify-content: center;
         gap: 10px;
+        width: 100%;
     }
     .variable-input-group .form-group {
-        max-width: 180px; /* Taki sam rozmiar jak w głównych polach */
+        max-width: 150px; /* Dopasowujemy szerokość do głównego formularza */
         min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centrujemy pola wejściowe i suwaki w obrębie .form-group */
     }
     .variable-input-group .form-control,
     .variable-input-group .form-range {
-        height: 22px; /* Taki sam jak w głównych polach */
+        height: 22px;
         font-size: 0.7em;
         padding: 2px;
         text-align: center;
-        max-width: 180px;
-        background: none;
+        max-width: 150px; /* Dopasowujemy szerokość do głównego formularza */
+        background: #fff;
     }
     .remove-btn-wrapper {
         display: flex;
@@ -596,13 +599,16 @@
         text-transform: uppercase;
         margin-bottom: 2px;
         color: #333333;
-    }
+        text-align: left; /* Wyrównanie tekstu do lewej strony */
+        width: 100%;
+        }
     body.dark-mode .variable-input-group .form-label {
         color: #e0e0e0; /* Spójność z trybem ciemnym */
     }
     
     .variable-input-group .input-group {
         justify-content: center;
+        width: 100%;
     }
     .variable-input-group .btn-danger {
         font-size: 0.7em;
@@ -617,6 +623,36 @@
     .variable-input-group .btn-danger:hover {
         background: #c82333;
     }
+    .variable-input-group .remove-first-btn-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 5px;
+        align-self: center; /* Centruje kontener w poziomie w obrębie .variable-input-group */
+        width: 100%; /* Upewniamy się, że kontener zajmuje pełną szerokość, aby centrowanie działało */
+    }
+    
+    .variable-input-group .btn-danger.remove-first-btn {
+        font-size: 0.7em;
+        padding: 2px 8px;
+        height: 22px;
+        line-height: 18px;
+        background: #dc3545;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+    }
+    
+    .variable-input-group .btn-danger.remove-first-btn:hover {
+        background: #c82333;
+    }
+    .variable-input-group .remove-btn-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 5px;
+        align-self: center; /* Centruje kontener w poziomie w obrębie .variable-input-group */
+        width: 100%; /* Upewniamy się, że kontener zajmuje pełną szerokość, aby centrowanie działało */
+    }
+    
     #addVariableBtn {
         background: linear-gradient(135deg, #C2B280, #b0a070);
         color: #000;
@@ -652,6 +688,12 @@
     body.dark-mode {
     background-color: #2b2b2b;
     color: #e0e0e0;
+    }
+
+    body.dark-mode .variable-input-group .form-control,
+    body.dark-mode .variable-input-group .form-range {
+        background: #fff; /* Białe tło w trybie ciemnym */
+        color: #333333; /* Ciemny tekst dla kontrastu */
     }
 
     body.dark-mode .container {
@@ -1072,8 +1114,23 @@
     elements.kwota.addEventListener("input", () => { elements.kwotaRange.value = elements.kwota.value; updateIloscObligacji(); });
     elements.typObligacji.addEventListener("change", updateDynamicRateField);
     elements.ikeIkzeBtn.addEventListener("change", updateDynamicRateField);
-    elements.inflacjaZmiennaBtn.addEventListener("change", () => { state.lastFormData.inflacjaZmienna = elements.inflacjaZmiennaBtn.checked; updateVariableInputs(); });
-    elements.stopaZmiennaBtn.addEventListener("change", () => { state.lastFormData.stopaZmienna = elements.stopaZmiennaBtn.checked; updateVariableInputs(); });
+    elements.inflacjaZmiennaBtn.addEventListener("change", () => { 
+        state.lastFormData.inflacjaZmienna = elements.inflacjaZmiennaBtn.checked; 
+        if (!elements.inflacjaZmiennaBtn.checked) {
+            // Resetujemy tablicę zmiennych inflacji, gdy checkbox jest odznaczony
+            state.variableInflacjaChanges = [];
+        }
+        updateVariableInputs(); 
+    });
+    
+    elements.stopaZmiennaBtn.addEventListener("change", () => { 
+        state.lastFormData.stopaZmienna = elements.stopaZmiennaBtn.checked; 
+        if (!elements.stopaZmiennaBtn.checked) {
+            // Resetujemy tablicę zmiennych stopy referencyjnej, gdy checkbox jest odznaczony
+            state.variableStopaChanges = [];
+        }
+        updateVariableInputs(); 
+    });
     elements.obliczBtn.addEventListener("click", () => { console.log("Oblicz clicked"); obliczObligacje(); });
     elements.addVariableBtn.addEventListener("click", () => { console.log("AddVariable clicked"); addVariableChange(); });
     elements.generatePdfBtn.addEventListener("click", () => { console.log("GeneratePdf clicked"); generatePdf(); });
@@ -1223,25 +1280,25 @@
         const wrapper = document.getElementById("variableInputsWrapper");
         const config = obligacjeConfig[typ];
         const maxCykl = ["ROR", "DOR"].includes(typ) ? config.okres : config.okres / 12;
-
+    
         if (isInflacjaZmienna || isStopaZmienna) {
             variableInputs.style.display = "block";
             addVariableBtn.style.display = "block";
-
+    
             if ((isInflacjaZmienna && state.variableInflacjaChanges.length === 0) || (isStopaZmienna && state.variableStopaChanges.length === 0)) {
                 addVariableChange();
             }
-
+    
             wrapper.innerHTML = "";
             const changes = isInflacjaZmienna ? state.variableInflacjaChanges : state.variableStopaChanges;
-
+    
             changes.forEach((change, index) => {
                 const inputGroup = document.createElement("div");
                 inputGroup.className = "variable-input-group";
-
+    
                 const fieldsWrapper = document.createElement("div");
                 fieldsWrapper.className = "fields-wrapper";
-
+    
                 const cyklGroup = document.createElement("div");
                 cyklGroup.className = "form-group";
                 cyklGroup.innerHTML = `
@@ -1252,7 +1309,7 @@
                     </div>
                     <input type="range" class="form-range variable-cykl-range" min="1" max="${maxCykl}" step="1" value="${change.cykl}">
                 `;
-
+    
                 const rateGroup = document.createElement("div");
                 rateGroup.className = "form-group";
                 rateGroup.innerHTML = `
@@ -1263,11 +1320,39 @@
                     </div>
                     <input type="range" class="form-range variable-rate-range" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.wartosc}">
                 `;
-
+    
                 fieldsWrapper.appendChild(cyklGroup);
                 fieldsWrapper.appendChild(rateGroup);
                 inputGroup.appendChild(fieldsWrapper);
-
+    
+                // Dodajemy przycisk "Usuń" w pierwszym wierszu, ale tylko jeśli jest dokładnie jeden wiersz
+                if (index === 0 && changes.length === 1) {
+                    const removeFirstBtnWrapper = document.createElement("div");
+                    removeFirstBtnWrapper.className = "remove-first-btn-wrapper";
+                    const removeFirstBtn = document.createElement("button");
+                    removeFirstBtn.className = "btn btn-danger btn-sm remove-first-btn";
+                    removeFirstBtn.textContent = "Usuń";
+                    removeFirstBtn.onclick = () => {
+                        // Resetujemy sekcję zmiennych
+                        if (isInflacjaZmienna) {
+                            state.variableInflacjaChanges = [];
+                            elements.inflacjaZmiennaBtn.checked = false;
+                            state.lastFormData.inflacjaZmienna = false;
+                        } else {
+                            state.variableStopaChanges = [];
+                            elements.stopaZmiennaBtn.checked = false;
+                            state.lastFormData.stopaZmienna = false;
+                        }
+                        // Ukrywamy sekcję zmiennych i przycisk "Dodaj kolejne"
+                        variableInputs.style.display = "none";
+                        addVariableBtn.style.display = "none";
+                        wrapper.innerHTML = "";
+                    };
+                    removeFirstBtnWrapper.appendChild(removeFirstBtn);
+                    inputGroup.appendChild(removeFirstBtnWrapper);
+                }
+    
+                // Dodajemy przycisk "Usuń" dla kolejnych wierszy (od drugiego wzwyż)
                 if (index === changes.length - 1 && changes.length > 1) {
                     const removeBtnWrapper = document.createElement("div");
                     removeBtnWrapper.className = "remove-btn-wrapper";
@@ -1278,14 +1363,14 @@
                     removeBtnWrapper.appendChild(removeBtn);
                     inputGroup.appendChild(removeBtnWrapper);
                 }
-
+    
                 wrapper.appendChild(inputGroup);
-
+    
                 const cyklInput = inputGroup.querySelector(".variable-cykl");
                 const cyklRange = inputGroup.querySelector(".variable-cykl-range");
                 const rateInput = inputGroup.querySelector(".variable-rate");
                 const rateRange = inputGroup.querySelector(".variable-rate-range");
-
+    
                 cyklInput.addEventListener("input", () => {
                     let value = parseInt(cyklInput.value);
                     if (value < 1 || value > maxCykl) cyklInput.value = Math.max(1, Math.min(maxCykl, value));
@@ -1307,7 +1392,7 @@
                     changes[index].wartosc = parseFloat(rateRange.value);
                 });
             });
-
+    
             const maxChanges = maxVariableChanges[typ] || 0;
             addVariableBtn.style.display = changes.length < maxChanges ? "block" : "none";
         } else {
@@ -1324,14 +1409,14 @@
         const changes = isInflacjaZmienna ? state.variableInflacjaChanges : state.variableStopaChanges;
         const maxCykl = ["ROR", "DOR"].includes(typ) ? obligacjeConfig[typ].okres : obligacjeConfig[typ].okres / 12;
         const maxChanges = maxVariableChanges[typ] || 0;
-
+    
         if (!isInflacjaZmienna && !isStopaZmienna) return;
-
+    
         if (changes.length >= maxChanges) {
             alert(`Osiągnięto maksymalną liczbę zmian dla obligacji ${typ} (${maxChanges}).`);
             return;
         }
-
+    
         const lastCykl = changes.length > 0 ? changes[changes.length - 1].cykl : 1;
         const newCykl = Math.min(lastCykl + 1, maxCykl);
         changes.push({ cykl: newCykl, wartosc: isInflacjaZmienna ? 4.90 : 5.75 });
