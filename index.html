@@ -59,13 +59,9 @@
         font-size: 0.7em;
         color: #333333;
         cursor: pointer;
-        position: relative;
     }
     .checkbox-label input {
-        position: absolute;
-        opacity: 0;
-        width: 0;
-        height: 0;
+        display: none;
     }
     .checkbox-custom {
         width: 16px;
@@ -75,26 +71,18 @@
         margin-right: 5px;
         display: inline-block;
         position: relative;
-        order-radius: 4px; /* Lekko zaokrąglone rogi */
-        transition: all 0.2s ease; /* Płynne przejścia */
     }
-    
     .checkbox-label input:checked + .checkbox-custom {
-        background-color: #C2B280; /* Złote tło w trybie jasnym */
-        border-color: #C2B280; /* Ramka w kolorze tła */
+        background-color: #C2B280;
     }
     .checkbox-label input:checked + .checkbox-custom::after {
         content: '✔';
+        color: #000;
+        font-size: 12px;
         position: absolute;
-        left: 4px;
-        top: 2px;
-        width: 4px;
-        height: 8px;
-        border: solid #000000; /* Biały ptaszek w trybie jasnym */
-        border-width: 0 2px 2px 0;
-        transform: rotate(45deg);
-        opacity: 0; /* Ukrywamy ptaszka, gdy checkbox nie jest zaznaczony */
-        transition: opacity 0.2s ease;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
     .checkbox-label.header-checkbox {
         position: absolute;
@@ -928,20 +916,6 @@
     body.dark-mode .result-header h4,
     body.dark-mode .checkbox-label {
         color: #e0e0e0;
-    }
-
-    body.dark-mode .checkbox-custom {
-        border: 2px solid #e0e0e0; /* Ciemny szary kolor ramki w trybie ciemnym (jak teksty stałe) */
-        background-color: #2b2b2b; /* Tło w kolorze tła strony w trybie ciemnym */
-    }
-
-    body.dark-mode .checkbox-label input:checked + .checkbox-custom {
-        background-color: #8B7D47; /* Ciemne złote tło w trybie ciemnym */
-        border-color: #8B7D47;
-    }
-
-    body.dark-mode .checkbox-label input:checked + .checkbox-custom::after {
-        border-color: #000000; /* Czarny ptaszek w trybie ciemnym */
     }
 
     /* Tryb ciemny */
