@@ -59,31 +59,48 @@
         font-size: 0.7em;
         color: #333333;
         cursor: pointer;
+        position: relative;
     }
     .checkbox-label input {
-        display: none;
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
     }
     .checkbox-custom {
         width: 16px;
         height: 16px;
-        border: 2px solid #C2B280;
-        background-color: #fff;
+        border: 2px solid #e0e0e0; /* Szary kolor ramki w trybie jasnym (jak ramki boxów) */
+        background-color: #ffffff; /* Białe tło w trybie jasnym */
         margin-right: 5px;
         display: inline-block;
         position: relative;
+        border-radius: 4px; /* Lekko zaokrąglone rogi */
+        transition: all 0.2s ease; /* Płynne przejścia */
     }
+    
     .checkbox-label input:checked + .checkbox-custom {
-        background-color: #C2B280;
+        background-color: #C2B280; /* Złote tło w trybie jasnym */
+        border-color: #C2B280; /* Ramka w kolorze tła */
     }
-    .checkbox-label input:checked + .checkbox-custom::after {
-        content: '✔';
-        color: #000;
-        font-size: 12px;
+
+    /* Styl ptaszka za pomocą ::after */
+    .checkbox-custom::after {
+        content: "✔"; /* Używamy znaku Unicode dla ptaszka */
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        left: 50%; /* Centrujemy w poziomie */
+        top: 50%; /* Centrujemy w pionie */
+        transform: translate(-50%, -50%); /* Precyzyjne centrowanie */
+        font-size: 12px; /* Rozmiar ptaszka */
+        color: #000000; /* Kolor ptaszka w trybie jasnym */
+        opacity: 0; /* Ukrywamy ptaszka, gdy checkbox nie jest zaznaczony */
+        transition: opacity 0.2s ease;
     }
+    
+    .checkbox-label input:checked + .checkbox-custom::after {
+        opacity: 1; /* Pokazujemy ptaszka */
+    }
+    
     .checkbox-label.header-checkbox {
         position: absolute;
         top: -20px;
@@ -346,33 +363,79 @@
         text-align: center;
         font-weight: bold; /* Pogrubienie */
         line-height: 26px;
-        font-size: 14px; /* Powiększenie */
+        font-size: 10px; /* Powiększenie */
         white-space: nowrap;
         overflow: hidden;
         position: relative;
         color: #fff;
         margin-right: 6px;
     }
-    
-    .chart-legend .color-box[data-tooltip]:hover::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        top: 50%; /* Wyśrodkowanie w pionie */
-        left: 50%; /* Wyśrodkowanie w poziomie */
-        transform: translate(-50%, -50%); /* Precyzyjne centrowanie */
-        background-color: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        font-size: 14px; /* Tej samej wielkości co reszta */
-        padding: 4px 8px;
-        border-radius: 3px;
-        z-index: 10;
-        white-space: nowrap;
-    }
 
     .chart-legend .color-box .value {
         font-weight: bold;
-        font-size: 14px;
+        font-size: 10px;
         display: block;
+    }
+    
+    .color-box {
+        position: relative; /* Upewniamy się, że pozycja jest ustawiona */
+    }
+    
+    .color-box:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 10px !important; /* Zmniejszona wielkość czcionki z !important */
+        white-space: nowrap;
+        z-index: 10;
+        background-color: #000000; /* Domyślne tło */
+        color: #ffffff; /* Domyślny kolor tekstu */
+        line-height: normal !important; /* Reset potencjalnych nadpisywań */
+        font-family: 'Montserrat', sans-serif !important; /* Upewniamy się, że czcionka jest poprawna */
+    }
+
+    /* Dodaj tutaj, jeśli potrzeba większej specyficzności */
+    .chart-legend .color-box:hover::after {
+        font-size: 10px !important; /* Zwiększamy specyficzność */
+        font-family: 'Montserrat', sans-serif !important; /* Upewniamy się, że czcionka jest poprawna */
+    }  
+    
+    /* Kapitał (data-index="0") */
+    .legend-item[data-index="0"] .color-box:hover::after {
+        background-color: #28a745; /* Taki sam kolor jak pasek Kapitał */
+        color: #000000; /* Czarny tekst dla lepszej czytelności */
+    }
+    
+    /* Odsetki (data-index="1") */
+    .legend-item[data-index="1"] .color-box:hover::after {
+        background-color: #007bff; /* Taki sam kolor jak pasek Odsetki */
+        color: #ffffff; /* Biały tekst */
+    }
+    
+    /* Podatek (data-index="2") */
+    .legend-item[data-index="2"] .color-box:hover::after {
+        background-color: #dc3545; /* Taki sam kolor jak pasek Podatek */
+        color: #ffffff; /* Biały tekst */
+    }
+    
+
+    .legend-text:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #000000;
+        color: #ffffff;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 10px; /* Nowa wielkość czcionki */
+        white-space: nowrap;
+        z-index: 10;
     }
 
     .chart-legend .legend-text {
@@ -387,23 +450,6 @@
         color: #e0e0e0;
     }
     
-    .chart-legend .color-box:hover::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        color: #fff;
-        font-size: 0.9em;
-        line-height: 18px;
-        text-align: center;
-        background-color: rgba(0, 0, 0, 0.8);
-        z-index: 30;
-    }
-    .chart-legend .color-box:hover .value {
-        display: none;
-    }
     #siteLogo {
         cursor: pointer;
     }
@@ -918,6 +964,20 @@
         color: #e0e0e0;
     }
 
+    body.dark-mode .checkbox-custom {
+        border: 2px solid #e0e0e0; /* Ciemny szary kolor ramki w trybie ciemnym (jak teksty stałe) */
+        background-color: #404040; /* Tło w kolorze tła strony w trybie ciemnym */
+    }
+
+    body.dark-mode .checkbox-label input:checked + .checkbox-custom {
+        background-color: #8B7D47; /* Ciemne złote tło w trybie ciemnym */
+        border-color: #8B7D47;
+    }
+
+    body.dark-mode .checkbox-label input:checked + .checkbox-custom::after {
+        border-color: #000000; /* Czarny ptaszek w trybie ciemnym */
+    }
+
     /* Tryb ciemny */
     body.dark-mode .harmonogram table {
         background: #1f1f1f; /* Ciemniejsze tło tabeli w trybie ciemnym */
@@ -1016,15 +1076,6 @@
                 <form id="obligacjeForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="kwota" class="form-label">Kwota inwestycji</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="kwota" min="100" max="10000000" step="100" value="10000">
-                                <span class="input-group-text">zł</span>
-                            </div>
-                            <input type="range" class="form-range" id="kwotaRange" min="100" max="10000000" step="100" value="10000">
-                            <div class="sub-info" id="iloscObligacji">Ilość obligacji: 100</div>
-                        </div>
-                        <div class="form-group">
                             <label for="typObligacji" class="form-label">Typ obligacji*</label>
                             <select class="form-control" id="typObligacji">
                                 <option value="OTS" selected>3-miesięczne (OTS)</option>
@@ -1037,6 +1088,15 @@
                                 <option value="ROD">12-letnie (ROD)</option>
                             </select>
                             <div class="sub-info"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="kwota" class="form-label">Kwota inwestycji</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="kwota" min="100" max="10000000" step="100" value="10000">
+                                <span class="input-group-text">zł</span>
+                            </div>
+                            <input type="range" class="form-range" id="kwotaRange" min="100" max="10000000" step="100" value="10000">
+                            <div class="sub-info" id="iloscObligacji">Ilość obligacji: 100</div>
                         </div>
                         <div class="form-group" id="dynamicRateGroup" style="display: none;">
                             <label for="dynamicRate" class="form-label" id="dynamicRateLabel">Stopa Ref. NBP</label>
@@ -1111,19 +1171,19 @@
                     </div>
                     <div class="chart-legend">
                         <div class="legend-item" data-index="0">
-                            <div class="color-box" style="background-color: #28a745;" data-tooltip="">
+                            <div class="color-box" style="background-color: #28a745;" data-tooltip="" data-color="#28a745">
                                 <span class="value" id="valueKapital">-</span>
                             </div>
                             <span class="legend-text" id="legendKapital">Kapitał</span>
                         </div>
                         <div class="legend-item" data-index="1">
-                            <div class="color-box" style="background-color: #007bff;" data-tooltip="">
+                            <div class="color-box" style="background-color: #007bff;" data-tooltip="" data-color="#007bff">
                                 <span class="value" id="valueOdsetki">-</span>
                             </div>
                             <span class="legend-text" id="legendOdsetki">Odsetki</span>
                         </div>
                         <div class="legend-item" data-index="2">
-                            <div class="color-box" style="background-color: #dc3545;" data-tooltip="">
+                            <div class="color-box" style="background-color: #dc3545;" data-tooltip="" data-color="#dc3545">
                                 <span class="value" id="valuePodatek">-</span>
                             </div>
                             <span class="legend-text" id="legendPodatek">Podatek</span>
@@ -1904,6 +1964,11 @@
         if (valuePodatek) valuePodatek.textContent = state.isIkeIkzeMode ? "0,00 zł***" : `${podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         const legendPodatek = document.querySelector('.result-wrapper-chart .legend-item[data-index="2"] .color-box');
         if (legendPodatek) legendPodatek.setAttribute('data-tooltip', `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " zł"}`);
+
+        // Ustawianie data-tooltip dla etykiet tekstowych w legendzie
+        document.querySelector('#legendKapital').setAttribute('data-tooltip', 'Kapitał');
+        document.querySelector('#legendOdsetki').setAttribute('data-tooltip', 'Odsetki');
+        document.querySelector('#legendPodatek').setAttribute('data-tooltip', 'Podatek');
     
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
         const okresInwestycji = document.getElementById("okresInwestycji");
