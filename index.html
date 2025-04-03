@@ -6,40 +6,115 @@
     <title>Kalkulator Obligacji Skarbu Państwa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-    <!-- Zastępujemy jsPDF na PDFMake -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
-    <!-- Dodajemy Roboto dla polskich znaków -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <style>
-    body {
-        background-color: #f5f6f5;
-        font-family: 'Montserrat', sans-serif;
-        padding: 10px;
+    /* Zmienne CSS dla kolorów */
+    :root {
+        --primary-bg: #f5f6f5;
+        --primary-text: #333333;
+        --secondary-bg: #ffffff;
+        --accent-color: #c2b280;
+        --accent-gradient-start: #c2b280;
+        --accent-gradient-end: #b0a070;
+        --border-color: #e0e0e0;
+        --highlight-yellow: #17a2b8;
+        --highlight-green: #28a745;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+        --logo-bg: #e9ecef;
+        --input-bg: #fff;
+        --input-group-bg: #f5f5f5;
+        --range-track: #d3d3d3;
+        --harmonogram-bg: #f9f9f9;
+        --small-font-size: 0.7em;
+        --border-radius: 5px;
+        --slider-thumb-color: #FFD700;
+        --range-bg: #e5e5e5;
     }
+    
+    .dark-mode {
+        --primary-bg: #2b2b2b;
+        --primary-text: #e0e0e0;
+        --secondary-bg: #3a3a3a;
+        --accent-color: #8b7d47;
+        --accent-gradient-start: #8b7d47;
+        --accent-gradient-end: #70673b;
+        --border-color: #f5f5f5;
+        --shadow-color: rgba(0, 0, 0, 0.5);
+        --logo-bg: #3a3a3a;
+        --input-bg: #3a3a3a;
+        --input-group-bg: #666666;
+        --range-track: #666666;
+        --harmonogram-bg: #404040;
+        --slider-thumb-color: #FFD700;
+        --range-bg: #333333;
+        --accent-gradient-start-black: #a3945c;
+    }
+    
+    /* Reset i style bazowe */
+    *,
+    ::after,
+    ::before {
+        box-sizing: border-box;
+    }
+    
+    body {
+        margin: 0;
+        background-color: var(--primary-bg);
+        font-family: 'Montserrat', sans-serif;
+        font-size: var(--bs-body-font-size, 1rem);
+        font-weight: var(--bs-body-font-weight, 400);
+        line-height: var(--bs-body-line-height, 1.5);
+        color: var(--primary-text);
+        text-align: var(--bs-body-text-align, left);
+        padding: 10px;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Style dla kontenerów */
+    .container,
+    .container-fluid,
+    .container-lg,
+    .container-md,
+    .container-sm,
+    .container-xl,
+    .container-xxl {
+        --bs-gutter-x: 1.5rem;
+        --bs-gutter-y: 0;
+        width: 100%;
+        padding-right: calc(var(--bs-gutter-x) * 0.5);
+        padding-left: calc(var(--bs-gutter-x) * 0.5);
+        margin: 30px auto 0;
+        max-width: 1200px;
+        background: var(--secondary-bg);
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px var(--shadow-color);
+    }
+    
+    /* Logo i nagłówek */
     .logo-container {
-        background-color: #e9ecef;
+        background-color: var(--logo-bg);
         padding: 15px;
         text-align: center;
         margin-bottom: 20px;
         position: relative;
     }
-    .logo {
+    
+    .logo,
+    #siteLogo {
         max-width: 200px;
         margin-bottom: 0;
         cursor: pointer;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
     }
-    .container {
-        max-width: 1200px;
-        margin: 30px auto 0;
-        background: #FFFFFF;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-    /* Pozostała część CSS pozostaje bez zmian */
+    
     .header-row {
         display: flex;
         justify-content: center;
@@ -47,58 +122,84 @@
         margin-bottom: 15px;
         position: relative;
     }
-    .header-row h4 {
-        font-size: 1.2em;
-        color: #333333;
+    
+    .header-row h4,
+    .result-header h4,
+    .result-wrapper-chart h5,
+    .result-wrapper-harmonogram h5 {
         font-weight: 700;
         margin: 0;
+        text-align: center;
     }
+    
+    .header-row h4,
+    .result-header h4 {
+        font-size: 1.2em;
+        flex: 1;
+        text-align: center;
+    }
+    
+    .result-wrapper-chart h5,
+    .result-wrapper-harmonogram h5 {
+        font-size: 1em;
+        margin-bottom: 10px;
+    }
+    
+    .result-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    
+    /* Style dla checkboxów */
     .checkbox-label {
         display: flex;
         align-items: center;
-        font-size: 0.7em;
-        color: #333333;
+        font-size: var(--small-font-size);
         cursor: pointer;
         position: relative;
     }
+    
     .checkbox-label input {
         position: absolute;
         opacity: 0;
         width: 0;
         height: 0;
     }
+    
     .checkbox-custom {
         width: 16px;
         height: 16px;
-        border: 2px solid #e0e0e0; /* Szary kolor ramki w trybie jasnym (jak ramki boxów) */
-        background-color: #ffffff; /* Białe tło w trybie jasnym */
+        border: 2px solid var(--border-color);
+        background-color: var(--input-bg);
         margin-right: 5px;
         display: inline-block;
         position: relative;
-        border-radius: 4px; /* Lekko zaokrąglone rogi */
-        transition: all 0.2s ease; /* Płynne przejścia */
+        border-radius: 4px;
+        transition: all 0.2s ease;
     }
     
     .checkbox-label input:checked + .checkbox-custom {
-        background-color: #C2B280; /* Złote tło w trybie jasnym */
-        border-color: #C2B280; /* Ramka w kolorze tła */
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
     }
-
-    /* Styl ptaszka za pomocą ::after */
+    
     .checkbox-custom::after {
-        content: "✔"; /* Używamy znaku Unicode dla ptaszka */
+        content: "✔";
         position: absolute;
-        left: 50%; /* Centrujemy w poziomie */
-        top: 50%; /* Centrujemy w pionie */
-        transform: translate(-50%, -50%); /* Precyzyjne centrowanie */
-        font-size: 12px; /* Rozmiar ptaszka */
-        color: #000000; /* Kolor ptaszka w trybie jasnym */
-        opacity: 0; /* Ukrywamy ptaszka, gdy checkbox nie jest zaznaczony */
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        color: #000000;
+        opacity: 0;
         transition: opacity 0.2s ease;
     }
     
     .checkbox-label input:checked + .checkbox-custom::after {
-        opacity: 1; /* Pokazujemy ptaszka */
+        opacity: 1;
     }
     
     .checkbox-label.header-checkbox {
@@ -106,159 +207,358 @@
         top: -20px;
         right: 10px;
     }
+    
+    /* Style dla formularzy i sekcji wyników */
     .form-section {
+        display: block;
         padding: 10px;
         position: relative;
     }
-    .form-row {
+    
+    .result-section {
+        display: none;
+        padding: 10px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .form-row,
+    .checkbox-row,
+    .fields-wrapper {
         display: flex;
         justify-content: center;
-        margin-bottom: 10px;
-        gap: 10px;
         align-items: flex-start;
+        margin-bottom: 10px;
+        gap: 15px;
+        flex-wrap: wrap;
+        text-align: left;
     }
+    
     .form-group {
         flex: 1;
-        min-width: 0;
+        min-width: 120px;
         max-width: 150px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
     }
-    .form-label {
-        font-size: 0.7em;
+    
+    #obligacjeForm .form-row:first-child {
+        margin-bottom: 30px;
+    }
+    
+    #dynamicRateGroup {
+        width: 150px; 
+        min-width: 150px; 
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        margin-right: 15px; 
+    }
+    
+    .form-label,
+    .variable-input-group .form-label {
+        font-size: var(--small-font-size);
         text-transform: uppercase;
         margin-bottom: 2px;
-        color: #333333;
+        text-align: left;
+        width: 100%;
     }
-    .form-control, .form-select, .form-range {
+    
+    .form-control,
+    .form-select,
+    .input-group-text,
+    .variable-input-group .form-control {
         height: 22px;
-        font-size: 0.7em;
+        font-size: var(--small-font-size);
         padding: 2px;
         text-align: center;
-        background: #fff; /* Białe tło w trybie jasnym */
-        color: #333333; /* Ciemny tekst w trybie jasnym */
-        border: 1px solid #e0e0e0; /* Czarna ramka */
-        border-radius: 5px;
-        box-sizing: border-box; /* Wlicza padding i border w wysokość */
-        line-height: 18px; /* Wyrównanie tekstu w pionie */
-        display: inline-flex; /* Lepsze wyrównanie w pionie */
-        align-items: center; /* Centrowanie tekstu w pionie */
-        justify-content: center; /* Centrowanie tekstu w poziomie */
+        background: var(--input-bg);
+        color: var(--primary-text);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        box-sizing: border-box;
+        line-height: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
+
+    input.form-control:focus,
+    select.form-select:focus {
+        outline: none !important;
+        box-shadow: none !important;
+        border-color: var(--border-color) !important;
+        background: var(--input-bg) !important;
+        color: var(--primary-text) !important;
+    }
+    
+    input.form-control:active,
+    input.form-control:focus-visible,
+    select.form-select:active,
+    select.form-select:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
+        border-color: var(--border-color) !important;
+        background: var(--input-bg) !important;
+        color: var(--primary-text) !important;
+    }
+    
+    .form-control:focus,
+    .form-select:focus,
+    .form-range:focus {
+        outline: none !important;
+        background: var(--input-bg);
+        color: var(--primary-text);
+    }
+    
+    .form-range:focus::-webkit-slider-runnable-track {
+        background: var(--input-group-bg) !important;
+        box-shadow: none !important;
+    }
+    .form-range:focus::-moz-range-track {
+        background: var(--input-group-bg) !important;
+        box-shadow: none !important;
+    }
+    .form-range:focus::-ms-track {
+        background: var(--input-group-bg) !important;
+        box-shadow: none !important;
+    }
+    
+    .form-range:focus::-webkit-slider-thumb {
+        background: var(--accent-color);
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    .form-range:focus::-moz-range-thumb {
+        background: var(--accent-color);
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    .form-range:focus::-ms-thumb {
+        background: var(--accent-color);
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: 0 0 4px var(--accent-color);
+    }
+    
+    .input-group-text {
+        background: var(--input-group-bg);
+        padding: 2px 5px;
+    }
+    
+    .input-group {
+        width: 150px;
+        display: flex;
+        justify-content: center;
+    }
+    
     .form-select {
         max-width: 100px;
         appearance: none;
         background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQ0lEQVR42mNgwAfKy8Q/Y//+Ii//3jVAYQzsIFyQ0dOaWq992zxcnN5+9NmyZACV40DmGhPZtzwUAxhUaoLntdha0DqQbtz4E9DzN6XgI0P2VYFlQrUwoQDIgbChLE/0awXiwV5rhugPX6A8BSsYFDqU+rEFdkGZA7+G9HMqaAU6l+0w+NdJD7ADhzhR/4KDZnWOw0QKrVqYc1G+1Dczfx8DR0uv+QJqDRvQxdizFAQAwsy39EZhAAAwAAJ4+Q1XFlAAAAABJRU5ErkJggg==') no-repeat right 5px center;
+        padding: 0 20px 0 5px;
+        line-height: 22px;
     }
-    .form-range {
-        margin-top: 2px;
-        height: 8px;
-        background: #d3d3d3;
-        border-radius: 5px;
+    
+    /* Style dla suwaków */
+    input[type="range"].form-range {
+        margin-top: 5px;
+        height: 6px;
+        background: var(--input-group-bg) !important; /* Nowa zmienna z wymuszeniem */
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius);
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        outline: none;
     }
-    .form-range::-webkit-slider-thumb {
-        background: #C2B280;
-        border: none;
-        border-radius: 50%;
-        width: 12px;
-        height: 12px;
-        cursor: pointer;
+    
+    /* Reset tła toru w przeglądarkach */
+    input[type="range"].form-range::-webkit-slider-runnable-track {
+        background: var(--input-group-bg) !important; /* Tor w Chrome/Safari */
+        height: 6px;
+        border-radius: var(--border-radius);
         -webkit-appearance: none;
     }
-    .form-range::-moz-range-thumb {
-        background: #C2B280;
+    
+    input[type="range"].form-range::-moz-range-track {
+        background: var(--input-group-bg) !important; /* Tor w Firefox */
+        height: 6px;
+        border-radius: var(--border-radius);
+    }
+    
+    input[type="range"].form-range::-ms-track {
+        background: var(--input-group-bg) !important; /* Tor w Edge/IE */
+        height: 6px;
+        border-radius: var(--border-radius);
+        border: 2px solid var(--border-color);
+        color: transparent; /* Ukrywa domyślny tor w IE */
+    }
+    
+    /* Style kciuka */
+    input[type="range"].form-range::-webkit-slider-thumb {
+        background: var(--accent-gradient-start); /* Kolor z btn-primary */
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
         border: none;
+        cursor: pointer;
+        -webkit-appearance: none;
+        transform: translateY(2px); /* Centrowanie */
+    }
+    
+    input[type="range"].form-range::-moz-range-thumb {
+        background: var(--accent-gradient-start);
+        width: 11px;
+        height: 11px;
         border-radius: 50%;
-        width: 12px;
-        height: 12px;
+        border: none;
         cursor: pointer;
     }
-    .form-range::-ms-thumb {
-        width: 15px;
-        height: 15px;
-        background: #C2B280; /* Złoty w trybie jasnym - bez zmian */
-        border: 1px solid #C2B280;
+    
+    input[type="range"].form-range::-ms-thumb {
+        background: var(--accent-gradient-start);
+        width: 11px;
+        height: 11px;
         border-radius: 50%;
+        border: none;
         cursor: pointer;
     }
-    .input-group-text {
-        height: 22px; /* Jawnie ustawiona wysokość */
-        font-size: 0.7em;
-        padding: 2px 5px;
-        background: #f5f5f5; /* Bardzo jasny szary w trybie jasnym */
-        color: #333333; /* Ciemny tekst w trybie jasnym */
-        border: 1px solid #e0e0e0; /* Czarna ramka */
-        border-radius: 5px;
-        box-sizing: border-box; /* Wlicza padding i border w wysokość */
-        line-height: 18px; /* Wyrównanie tekstu w pionie */
-        display: inline-flex; /* Lepsze wyrównanie w pionie */
-        align-items: center; /* Centrowanie tekstu w pionie */
-        justify-content: center; /* Centrowanie tekstu w poziomie */
+    
+    /* Tryb ciemny dla kciuka */
+    .dark-mode input[type="range"].form-range::-webkit-slider-thumb {
+        background: var(--accent-gradient-start-black);
+        transform: translateY(2px);
     }
+    
+    .dark-mode input[type="range"].form-range::-moz-range-thumb {
+        background: var(--accent-gradient-start-black);
+    }
+    
+    .dark-mode input[type="range"].form-range::-ms-thumb {
+        background: var(--accent-gradient-start-black);
+    }
+
+    .dark-mode .harmonogram table {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        border: 1px solid #666666;
+    }
+    
+    .dark-mode .harmonogram th {
+        border-bottom: 2px solid #666666;
+    }
+    
+    .dark-mode .harmonogram td {
+        border-bottom: 1px solid #666666;
+    }
+
+    .dark-mode .harmonogram td .star,
+    .dark-mode #harmonogramOpis .star {
+        color: #c2b280;
+    }
+    
     .sub-info {
         font-size: 0.4em;
-        color: #333333;
         margin-top: 2px;
         text-align: left;
+        align-self: flex-start;
+        width: 100%;
     }
+    
+    /* Opisy i dane */
     .opis-container {
         margin-top: 20px;
         text-align: center;
         margin-bottom: 10px;
     }
+    
     .obligacje-opis {
         font-size: 0.6em;
-        color: #333333;
         text-align: center;
         max-width: 400px;
         margin: 10px auto 0;
         line-height: 1.4;
     }
+    
     .harmonogram-opis {
-        font-size: 0.5em; /* Zmniejszony rozmiar */
-        color: #333333;
+        font-size: 0.5em;
         text-align: left;
         max-width: 1000px;
         margin: 10px auto 0;
         line-height: 1.4;
         padding-left: 8em;
     }
+
+    .harmonogram td,
+    #harmonogramOpis {
+        color: var(--primary-text);
+    }
+    
+    .harmonogram td .star,
+    #harmonogramOpis .star {
+        color: #8b7d47;
+    }
+    
     .data-container {
         text-align: right;
         margin-top: 5px;
     }
-    .data-info {
-        font-size: 0.8em;
-        color: #C2B280;
-    }
+    
+    .data-info,
     .data-date {
         font-size: 0.8em;
+        color: var(--accent-color);
     }
-    .result-section {
-        display: none;
-        padding: 10px;
-        max-width: 1200px;
-        margin: 0 auto;
-        background: #FFFFFF;
-        overflow: visible;
+    
+    .data-date {
+        font-size: 0.9em;
     }
-    .result-container {
+    
+    /* Sekcja wyników */
+    .result-container,
+    .form-container,
+    .harmonogram-container {
         display: flex;
         gap: 20px;
         justify-content: center;
         flex-wrap: wrap;
         position: relative;
-        overflow: visible; /* Dodajemy */
     }
-    .result-header {
-        text-align: center;
-        margin-bottom: 20px;
-        position: relative;
+    
+    .harmonogram-container {
+        margin-top: 20px;
+        padding: 20px;
     }
-    .result-header h4 {
-        font-size: 1.2em;
-        color: #333333;
-        font-weight: 700;
-        display: inline-block;
+    
+    .harmonogram-chart-wrapper {
+        background-color: var(--harmonogram-bg);
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 1100px;
+        width: 100%;
+        margin: 0 auto;
     }
+    
+    .result-wrapper-chart {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .result-wrapper-harmonogram {
+        flex: 1;
+        max-width: 1000px;
+    }
+    
+    /* Style dla wykresów */
     .chart-container {
         display: flex;
         justify-content: center;
@@ -266,78 +566,33 @@
         gap: 20px;
         margin-bottom: 20px;
         position: relative;
-        overflow: visible;
     }
+    
     .chart {
         flex: 0 0 auto;
         width: 160px;
         height: 160px;
         position: relative;
-        z-index: 25; /* Już masz, ale upewniamy się */
-        overflow: visible; /* Dodajemy, aby wycinki nie były przycinane */
+        z-index: 25;
     }
-    /* Dodajemy styl dla canvasu w wykresie */
+    
     .chart canvas {
         position: relative;
-        z-index: 30; /* Wyższy z-index dla samego wykresu */
-    }
-    body.dark-mode .result-section,
-    body.light-mode .result-section,
-    body.dark-mode .result-container,
-    body.light-mode .result-container {
-        overflow: visible;
-    }
-    /* Tryb ciemny */
-    body.dark-mode .form-control {
-        background: #3a3a3a; /* Ciemne tło w trybie ciemnym */
-        color: #e0e0e0; /* Jasny tekst w trybie ciemnym */
-        border: 1px solid #555555;
+        z-index: 30;
     }
     
-    body.dark-mode .input-group-text {
-        background: #666666; /* Ciemniejszy szary w trybie ciemnym */
-        color: #e0e0e0; /* Jasny tekst w trybie ciemnym */
-        border: 1px solid #555555;
-    }
-    /* Tryb ciemny */
-    body.dark-mode .form-range,
-    body.dark-mode .variable-range {
-        background: #555555;
-        border: none !important; /* Usunięcie ramki z większą specyficznością */
-        box-shadow: none !important;
-        outline: none !important;
+    .chart-container-line {
+        margin-top: 20px;
+        width: 100%;
+        height: 400px;
+        background-color: transparent;
     }
     
-    body.dark-mode .form-range::-webkit-slider-runnable-track,
-    body.dark-mode .variable-range::-webkit-slider-runnable-track {
-        background: #555555;
-        border: none !important;
-        border-radius: 5px;
-        height: 5px;
-        box-shadow: none !important;
-        outline: none !important;
+    .chart-line {
+        width: 100%;
+        height: 100%;
     }
     
-    body.dark-mode .form-range::-moz-range-track,
-    body.dark-mode .variable-range::-moz-range-track {
-        background: #555555;
-        border: none !important;
-        border-radius: 5px;
-        height: 5px;
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    
-    body.dark-mode .form-range::-ms-track,
-    body.dark-mode .variable-range::-ms-track {
-        background: #555555;
-        border: none !important;
-        border-radius: 5px;
-        height: 5px;
-        box-shadow: none !important;
-        outline: none !important;
-    }
-
     .chart-legend {
         flex: 0 0 auto;
         max-width: 200px;
@@ -346,155 +601,110 @@
         flex-direction: column;
         justify-content: center;
     }
+    
     .chart-legend .legend-item {
         display: flex;
         align-items: center;
         margin-bottom: 6px;
-        font-size: 0.7em;
-        color: #333333;
+        font-size: var(--small-font-size);
         cursor: pointer;
         transition: transform 0.3s ease;
         padding-left: 8px;
     }
+    
+    .chart-legend .legend-text {
+        font-weight: bold;
+        font-size: 14px;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    }
+    
     .chart-legend .color-box {
         width: 130px;
+        min-width: 130px;
         height: 26px;
-        border-radius: 5px;
+        border-radius: var(--border-radius);
         text-align: center;
-        font-weight: bold; /* Pogrubienie */
+        font-weight: bold;
         line-height: 26px;
-        font-size: 10px; /* Powiększenie */
+        font-size: 10px;
         white-space: nowrap;
         overflow: hidden;
         position: relative;
         color: #fff;
         margin-right: 6px;
     }
-
+    
     .chart-legend .color-box .value {
         font-weight: bold;
         font-size: 10px;
         display: block;
     }
     
-    .color-box {
-        position: relative; /* Upewniamy się, że pozycja jest ustawiona */
-    }
-    
-    .color-box:hover::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 5px 10px;
-        border-radius: 4px;
-        font-size: 10px !important; /* Zmniejszona wielkość czcionki z !important */
-        white-space: nowrap;
-        z-index: 10;
-        background-color: #000000; /* Domyślne tło */
-        color: #ffffff; /* Domyślny kolor tekstu */
-        line-height: normal !important; /* Reset potencjalnych nadpisywań */
-        font-family: 'Montserrat', sans-serif !important; /* Upewniamy się, że czcionka jest poprawna */
-    }
-
-    /* Dodaj tutaj, jeśli potrzeba większej specyficzności */
-    .chart-legend .color-box:hover::after {
-        font-size: 10px !important; /* Zwiększamy specyficzność */
-        font-family: 'Montserrat', sans-serif !important; /* Upewniamy się, że czcionka jest poprawna */
-    }  
-    
-    /* Kapitał (data-index="0") */
-    .legend-item[data-index="0"] .color-box:hover::after {
-        background-color: #28a745; /* Taki sam kolor jak pasek Kapitał */
-        color: #000000; /* Czarny tekst dla lepszej czytelności */
-    }
-    
-    /* Odsetki (data-index="1") */
-    .legend-item[data-index="1"] .color-box:hover::after {
-        background-color: #007bff; /* Taki sam kolor jak pasek Odsetki */
-        color: #ffffff; /* Biały tekst */
-    }
-    
-    /* Podatek (data-index="2") */
-    .legend-item[data-index="2"] .color-box:hover::after {
-        background-color: #dc3545; /* Taki sam kolor jak pasek Podatek */
-        color: #ffffff; /* Biały tekst */
-    }
-    
-
+    .color-box:hover::after,
     .legend-text:hover::after {
         content: attr(data-tooltip);
         position: absolute;
         bottom: 100%;
         left: 50%;
         transform: translateX(-50%);
-        background-color: #000000;
-        color: #ffffff;
         padding: 5px 10px;
         border-radius: 4px;
-        font-size: 10px; /* Nowa wielkość czcionki */
+        font-size: 10px;
         white-space: nowrap;
         z-index: 10;
-    }
-
-    .chart-legend .legend-text {
-        font-weight: bold;
-        font-size: 14px;
-        color: #333333;
-        opacity: 1;
-        transition: opacity 0.3s ease;
-    }
-
-    body.dark-mode .chart-legend .legend-text {
-        color: #e0e0e0;
+        background-color: #000000;
+        color: #ffffff;
+        line-height: normal;
+        font-family: 'Montserrat', sans-serif;
     }
     
-    #siteLogo {
-        cursor: pointer;
+    .legend-item[data-index="0"] .color-box:hover::after {
+        background-color: #28a745;
+        color: #000000;
     }
     
+    .legend-item[data-index="1"] .color-box:hover::after {
+        background-color: #007bff;
+        color: #ffffff;
+    }
+    
+    .legend-item[data-index="2"] .color-box:hover::after {
+        background-color: #dc3545;
+        color: #ffffff;
+    }
+    
+    /* Stopka podsumowania */
     .summary-footer {
         display: flex;
         justify-content: center;
         gap: 15px;
         margin-top: 10px;
     }
+    
     .summary-footer .highlight {
         font-size: 0.8em;
         padding: 4px 6px;
-        border-radius: 5px;
+        border-radius: var(--border-radius);
         position: relative;
         cursor: pointer;
+        color: #ffffff;
     }
+    
     .highlight.yellow {
-        background-color: #17a2b8;
-        color: #ffffff;
+        background-color: var(--highlight-yellow);
     }
-    .highlight.yellow:hover {
-        color: transparent;
-    }
-    .highlight.yellow:hover::after {
-        content: attr(data-hover);
-        font-weight: bold;
-        font-size: 1.1em;
-        color: #ffffff;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+    
     .highlight.green {
-        background-color: #28a745;
-        color: #ffffff;
+        background-color: var(--highlight-green);
     }
+    
+    .highlight.yellow:hover,
     .highlight.green:hover {
         color: transparent;
     }
+    
+    .highlight.yellow:hover::after,
     .highlight.green:hover::after {
         content: attr(data-hover);
         font-weight: bold;
@@ -509,33 +719,34 @@
         justify-content: center;
         align-items: center;
     }
-    /* Harmonogram – bez własnego tła */
+    
+    /* Style dla harmonogramu */
     .harmonogram {
-        padding: 0; /* Usuwamy padding, bo jest w wrapperze */
-        background-color: transparent; /* Reset tła */
+        padding: 0;
     }
+    
     .harmonogram table {
         margin: 0 auto;
-        width: auto;
+        width: 100%;
         max-width: 1000px;
         display: table;
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        background: #f9f9f9; /* Tło tabeli w trybie jasnym */
-        font-size: 0.8em; /* Przywrócenie oryginalnej wielkości czcionki */
+        box-shadow: 0 1px 3px var(--shadow-color);
+        background: var(--harmonogram-bg);
+        font-size: 0.8em;
     }
     
     .harmonogram th {
-        background: linear-gradient(90deg, #C2B280, #b0a070); /* Oryginalny kolor nagłówka w trybie jasnym */
-        color: #000000;
+        background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+        color: var(--primary-text);
         padding: 12px;
         text-align: center;
         vertical-align: middle;
         font-weight: 500;
-        border-bottom: 2px solid #ddd;
+        border-bottom: 2px solid var(--border-color);
         white-space: normal;
         line-height: 1.2;
         overflow: hidden;
@@ -546,22 +757,23 @@
         padding: 10px;
         text-align: center;
         font-weight: 400;
-        border-bottom: 1px solid #eee;
-        background-color: #f9f9f9; /* Tło komórek w trybie jasnym */
-        color: #000000;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--harmonogram-bg);
+        color: var(--primary-text);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    /* Kolor czcionki "Harmonogram odsetek" */
+    
     .harmonogram .btn-toggle {
         cursor: pointer;
         font-size: 0.65em;
-        color: #000000;
         text-decoration: underline;
-        margin-bottom: 25px; /* Większy odstęp od tabelki (było 15px) */
+        margin-bottom: 25px;
         position: relative;
+        color: var(--primary-text);
     }
+    
     .btn-toggle {
         cursor: pointer;
         font-size: 0.8em;
@@ -569,300 +781,46 @@
         text-decoration: underline;
         margin-bottom: 10px;
     }
-    .btn-primary, .btn-secondary {
-        background: linear-gradient(135deg, #C2B280, #b0a070);
+    
+    /* Przyciski */
+    .btn-primary,
+    .btn-secondary,
+    #addVariableBtn,
+    .zoom-controls .btn {
+        background: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end));
         border: none;
-        color: #000000;
+        color: var(--primary-text);
         font-size: 0.9em;
         padding: 8px 20px;
         width: auto;
         margin: 25px auto 0;
         display: block;
         border-radius: 25px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px var(--shadow-color);
         transition: transform 0.2s ease, box-shadow 0.3s ease;
     }
-    .btn-primary:hover, .btn-secondary:hover {
+    
+    .btn-primary:hover,
+    .btn-secondary:hover,
+    #addVariableBtn:hover,
+    .zoom-controls .btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        background: linear-gradient(135deg, #b0a070, #C2B280);
-        color: #000000;
+        box-shadow: 0 6px 12px var(--shadow-color);
+        background: linear-gradient(135deg, var(--accent-gradient-end), var(--accent-gradient-start));
     }
-    .btn-sm {
-        font-size: 0.7em;
+    
+    .btn-sm,
+    #addVariableBtn {
+        font-size: var(--small-font-size);
         padding: 3px 10px;
-    }
-    #generatePdfBtn {
-        position: absolute;
-        top: 0;
-        right: 10px;
-    }
-    #harmonogramContent {
-        display: block;
-    }
-    .form-container {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        position: relative;
-    }
-    .form-wrapper {
-        flex: 1;
-        max-width: 400px;
-    }
-    .result-container {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-        position: relative;
-    }
-    .harmonogram-container {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 20px;
-        position: relative;
-        background-color: transparent !important; /* Reset tła */
-        padding: 20px;
-    }
-    /* Nowy wrapper dla harmonogramu i wykresu */
-    .harmonogram-chart-wrapper {
-        background-color: #f9f9f9; /* Tło w trybie jasnym */
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 1100px; /* Zwiększona szerokość */
-        width: calc(100% + 60px); /* Szersze tło */
-        margin: 0 auto;
-    }
-    /* Reset tła dla podsumowania */
-    .result-wrapper-chart {
-        background-color: transparent !important;
-    }
-    body.dark-mode .result-wrapper-chart {
-        background-color: transparent !important;
-    }
-    /* Tryb ciemny */
-    body.dark-mode .harmonogram .btn-toggle {
-        color: #e0e0e0; /* Dopasowanie do trybu ciemnego */
-    }
-    
-    body.dark-mode .harmonogram-opis {
-        color: #e0e0e0; /* Dopasowanie do trybu ciemnego */
-    }
-    .result-wrapper-harmonogram {
-        flex: 1;
-        max-width: 1000px;
-    }
-    .result-wrapper-chart h5, .result-wrapper-harmonogram h5 {
-        font-size: 1em;
-        text-align: center;
-        margin-bottom: 10px;
-        color: #333333;
-    }
-    .chart-container-line {
-        margin-top: 20px;
-        width: 100%;
-        height: 400px;
-        background-color: transparent;
-    }
-    .chart-line {
-        width: 100%;
-        height: 100%;
-    }
-    .variable-rate-container {
-        margin-top: 15px;
-        text-align: center;
-    }
-    .checkbox-row {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin-bottom: 10px;
-    }
-    .variable-inputs {
-        margin-top: 10px;
-    }
-    .variable-input-group {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 10px;
-        align-items: flex-start;
-    }
-   
-    .fields-wrapper {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-    }
-    .variable-input-group .form-group {
-        max-width: 150px; /* Dopasowujemy szerokość do głównego formularza */
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Centrujemy pola wejściowe i suwaki w obrębie .form-group */
-    }
-    
-    /* Styl dla suwaka w sekcji zmiennych */
-    .variable-input-group .form-range {
-        margin-top: 10px;
-        height: 8px; /* Wysokość suwaka pozostaje taka sama */
-        background: #d3d3d3; /* Szare tło w trybie jasnym */
-        border-radius: 5px;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-    
-    /* Styl dla kciuka suwaka w trybie jasnym */
-    .variable-input-group .form-range::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 12px;
-        height: 12px;
-        background: #C2B280; /* Taki sam kolor jak w sekcji "Kwota inwestycji" */
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-    }
-    .variable-input-group .form-range::-moz-range-thumb {
-        width: 12px;
-        height: 12px;
-        background: #C2B280;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-    }
-    /* Styl dla suwaka w trybie ciemnym */
-    body.dark-mode .variable-input-group .form-range {
-        background: #666666; /* Ciemniejsze tło w trybie ciemnym dla lepszego kontrastu */
-        border: none !important; /* Usuwamy ramkę */
-        outline: none !important; /* Usuwamy outline dodawany przez przeglądarkę */
-    }
-
-    /* Upewniamy się, że tory suwaków nie mają ramki */
-    body.dark-mode .variable-input-group .form-range::-webkit-slider-runnable-track {
-        background: #666666;
-        border: none !important;
-        border-radius: 5px;
-        height: 5px;
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    
-    body.dark-mode .variable-input-group .form-range::-moz-range-track {
-        background: #666666;
-        border: none !important;
-        border-radius: 5px;
-        height: 5px;
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    
-    body.dark-mode .variable-input-group .form-range::-ms-track {
-        background: #666666;
-        border: none !important;
-        border-radius: 5px;
-        height: 5px;
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    
-    body.dark-mode .variable-input-group .form-range::-webkit-slider-thumb {
-        background: #70673B; /* Ciemniejszy odcień złotego */
-        border: 1px solid #70673B;
-    }
-    
-    body.dark-mode .variable-input-group .form-range::-moz-range-thumb {
-        background: #70673B; /* Ciemniejszy odcień złotego */
-        border: 1px solid #70673B;
-    }
-
-    
-    .remove-btn-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 5px;
-    }
-    .variable-input-group .form-label {
-        font-size: 0.7em; /* Taki sam jak w głównych polach */
-        text-transform: uppercase;
-        margin-bottom: 2px;
-        color: #333333;
-        text-align: left; /* Wyrównanie tekstu do lewej strony */
-        width: 100%;
-        }
-    body.dark-mode .variable-input-group .form-label {
-        color: #e0e0e0; /* Spójność z trybem ciemnym */
-    }
-    
-    .variable-input-group .input-group {
-        display: flex;
-        align-items: center;
-        max-width: 150px; /* Taka sama szerokość jak w sekcji "Kwota inwestycji" */
-        width: 100%; /* Upewniamy się, że zajmuje pełną dostępną szerokość */
-    }
-    .variable-input-group .btn-danger {
-        font-size: 0.7em;
-        padding: 2px 8px;
-        height: 22px;
-        line-height: 18px;
-        background: #dc3545;
-        border: none;
-        border-radius: 5px;
-        color: #fff;
-    }
-    .variable-input-group .btn-danger:hover {
-        background: #c82333;
-    }
-    .variable-input-group .remove-first-btn-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 5px;
-        align-self: center; /* Centruje kontener w poziomie w obrębie .variable-input-group */
-        width: 100%; /* Upewniamy się, że kontener zajmuje pełną szerokość, aby centrowanie działało */
-    }
-    
-    .variable-input-group .btn-danger.remove-first-btn {
-        font-size: 0.7em;
-        padding: 2px 8px;
-        height: 22px;
-        line-height: 18px;
-        background: #dc3545;
-        border: none;
-        border-radius: 5px;
-        color: #fff;
-    }
-    
-    .variable-input-group .btn-danger.remove-first-btn:hover {
-        background: #c82333;
-    }
-    .variable-input-group .remove-btn-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 5px;
-        align-self: center; /* Centruje kontener w poziomie w obrębie .variable-input-group */
-        width: 100%; /* Upewniamy się, że kontener zajmuje pełną szerokość, aby centrowanie działało */
     }
     
     #addVariableBtn {
-        background: linear-gradient(135deg, #C2B280, #b0a070);
-        color: #000;
-        font-size: 0.7em;
-        padding: 3px 10px;
         border-radius: 15px;
         margin: 0 auto;
-        display: block;
     }
-    #addVariableBtn:hover {
-        background: linear-gradient(135deg, #b0a070, #C2B280);
-    }
+    
     .zoom-controls .btn {
-        background: linear-gradient(135deg, #C2B280, #b0a070);
-        border: none;
-        color: #000000;
-        font-size: 0.9em;
         padding: 2px 8px;
         width: 25px;
         height: 25px;
@@ -870,186 +828,138 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
-    }
-
-    .zoom-controls .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        background: linear-gradient(135deg, #b0a070, #C2B280);
-    }
-    body.dark-mode {
-    background-color: #2b2b2b;
-    color: #e0e0e0;
-    }
-
-    body.dark-mode .container {
-        background: #3a3a3a;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Dodane style */
-    body.dark-mode .logo-container {
-        background-color: #3a3a3a; /* Dopasowanie tła do trybu ciemnego */
-    }
-
-    body.dark-mode .data-info {
-        color: #D4C791; /* Jasniejszy odcień złota dla kontrastu */
-    }
-
-    body.dark-mode .data-date {
-        color: #e0e0e0;
-    }
-
-    body.dark-mode .chart-legend .legend-item {
-        color: #e0e0e0; /* Tekst legendy w trybie ciemnym */
-    }
-
-    body.dark-mode .summary-footer .highlight.yellow {
-        background-color: #17a2b8; /* Zachowujemy kolor, ale można dostosować */
-        color: #e0e0e0;
-    }
-
-    body.dark-mode .summary-footer .highlight.green {
-        background-color: #28a745;
-        color: #e0e0e0;
-    }
-    body.dark-mode .summary-footer .highlight.yellow:hover {
-        color: transparent; /* Przywracamy efekt znikania */
-    }
-
-    body.dark-mode .summary-footer .highlight.green:hover {
-        color: transparent; /* Przywracamy efekt znikania */
-    }
-
-    body.dark-mode .summary-footer .highlight.yellow:hover::after,
-    body.dark-mode .summary-footer .highlight.green:hover::after {
-        color: #e0e0e0; /* Tekst po najechaniu w trybie ciemnym */
     }
     
-    /* Obsługa preferencji systemowych */
-    @media (prefers-color-scheme: dark) {
-        body:not(.light-mode) {
-            background-color: #2b2b2b;
-            color: #e0e0e0;
+    #generatePdfBtn {
+        position: absolute;
+        top: 0;
+        right: 10px;
+    }
+    
+    /* Pola dla zmiennych stóp */
+    .variable-rate-container {
+        margin-top: 15px;
+        text-align: center;
+    }
+    
+    .variable-inputs {
+        margin-top: 10px;
+    }
+    
+    .variable-input-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+    
+    .variable-inputs-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .variable-input-group .form-group {
+        width: 150px;
+        min-width: 0;
+        max-width: none;
+        flex: none;
+    }
+    
+    .variable-input-group .input-group {
+        display: flex;
+        align-items: center;
+        max-width: 150px;
+        width: 150px;
+    }
+    
+    .variable-input-group .btn-danger,
+    .variable-input-group .btn-danger.remove-first-btn {
+        font-size: var(--small-font-size);
+        padding: 2px 8px;
+        height: 22px;
+        line-height: 18px;
+        background: #dc3545;
+        border: none;
+        border-radius: var(--border-radius);
+        color: #fff;
+    }
+    
+    .variable-input-group .btn-danger:hover,
+    .variable-input-group .btn-danger.remove-first-btn:hover {
+        background: #c82333;
+    }
+    
+    .remove-btn-wrapper,
+    .remove-first-btn-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 5px;
+        align-self: center;
+        width: 100%;
+    }
+    
+    #harmonogramContent {
+        display: block;
+    }
+    
+    /* Responsywność */
+    @media (max-width: 768px) {
+        .form-group,
+        .input-group {
+            width: 100%;
+            max-width: none;
         }
-        body:not(.light-mode) .container {
-            background: #3a3a3a;
+    
+        .chart-container {
+            flex-direction: column;
+            align-items: center;
         }
-        body:not(.light-mode) .logo-container {
-            background-color: #3a3a3a;
+    
+        .chart {
+            width: 120px;
+            height: 120px;
+        }
+    
+        .chart-legend {
+            max-width: 100%;
+            align-items: center;
+        }
+    
+        .chart-container-line {
+            height: 300px;
+        }
+    
+        .harmonogram table {
+            font-size: 0.7em;
+        }
+    
+        .harmonogram th,
+        .harmonogram td {
+            padding: 8px;
+        }
+    
+        .harmonogram-opis {
+            padding-left: 1em;
         }
     }
     
-    body.dark-mode .form-section,
-    body.dark-mode .result-section,
-    body.dark-mode .harmonogram-container {
-        background-color: transparent !important; /* Reset tła w trybie ciemnym */
-    }
-    body.dark-mode .harmonogram-chart-wrapper {
-        background-color: #404040; /* Tło w trybie ciemnym */
-    }
-    body.dark-mode .harmonogram {
-        background-color: #404040; /* Nowe: Dopasowane tło */
-        padding: 20px;
-    }
-
-    body.dark-mode .form-label,
-    body.dark-mode .sub-info,
-    body.dark-mode .obligacje-opis,
-    body.dark-mode .harmonogram-opis,
-    body.dark-mode .header-row h4,
-    body.dark-mode .result-header h4,
-    body.dark-mode .checkbox-label {
-        color: #e0e0e0;
-    }
-
-    body.dark-mode .checkbox-custom {
-        border: 2px solid #e0e0e0; /* Ciemny szary kolor ramki w trybie ciemnym (jak teksty stałe) */
-        background-color: #404040; /* Tło w kolorze tła strony w trybie ciemnym */
-    }
-
-    body.dark-mode .checkbox-label input:checked + .checkbox-custom {
-        background-color: #8B7D47; /* Ciemne złote tło w trybie ciemnym */
-        border-color: #8B7D47;
-    }
-
-    body.dark-mode .checkbox-label input:checked + .checkbox-custom::after {
-        border-color: #000000; /* Czarny ptaszek w trybie ciemnym */
-    }
-
-    /* Tryb ciemny */
-    body.dark-mode .harmonogram table {
-        background: #1f1f1f; /* Ciemniejsze tło tabeli w trybie ciemnym */
-    }
-
-    /* Tryb ciemny */
-    body.dark-mode .form-range {
-        background: #555555; /* Tło takie samo jak .input-group-text w trybie ciemnym */
-        border: 1px solid #000000; /* Czarna krawędź w trybie ciemnym */
-    }
-    
-    body.dark-mode .form-range::-webkit-slider-thumb {
-        background: #70673B; /* Ciemniejszy złoty w trybie ciemnym */
-        border: 1px solid #70673B;
-    }
-    
-    body.dark-mode .form-range::-moz-range-thumb {
-        background: #70673B; /* Ciemniejszy złoty w trybie ciemnym */
-        border: 1px solid #70673B;
-    }
-    
-    body.dark-mode .form-range::-ms-thumb {
-        background: #70673B; /* Ciemniejszy złoty w trybie ciemnym */
-        border: 1px solid #70673B;
-    }
-    
-    body.dark-mode .harmonogram th {
-        background: linear-gradient(90deg, #8B7D47, #70673b); /* Oryginalny kolor nagłówka w trybie ciemnym */
-        color: #e0e0e0;
-        border-bottom: 2px solid #555;
-    }
-
-    body.dark-mode .chart-container-line {
-        background-color: transparent; /* Reset tła w trybie ciemnym */
-    }
-
-    body.dark-mode .harmonogram td {
-        background: #1f1f1f; /* Tło komórek w trybie ciemnym */
-        color: #e0e0e0;
-        border-bottom: 1px solid #555;
-    }
-    
-    body.dark-mode .btn-toggle {
-        color: #e0e0e0;
-    }
-
-    body.dark-mode .btn-primary,
-    body.dark-mode .btn-secondary,
-    body.dark-mode #addVariableBtn,
-    body.dark-mode .zoom-controls .btn {
-        background: linear-gradient(135deg, #8B7D47, #70673b);
-        color: #e0e0e0;
-    }
-
-    body.dark-mode .btn-primary:hover,
-    body.dark-mode .btn-secondary:hover,
-    body.dark-mode #addVariableBtn:hover,
-    body.dark-mode .zoom-controls .btn:hover {
-        background: linear-gradient(135deg, #70673b, #8B7D47);
-    }
-
-    /* Obsługa preferencji systemowych */
-    @media (prefers-color-scheme: dark) {
-        body:not(.light-mode) {
-            background-color: #2b2b2b;
-            color: #e0e0e0;
+    @media (max-width: 576px) {
+        .header-row h4,
+        .result-header h4 {
+            font-size: 1em;
         }
-        body:not(.light-mode) .container {
-            background: #3a3a3a;
+    
+        .checkbox-label.header-checkbox {
+            top: -15px;
+            right: 5px;
+            font-size: 0.6em;
         }
-        body:not(.light-mode) .logo-container {
-            background-color: #3a3a3a;
+    
+        .summary-footer {
+            flex-direction: column;
+            gap: 10px;
         }
     }
 </style>
@@ -1105,7 +1015,7 @@
                                 <span class="input-group-text">%</span>
                             </div>
                             <input type="range" class="form-range" id="dynamicRateRange" min="0" max="50" step="0.05" value="4.90">
-                            <div class="sub-info"></div>
+                            <div class="sub-info" id="dynamicRateInfo"></div>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1368,6 +1278,7 @@
 
     function setDynamicRateField(label, value, step, max) {
         const dynamicRateLabel = document.getElementById("dynamicRateLabel");
+        const dynamicRateInfo = document.getElementById("dynamicRateInfo");
         dynamicRateLabel.textContent = label;
         elements.dynamicRate.value = value;
         elements.dynamicRateRange.value = value;
@@ -1375,7 +1286,13 @@
         elements.dynamicRateRange.step = step;
         elements.dynamicRate.max = max;
         elements.dynamicRateRange.max = max;
-        document.getElementById("dynamicRateGroup").style.display = "block";
+    
+        // Aktualizacja sub-info
+        /*if (dynamicRateInfo) {
+            dynamicRateInfo.textContent = `Min: 0%, Max: ${max}%`;
+        } else {
+            console.warn("Element #dynamicRateInfo nie znaleziony.");
+        }*/
     }
 
     function updateDynamicRateField() {
@@ -1420,26 +1337,31 @@
         updateOprocentowanieInfo();
         updateOpisObligacji();
     
+        // Logika widoczności dynamicRateGroup
+        const dynamicRateGroup = document.getElementById("dynamicRateGroup");
         if (["ROR", "DOR"].includes(typ)) {
             const stopaRefValue = state.lastFormData.dynamicRates[typ] || 5.75;
             setDynamicRateField("Stopa Ref. NBP", stopaRefValue, "0.05", "20");
+            dynamicRateGroup.style.display = "flex";
+            console.log(`Pokazuję dynamicRateGroup dla typu ${typ}`); // Logowanie
         } else if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
             const inflacjaValue = state.lastFormData.dynamicRates[typ] || 4.90;
             setDynamicRateField("Inflacja", inflacjaValue, "0.1", "50");
+            dynamicRateGroup.style.display = "flex";
+            console.log(`Pokazuję dynamicRateGroup dla typu ${typ}`); // Logowanie
         } else {
-            document.getElementById("dynamicRateGroup").style.display = "none";
+            dynamicRateGroup.style.display = "none";
+            console.log(`Ukrywam dynamicRateGroup dla typu ${typ}`); // Logowanie
         }
     
         document.getElementById("inflacjaZmiennaLabel").style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
         document.getElementById("stopaZmiennaLabel").style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
     
-        // Resetowanie danych zmiennych, jeśli typ obligacji nie obsługuje zmiennej inflacji/stopy
         if (!["COI", "EDO", "ROS", "ROD"].includes(typ)) {
             state.variableInflation = [];
             elements.inflacjaZmiennaBtn.checked = false;
             state.lastFormData.inflacjaZmienna = false;
         } else if (elements.inflacjaZmiennaBtn.checked && state.variableInflation.length === 0) {
-            // Pobieramy wartość z górnego panelu
             const defaultValue = state.lastFormData.dynamicRates[typ] || 4.90;
             state.variableInflation = [{ value: defaultValue, period: 2 }];
         }
@@ -1449,14 +1371,13 @@
             elements.stopaZmiennaBtn.checked = false;
             state.lastFormData.stopaZmienna = false;
         } else if (elements.stopaZmiennaBtn.checked && state.variableReferenceRates.length === 0) {
-            // Pobieramy wartość z górnego panelu
             const defaultValue = state.lastFormData.dynamicRates[typ] || 5.75;
             state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
         }
     
         updateVariableInputs();
     }
-
+    
     function updateIloscObligacji() {
         const kwota = parseFloat(elements.kwota.value) || 0;
         const ilosc = Math.floor(kwota / 100);
@@ -2047,7 +1968,7 @@
                     <tr>
                         <td>${wiersz.okres}</td>
                         <td>${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
-                        <td>${wiersz.changeApplied ? '★ ' : ''}${wiersz.oprocentowanieNaCykl}</td>
+                        <td>${wiersz.changeApplied ? '<span class="star">★</span> ' : ''}${wiersz.oprocentowanieNaCykl}</td>
                         <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${state.isIkeIkzeMode ? "0,00 zł***" : parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}</td>
@@ -2055,7 +1976,7 @@
                         <td>${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł**</td>
                 `;
                 if (!["OTS", "TOS"].includes(typ)) {
-                    rowHTML += `<td>${wiersz.changeApplied ? '★ ' : ''}${wiersz.stopaRefLubInflacja}</td>`;
+                    rowHTML += `<td>${wiersz.changeApplied ? '<span class="star">★</span> ' : ''}${wiersz.stopaRefLubInflacja}</td>`;
                 }
                 rowHTML += `
                         <td>${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
@@ -2068,7 +1989,7 @@
         const harmonogramOpis = document.getElementById("harmonogramOpis");
         if (harmonogramOpis) {
             const hasStar = state.harmonogramData.some(wiersz => wiersz.changeApplied);
-            const starText = hasStar ? "★ Zmiana oprocentowania.<br>" : "";
+            const starText = hasStar ? '<span class="star">★</span> Zmiana oprocentowania.<br>' : "";
             const baseText = "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.";
             const ikeIkzeText = state.isIkeIkzeMode ? "<br>*** Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>." : "";
             harmonogramOpis.innerHTML = `${starText}${baseText}${ikeIkzeText}`;
@@ -2394,7 +2315,6 @@
         const container = document.querySelector('.container');
         container.style.transform = `scale(${currentZoom})`;
         container.style.transformOrigin = 'top center';
-        container.style.width = `${100 / currentZoom}%`;
     }
     
     document.getElementById("zoomInBtn").addEventListener("click", () => {
