@@ -1,3 +1,6 @@
+Dobra mistrzu już nie będę teraz kombinował, będziemy kombinować jak to zrobimy globalnie. Czyli teraz Chciałbym przelać to co przygotowaliśmy do głównego kodu, żeby móc wyrzucić ten kod dotyczący tabelki i wykresu liniowego, żeby już się implementowało w mniejszych rozdzielczościach. Na dole udostępnię Ci mój cały kod całej strony i podaj mi co muszę zmienić i co muszę wyrzucić z kodu z @media 768, 576, 480px.
+Najwyżej już globalnie będziemy zmieniać wielkość czcionki, itp.
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -21,6 +24,7 @@
         --accent-gradient-start: #c2b280;
         --accent-gradient-end: #b0a070;
         --border-color: #e0e0e0;
+        --border-color-rgb: 102, 102, 102;
         --highlight-yellow: #17a2b8;
         --highlight-green: #28a745;
         --shadow-color: rgba(0, 0, 0, 0.1);
@@ -43,6 +47,7 @@
         --accent-gradient-start: #8b7d47;
         --accent-gradient-end: #70673b;
         --border-color: #f5f5f5;
+        --border-color-rgb: 245, 245, 245;
         --shadow-color: rgba(0, 0, 0, 0.5);
         --logo-bg: #3a3a3a;
         --input-bg: #3a3a3a;
@@ -103,6 +108,18 @@
         text-align: center;
         margin-bottom: 20px;
         position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .zoom-controls {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        gap: 5px;
     }
     
     .logo,
@@ -160,6 +177,9 @@
         font-size: var(--small-font-size);
         cursor: pointer;
         position: relative;
+        margin-bottom: 10px;
+        margin: 5px 0;
+        justify-content: center;
     }
     
     .checkbox-label input {
@@ -203,9 +223,9 @@
     }
     
     .checkbox-label.header-checkbox {
-        position: absolute;
-        top: -20px;
-        right: 10px;
+        position: static;
+        top: auto;
+        right: auto;
     }
     
     /* Style dla formularzy i sekcji wyników */
@@ -364,9 +384,13 @@
         background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQ0lEQVR42mNgwAfKy8Q/Y//+Ii//3jVAYQzsIFyQ0dOaWq992zxcnN5+9NmyZACV40DmGhPZtzwUAxhUaoLntdha0DqQbtz4E9DzN6XgI0P2VYFlQrUwoQDIgbChLE/0awXiwV5rhugPX6A8BSsYFDqU+rEFdkGZA7+G9HMqaAU6l+0w+NdJD7ADhzhR/4KDZnWOw0QKrVqYc1G+1Dczfx8DR0uv+QJqDRvQxdizFAQAwsy39EZhAAAwAAJ4+Q1XFlAAAAABJRU5ErkJggg==') no-repeat right 5px center;
         padding: 0 20px 0 5px;
         line-height: 22px;
+        text-align: center;
+    }
+
+    .form-select option {
+        text-align: center;
     }
     
-    /* Style dla suwaków */
     input[type="range"].form-range {
         margin-top: 5px;
         height: 6px;
@@ -458,6 +482,7 @@
     
     .dark-mode .harmonogram td {
         border-bottom: 1px solid #666666;
+        border-right: 1px solid rgba(var(--border-color-rgb, 245, 245, 245), 0.3);
     }
 
     .dark-mode .harmonogram td .star,
@@ -681,6 +706,21 @@
         gap: 15px;
         margin-top: 10px;
     }
+
+    .highlight {
+        font-size: 0.8em;
+        padding: 4px 6px;
+        border-radius: var(--border-radius);
+        position: relative;
+        cursor: pointer;
+        color: #ffffff;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center; 
+        width: 100%;
+        max-width: 210px;
+    }
     
     .summary-footer .highlight {
         font-size: 0.8em;
@@ -718,6 +758,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        text-align: center;
+        
     }
     
     /* Style dla harmonogramu */
@@ -763,6 +805,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        border-right: 1px solid rgba(var(--border-color-rgb, 102, 102, 102), 0.3);
     }
     
     .harmonogram .btn-toggle {
@@ -772,6 +815,11 @@
         margin-bottom: 25px;
         position: relative;
         color: var(--primary-text);
+    }
+
+    .harmonogram th:last-child,
+    .harmonogram td:last-child {
+        border-right: none;
     }
     
     .btn-toggle {
@@ -831,9 +879,9 @@
     }
     
     #generatePdfBtn {
-        position: absolute;
-        top: 0;
-        right: 10px;
+        display: block;
+        margin: 0 0 15px auto; 
+        padding: 6px 15px;
     }
     
     /* Pola dla zmiennych stóp */
@@ -903,18 +951,310 @@
     #harmonogramContent {
         display: block;
     }
+
+    .calculator-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
     
-    /* Responsywność */
+    /* Tablet (max 768px) */
     @media (max-width: 768px) {
-        .form-group,
-        .input-group {
+        .calculator-container {
+            flex-direction: column;
+            padding: 15px;
             width: 100%;
             max-width: none;
+            box-sizing: border-box;
+        }
+    
+        .harmonogram-container {
+            width: 98%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+    
+        .harmonogram-chart-wrapper {
+            width: 98%;
+            max-width: none;
+            margin: 0 auto;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+    
+        .harmonogram {
+            width: 98%;
+            margin: 0 auto;
+        }
+    
+        .harmonogram table {
+            font-size: 0.6em; /* Bazowa, nadpisywana w th/td */
+            width: 98%;
+            max-width: 100%;
+            margin: 0 auto;
+            table-layout: auto;
+        }
+    
+        .harmonogram th {
+            padding: clamp(1px, 0.25vw, 2.5px);
+            font-size: clamp(0.4em, 1.2vw, 1.25em); /* Minimalnie mniejsza na dole zakresu */
+            white-space: normal;
+            word-break: normal;
+        }
+    
+        .harmonogram td {
+            padding: clamp(1px, 0.25vw, 2.5px);
+            font-size: clamp(0.4em, 1.2vw, 1.25em); /* Minimalnie mniejsza na dole zakresu */
+            white-space: normal;
+            word-break: normal;
+        }
+    
+        .harmonogram-opis {
+            padding-left: 0.5em;
+        }
+    
+        .chart-container-line {
+            width: 98%;
+            max-width: 100%;
+            height: clamp(200px, 32vw, 300px); /* Skalowana wysokość */
+            margin: 0 auto;
+        }
+    
+        .chart-line {
+            width: 98%;
+            height: 100%;
+            font-size: clamp(0.5em, calc(1.2vw + 1px), 1.35em);
+        }
+    
+        .checkbox-label {
+            font-size: 0.7em;
+            justify-content: center;
+        }
+    }
+   
+    @media (max-width: 576px) {
+        .header-row h4,
+        .result-header h4 {
+            font-size: 1em;
+        }
+
+        .checkbox-label.header-checkbox {
+            top: -15px;
+            right: 5px;
+            font-size: 0.6em;
+        }
+    
+        .summary-footer {
+            flex-direction: column;
+            gap: 5px;
+            text-align: center;
+        }
+    
+        .summary-footer .highlight {
+            display: block;
+            width: 180px;
+            max-width: 100%;
+            margin: 2px auto;
+            font-size: 0.7em;
+            padding: 3px 5px;
+        }
+    
+        .form-row,
+        .checkbox-row,
+        .fields-wrapper,
+        .variable-inputs-wrapper {
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+    
+        .form-group,
+        .input-group,
+        #dynamicRateGroup {
+            width: 200px;
+            max-width: 200px;
+            min-width: 200px;
+            margin: 2px auto;
+        }
+    
+        .input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        .form-control,
+        .form-select {
+            font-size: 0.75em;
+            height: 26px;
+            width: 130px;
+            padding: 4px 8px;
+            line-height: 20px;
+        }
+    
+        .input-group-text {
+            font-size: 0.75em;
+            height: 26px;
+            width: 70px;
+            padding: 4px 8px;
+            line-height: 20px;
+            text-align: center;
+        }
+    
+        #typObligacji.form-control {
+            text-align: center;
+            text-align-last: center;
+            width: 200px;
+            height: 26px;
+        }
+    
+        .variable-input-group .input-group {
+            max-width: 200px;
+            min-width: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        .variable-input-group .form-group {
+            width: 200px;
+            max-width: 200px;
+            min-width: 200px;
+            margin: 2px auto;
+        }
+    
+        .variable-input-group .form-control {
+            width: 130px;
+            height: 26px;
+            font-size: 0.75em;
+            padding: 4px 8px;
+            line-height: 20px;
+        }
+    
+        .variable-input-group .input-group-text {
+            width: 70px;
+            height: 26px;
+            font-size: 0.75em;
+            padding: 4px 8px;
+            line-height: 20px;
+        }
+    
+        .variable-input-group .fields-wrapper {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 200px;
+            min-width: 200px;
+            gap: 2px;
+        }
+    
+        .variable-input-group .form-group:nth-child(1) .input-group {
+            width: 200px;
+            max-width: 200px;
+            min-width: 200px;
+        }
+    
+        .variable-input-group .form-group:nth-child(1) .form-control {
+            width: 130px;
+        }
+    
+        .variable-input-group .form-group:nth-child(2) .input-group {
+            width: 200px;
+            max-width: 200px;
+            min-width: 200px;
+        }
+    
+        .variable-input-group .form-group:nth-child(2) .form-control {
+            width: 130px;
+        }
+    
+        .checkbox-label {
+            font-size: 0.65em;
+            justify-content: center;
+        }
+    
+        .harmonogram-container {
+            width: 98vw;
+            max-width: none;
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    
+        .harmonogram-chart-wrapper {
+            width: 100%;
+            max-width: none;
+            margin: 0 auto;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+    
+        .harmonogram {
+            overflow-x: auto;
+            width: 100%;
+        }
+    
+        .harmonogram table {
+            font-size: 0.6em;
+            max-width: none;
+            width: auto;
+            min-width: 100%;
+        }
+    
+        .harmonogram th {
+            padding: 4px;
+            font-size: 0.6em;
+            white-space: normal;
+            width: auto;
+        }
+    
+        .harmonogram td {
+            padding: 4px;
+            font-size: 0.6em;
+            white-space: nowrap;
+            width: auto;
+        }
+    
+        .harmonogram-opis {
+            padding-left: 0.9em;
+        }
+    
+        .btn-primary {
+            display: block;
+            width: auto;
+            margin: 2.5px auto;
+            padding: 6px 10px;
+        }
+    
+        #addVariableBtn {
+            display: block;
+            width: auto;
+            margin: 2.5px auto;
+            padding: 6px 10px;
+        }
+    
+        #generatePdfBtn {
+            display: block;
+            width: auto;
+            margin: 2.5px 0 2.5px auto;
+            padding: 6px 10px;
         }
     
         .chart-container {
             flex-direction: column;
             align-items: center;
+            gap: 10px;
         }
     
         .chart {
@@ -925,41 +1265,273 @@
         .chart-legend {
             max-width: 100%;
             align-items: center;
+            margin-top: 10px;
+        }
+    
+        .chart-legend .legend-item {
+            width: 100%;
+            max-width: 200px;
+            justify-content: flex-start;
+            padding-left: 0;
+        }
+    
+        .chart-legend .legend-text {
+            font-size: 12px;
         }
     
         .chart-container-line {
-            height: 300px;
+            width: 100%;
+            max-width: 100%;
+            height: 250px;
+            margin: 0 auto;
         }
     
-        .harmonogram table {
-            font-size: 0.7em;
-        }
-    
-        .harmonogram th,
-        .harmonogram td {
-            padding: 8px;
-        }
-    
-        .harmonogram-opis {
-            padding-left: 1em;
+        .chart-line {
+            width: 100%;
+            height: 100%;
+            font-size: 0.65em;
         }
     }
     
-    @media (max-width: 576px) {
-        .header-row h4,
-        .result-header h4 {
-            font-size: 1em;
+    /* Mobile (max 480px) */
+    @media (max-width: 480px) {
+        body {
+            margin: 0;
+            padding: 0;
         }
     
-        .checkbox-label.header-checkbox {
-            top: -15px;
-            right: 5px;
-            font-size: 0.6em;
+        .calculator-container {
+            padding: 10px;
+        }
+    
+        .form-row,
+        .checkbox-row,
+        .fields-wrapper,
+        .variable-inputs-wrapper {
+            display: block;
+            text-align: center;
+        }
+    
+        .form-group,
+        #dynamicRateGroup {
+            display: block;
+            width: 200px;
+            max-width: 200px;
+            min-width: 200px;
+            margin: 10px auto;
+        }
+    
+        .input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 200px;
+            margin: 0 auto;
+        }
+    
+        .form-control,
+        .form-select {
+            font-size: 0.9em;
+            height: 28px;
+            width: 130px;
+            padding: 4px 8px;
+            line-height: 20px;
+        }
+    
+        .input-group-text {
+            font-size: 0.9em;
+            height: 28px;
+            width: 70px;
+            padding: 4px 8px;
+            line-height: 20px;
+            text-align: center;
+        }
+    
+        .form-range {
+            display: block;
+            height: 8px;
+            width: 200px;
+            margin: 5px auto 0;
+        }
+    
+        .form-range::-webkit-slider-thumb,
+        .form-range::-moz-range-thumb,
+        .form-range::-ms-thumb {
+            width: 14px;
+            height: 14px;
+        }
+    
+        .variable-rate-container {
+            text-align: center;
+        }
+    
+        .variable-inputs {
+            display: block;
+        }
+    
+        .variable-input-group {
+            display: block;
+            width: 200px;
+            margin: 15px auto;
+        }
+    
+        .variable-input-group .fields-wrapper {
+            display: block;
+            width: 200px;
+        }
+    
+        .variable-input-group .form-group {
+            display: block;
+            width: 200px;
+            max-width: 200px;
+            min-width: 200px;
+            margin: 10px auto;
+        }
+    
+        .variable-input-group .input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 200px;
+            margin: 0 auto;
+        }
+    
+        .variable-input-group .form-control {
+            width: 130px;
+            height: 28px;
+            font-size: 0.9em;
+            padding: 4px 8px;
+            line-height: 20px;
+        }
+    
+        .variable-input-group .input-group-text {
+            width: 70px;
+            height: 28px;
+            font-size: 0.9em;
+            padding: 4px 8px;
+            line-height: 20px;
+        }
+    
+        .variable-input-group .form-range {
+            width: 200px;
+            margin: 5px auto 0;
+        }
+    
+        #typObligacji.form-control {
+            text-align: center;
+            text-align-last: center;
+            width: 200px;
+            height: 28px;
+        }
+    
+        .checkbox-label {
+            display: flex;
+            justify-content: center;
+            font-size: 0.65em;
+            margin: 10px 0;
+        }
+    
+        .btn-primary {
+            display: block;
+            width: auto;
+            margin: 20px auto;
+            padding: 6px 15px;
+        }
+    
+        #addVariableBtn {
+            display: block;
+            width: auto;
+            margin: 20px auto;
+            padding: 6px 15px;
+        }
+    
+        #generatePdfBtn {
+            display: block;
+            width: auto;
+            margin: 20px 0 20px auto;
+            padding: 6px 15px;
+        }
+    
+        .logo-container {
+            display: flex !important;
+            justify-content: flex-start !important;
+            text-align: left !important;
+            flex-wrap: wrap;
+        }
+    
+        .logo,
+        #siteLogo {
+            margin: 0 !important;
+            padding: 10px 0;
+            max-width: 150px;
+        }
+    
+        .zoom-controls {
+            position: static;
+            transform: none;
+            margin-left: auto;
         }
     
         .summary-footer {
-            flex-direction: column;
-            gap: 10px;
+            display: block;
+            text-align: center;
+        }
+    
+        .summary-footer .highlight {
+            display: block;
+            width: 180px;
+            margin: 10px auto;
+            font-size: 0.7em;
+            padding: 3px 5px;
+        }
+    
+        .harmonogram-container {
+            width: 98vw;
+            max-width: none;
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    
+        .harmonogram-chart-wrapperHardk {
+            width: 100%;
+            max-width: none;
+            margin: 0 auto;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+    
+        .harmonogram {
+            overflow-x: auto;
+            width: 100%;
+        }
+    
+        .harmonogram table {
+            font-size: 0.55em;
+            max-width: none;
+            width: auto;
+            min-width: 100%;
+        }
+    
+        .harmonogram th {
+            padding: 1px;
+            font-size: 0.6em;
+            white-space: normal;
+        }
+    
+        .harmonogram td {
+            padding: 1px;
+            font-size: 0.55em;
+            white-space: normal;
+        }
+    
+        .chart-container-line {
+            width: 100%;
+            max-width: 100%;
+            height: 250px;
         }
     }
 </style>
@@ -975,11 +1547,6 @@
     <div class="form-section" id="formSection">
         <div class="header-row">
             <h4>Kalkulator Obligacji Skarbu Państwa</h4>
-            <label class="checkbox-label header-checkbox" for="ikeIkzeBtn">
-                <input type="checkbox" id="ikeIkzeBtn">
-                <span class="checkbox-custom"></span>
-                <b>Inwestycje w IKE lub IKZE</b>
-            </label>
         </div>
         <div class="form-container">
             <div class="form-wrapper">
@@ -1036,6 +1603,15 @@
                             <div class="sub-info" id="oprocentowanieInfo"></div>
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div id="ikeIkzeContainer" style="display: none;">
+                            <label class="checkbox-label" for="ikeIkzeBtn">
+                                <input type="checkbox" id="ikeIkzeBtn">
+                                <span class="checkbox-custom"></span>
+                                <b>Inwestycje w IKE lub IKZE</b>
+                            </label>
+                        </div>
+                    </div>
                     <div class="variable-rate-container">
                         <div class="checkbox-row" id="variableCheckboxRow">
                             <label class="checkbox-label" id="inflacjaZmiennaLabel" for="inflacjaZmiennaBtn" style="display: none;">
@@ -1068,9 +1644,9 @@
         </div>
     </div>
     <div class="result-section" id="resultSection">
+        <button id="generatePdfBtn" class="btn btn-primary btn-sm" aria-label="Generuj PDF z wynikami">Generuj PDF</button>
         <div class="result-header">
             <h4 id="resultHeader">Podsumowanie wyników</h4>
-            <button id="generatePdfBtn" class="btn btn-primary btn-sm" aria-label="Generuj PDF z wynikami">Generuj PDF</button>
         </div>
         <button class="btn btn-secondary mb-3" onclick="showForm()" aria-label="Powrót do edycji formularza">Powrót do edycji</button>
         <div class="result-container">
@@ -1100,9 +1676,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="summary-footer">
-                    <span class="highlight yellow" data-hover="3 miesięcy">Okres inwestycji: <span id="okresInwestycji">-</span> </span>
-                    <span class="highlight green" data-hover="">Zysk netto: <span id="zyskNetto">-</span> </span>
+               <div class="summary-footer">
+                    <span class="highlight yellow" data-hover="3 miesięcy" id="okresInwestycji">-</span>
+                    <span class="highlight green" data-hover="" id="zyskNetto">-</span>
                 </div>
                 <div class="obligacje-opis" id="obligacjeOpisPodsumowanie"></div>
             </div>
@@ -1286,13 +1862,6 @@
         elements.dynamicRateRange.step = step;
         elements.dynamicRate.max = max;
         elements.dynamicRateRange.max = max;
-    
-        // Aktualizacja sub-info
-        /*if (dynamicRateInfo) {
-            dynamicRateInfo.textContent = `Min: 0%, Max: ${max}%`;
-        } else {
-            console.warn("Element #dynamicRateInfo nie znaleziony.");
-        }*/
     }
 
     function updateDynamicRateField() {
@@ -1343,15 +1912,12 @@
             const stopaRefValue = state.lastFormData.dynamicRates[typ] || 5.75;
             setDynamicRateField("Stopa Ref. NBP", stopaRefValue, "0.05", "20");
             dynamicRateGroup.style.display = "flex";
-            console.log(`Pokazuję dynamicRateGroup dla typu ${typ}`); // Logowanie
         } else if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
             const inflacjaValue = state.lastFormData.dynamicRates[typ] || 4.90;
             setDynamicRateField("Inflacja", inflacjaValue, "0.1", "50");
             dynamicRateGroup.style.display = "flex";
-            console.log(`Pokazuję dynamicRateGroup dla typu ${typ}`); // Logowanie
         } else {
             dynamicRateGroup.style.display = "none";
-            console.log(`Ukrywam dynamicRateGroup dla typu ${typ}`); // Logowanie
         }
     
         document.getElementById("inflacjaZmiennaLabel").style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
@@ -1373,6 +1939,18 @@
         } else if (elements.stopaZmiennaBtn.checked && state.variableReferenceRates.length === 0) {
             const defaultValue = state.lastFormData.dynamicRates[typ] || 5.75;
             state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
+        }
+    
+        // Logika widoczności checkboxa IKE/IKZE
+        const ikeIkzeContainer = document.getElementById("ikeIkzeContainer");
+        const allowedTypes = ["ROR", "DOR", "TOS", "COI", "EDO"];
+        if (allowedTypes.includes(typ)) {
+            ikeIkzeContainer.style.display = "block";
+        } else {
+            ikeIkzeContainer.style.display = "none";
+            elements.ikeIkzeBtn.checked = false; // Odznaczamy checkbox
+            state.isIkeIkzeMode = false; // Resetujemy stan
+            state.lastFormData.ikeIkze = false; // Aktualizujemy zapisany stan
         }
     
         updateVariableInputs();
@@ -1892,13 +2470,13 @@
         document.querySelector('#legendPodatek').setAttribute('data-tooltip', 'Podatek');
     
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
-        const okresInwestycji = document.getElementById("okresInwestycji");
-        if (okresInwestycji) okresInwestycji.textContent = `${miesiace} ${jednostkaOkresu}`;
+        const okresInwestycjiSpan = document.querySelector('.summary-footer .highlight.yellow');
+        if (okresInwestycjiSpan) okresInwestycjiSpan.textContent = `Okres inwestycji: ${miesiace} ${jednostkaOkresu}`;
         const highlightYellow = document.querySelector('.result-wrapper-chart .highlight.yellow');
         if (highlightYellow) highlightYellow.setAttribute('data-hover', `${miesiace} ${jednostkaOkresu}`);
     
-        const zyskNetto = document.getElementById("zyskNetto");
-        if (zyskNetto) zyskNetto.textContent = `${zyskNettoCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
+        const zyskNettoSpan = document.querySelector('.summary-footer .highlight.green');
+        if (zyskNettoSpan) zyskNettoSpan.textContent = `Zysk netto: ${zyskNettoCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`;
         const highlightGreen = document.querySelector('.result-wrapper-chart .highlight.green');
         if (highlightGreen) highlightGreen.setAttribute('data-hover', `${zyskNettoCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł`);
     
@@ -1968,7 +2546,7 @@
                     <tr>
                         <td>${wiersz.okres}</td>
                         <td>${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
-                        <td>${wiersz.changeApplied ? '<span class="star">★</span> ' : ''}${wiersz.oprocentowanieNaCykl}</td>
+                        <td>${wiersz.changeApplied ? '<span class="star">★</span>' : ''}${wiersz.oprocentowanieNaCykl}</td>
                         <td>${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
                         <td>${state.isIkeIkzeMode ? "0,00 zł***" : parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}</td>
@@ -1976,7 +2554,7 @@
                         <td>${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł**</td>
                 `;
                 if (!["OTS", "TOS"].includes(typ)) {
-                    rowHTML += `<td>${wiersz.changeApplied ? '<span class="star">★</span> ' : ''}${wiersz.stopaRefLubInflacja}</td>`;
+                    rowHTML += `<td>${wiersz.changeApplied ? '<span class="star">★</span>' : ''}${wiersz.stopaRefLubInflacja}</td>`;
                 }
                 rowHTML += `
                         <td>${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł</td>
@@ -1989,8 +2567,8 @@
         const harmonogramOpis = document.getElementById("harmonogramOpis");
         if (harmonogramOpis) {
             const hasStar = state.harmonogramData.some(wiersz => wiersz.changeApplied);
-            const starText = hasStar ? '<span class="star">★</span> Zmiana oprocentowania.<br>' : "";
-            const baseText = "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.";
+            const starText = hasStar ? '<span class="star">★</span><strong> Zmiana oprocentowania.</strong><br>' : "";
+            const baseText = "** <strong>Opłata maksymalna za wcześniejszy wykup</strong>, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym wypadku opłata będzie do wartości narosłych odsetek.";
             const ikeIkzeText = state.isIkeIkzeMode ? "<br>*** Podatek wyniesie <strong>0 zł</strong> po osiągnięciu <strong>wieku emerytalnego</strong> i <strong>55 roku życia</strong> lub <strong>60 roku życia</strong> w przypadku <strong>IKE</strong> oraz <strong>10 % zryczałtowanego podatku</strong> po osiągnięciu <strong>65 roku życia</strong> w przypadku <strong>IKZE</strong>." : "";
             harmonogramOpis.innerHTML = `${starText}${baseText}${ikeIkzeText}`;
             harmonogramOpis.style.display = "block";
@@ -2006,6 +2584,13 @@
     
         const ctxLine = elements.obligacjeChartLine.getContext("2d");
         const isDarkMode = document.body.classList.contains('dark-mode');
+        
+        // Dynamiczne ustawienie rozmiaru czcionek w zależności od szerokości ekranu
+        const screenWidth = window.innerWidth;
+        const titleFontSize = screenWidth <= 480 ? 10 : screenWidth <= 768 ? 12 : 14; // Mobile: 10px, Tablet: 12px, Desktop: 14px
+        const tickFontSize = screenWidth <= 480 ? 8 : screenWidth <= 768 ? 10 : 12;  // Mobile: 8px, Tablet: 10px, Desktop: 12px
+        const legendFontSize = screenWidth <= 480 ? 8 : screenWidth <= 768 ? 10 : 12; // Mobile: 8px, Tablet: 10px, Desktop: 12px
+        
         state.chartLine = new Chart(ctxLine, {
             type: 'line',
             data: {
@@ -2039,15 +2624,19 @@
                         title: { 
                             display: true, 
                             text: ["OTS", "ROR", "DOR"].includes(typ) ? 'Okres (miesiące)' : 'Okres (lata)', 
-                            font: { size: 14 },
+                            font: { size: titleFontSize }, // Dynamiczny rozmiar
                             color: isDarkMode ? '#e0e0e0' : '#333333'
                         }, 
                         ticks: { 
-                            font: { size: 12 },
-                            color: isDarkMode ? '#e0e0e0' : '#333333'
+                            font: { size: tickFontSize }, // Dynamiczny rozmiar
+                            color: isDarkMode ? '#e0e0e0' : '#333333',
+                            maxRotation: 45, // Obrót etykiet dla małych ekranów
+                            minRotation: 0,
+                            autoSkip: true, // Automatyczne pomijanie etykiet
+                            maxTicksLimit: 10 // Ograniczenie liczby etykiet
                         },
                         grid: {
-                            color: isDarkMode ? '#333333' : '#e0e0e0', // Zmieniamy kolor siatki w trybie ciemnym na jaśniejszy
+                            color: isDarkMode ? '#333333' : '#e0e0e0',
                             borderColor: isDarkMode ? '#333333' : '#333333'
                         }
                     },
@@ -2055,18 +2644,18 @@
                         title: { 
                             display: true, 
                             text: 'Wartość (PLN)', 
-                            font: { size: 14 },
+                            font: { size: titleFontSize }, // Dynamiczny rozmiar
                             color: isDarkMode ? '#e0e0e0' : '#333333'
                         }, 
                         min: yMin, 
                         max: yMax, 
                         ticks: { 
                             stepSize: stepSize, 
-                            font: { size: 12 },
+                            font: { size: tickFontSize }, // Dynamiczny rozmiar
                             color: isDarkMode ? '#e0e0e0' : '#333333'
                         },
                         grid: {
-                            color: isDarkMode ? '#333333' : '#e0e0e0', // Zmieniamy kolor siatki w trybie ciemnym na jaśniejszy
+                            color: isDarkMode ? '#333333' : '#e0e0e0',
                             borderColor: isDarkMode ? '#333333' : '#333333'
                         }
                     }
@@ -2074,7 +2663,7 @@
                 plugins: { 
                     legend: { 
                         labels: { 
-                            font: { size: 12 },
+                            font: { size: legendFontSize }, // Dynamiczny rozmiar
                             color: isDarkMode ? '#e0e0e0' : '#333333'
                         } 
                     } 
@@ -2123,44 +2712,73 @@
         const zyskNetto = document.getElementById("zyskNetto");
     
         const typ = state.lastFormData.typObligacji;
+        if (!typ) {
+            console.error("Brak typu obligacji w state.lastFormData.typObligacji");
+            alert("Błąd: Brak typu obligacji.");
+            return;
+        }
+    
         const nazwaObligacji = nazwyObligacji[typ];
         const headerText = `Wynik inwestycji dla obligacji ${nazwaObligacji}${state.isIkeIkzeMode ? " (IKE/IKZE)" : ""}*`;
         const opis = opisyObligacji[typ] || "";
         const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
         const today = new Date().toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
     
+        const parseNumber = (text) => {
+            const cleaned = text.replace(/[^\d,.]/g, "").replace(",", ".");
+            const number = parseFloat(cleaned);
+            return isNaN(number) ? 0 : number;
+        };
+    
         const summary = [
             `Kapitał: ${parseFloat(state.lastFormData.kwota).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-            `Odsetki: ${parseFloat(valueOdsetki.textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-            `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : parseFloat(valuePodatek.textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}`,
+            `Odsetki: ${parseNumber(valueOdsetki.textContent).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+            `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : parseNumber(valuePodatek.textContent).toLocaleString('pl-PL', { minimumFractionDigits: 2 }) + " zł"}`,
             `Okres inwestycji: ${state.lastFormData.okres} ${jednostkaOkresu}`,
-            `Zysk netto: ${parseFloat(zyskNetto.textContent.replace(/[^\d,.]/g, "").replace(",", ".")).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
+            `Zysk netto: ${parseNumber(zyskNetto.textContent).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`
         ];
     
-        const headers = ["OTS", "ROR", "DOR"].includes(typ) ?
-            ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Stopa Ref. NBP", "Suma netto"] :
-            ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
+        const headers = ["OTS", "ROR", "DOR"].includes(typ)
+            ? ["Miesiąc", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Stopa Ref. NBP", "Suma netto"]
+            : ["Rok", "Wartość inwestycji", "Oproc.", "Odsetki", "Suma odsetek", "Podatek", state.isIkeIkzeMode ? "Zysk" : "Zysk netto", "Opłata za wykup", "Inflacja", "Suma netto"];
         if (["OTS", "TOS"].includes(typ)) headers.splice(8, 1);
+    
+        const safeParseFloat = (value) => isNaN(parseFloat(value)) ? 0 : parseFloat(value);
     
         const tableData = state.harmonogramData.map(wiersz => {
             const row = [
-                wiersz.okres.toString(),
-                `${parseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                wiersz.oprocentowanieNaCykl + (wiersz.changeApplied ? ' ★' : ''),
-                `${parseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `${parseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                state.isIkeIkzeMode ? "0,00 zł***" : `${parseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `${parseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
-                `${parseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł**`
+                (wiersz.okres || 0).toString(),
+                `${safeParseFloat(wiersz.wartoscInwestycji).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                `${wiersz.changeApplied ? '★ ' : ''}${wiersz.oprocentowanieNaCykl || '0%'}`,
+                `${safeParseFloat(wiersz.odsetkiBrutto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                `${safeParseFloat(wiersz.skumulowaneOdsetki).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                state.isIkeIkzeMode ? "0,00 zł***" : `${safeParseFloat(wiersz.podatek).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                `${safeParseFloat(wiersz.zyskNetto).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`,
+                `${safeParseFloat(wiersz.oplataZaWykup).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł**`
             ];
-            if (!["OTS", "TOS"].includes(typ)) row.push(wiersz.stopaRefLubInflacja + (wiersz.changeApplied ? ' ★' : ''));
-            row.push(`${parseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
+            if (!["OTS", "TOS"].includes(typ)) {
+                row.push(`${wiersz.changeApplied ? '★ ' : ''}${wiersz.stopaRefLubInflacja || '0%'}`);
+            }
+            row.push(`${safeParseFloat(wiersz.kwotaPoZakonczeniuCyklu).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł`);
             return row;
         });
     
+        const calculateColumnWidths = () => {
+            const allRows = [headers, ...tableData];
+            const columnWidths = headers.map((_, colIndex) => {
+                const maxLength = Math.max(
+                    ...allRows.map(row => row[colIndex] ? row[colIndex].length : 0)
+                );
+                const baseWidth = maxLength * 4;
+                return Math.min(Math.max(baseWidth, 30), 100);
+            });
+    
+            return columnWidths;
+        };
+    
+        const columnWidths = calculateColumnWidths();
         const lineChartCanvas = document.getElementById("obligacjeChartLine");
     
-        // Zapamiętujemy oryginalne kolory wykresu
         const originalColors = {
             xGridColor: state.chartLine.options.scales.x.grid.color,
             yGridColor: state.chartLine.options.scales.y.grid.color,
@@ -2173,40 +2791,20 @@
             legendColor: state.chartLine.options.plugins.legend.labels.color
         };
     
-        // Ustawiamy kolory na wartości trybu jasnego, niezależnie od trybu
-        state.chartLine.options.scales.x.grid.color = '#e0e0e0'; // Siatka w trybie jasnym
-        state.chartLine.options.scales.y.grid.color = '#e0e0e0'; // Siatka w trybie jasnym
-        state.chartLine.options.scales.x.grid.borderColor = '#333333'; // Krawędź osi w trybie jasnym
-        state.chartLine.options.scales.y.grid.borderColor = '#333333'; // Krawędź osi w trybie jasnym
-        state.chartLine.options.scales.x.title.color = '#333333'; // Kolor tytułu osi X w trybie jasnym
-        state.chartLine.options.scales.y.title.color = '#333333'; // Kolor tytułu osi Y w trybie jasnym
-        state.chartLine.options.scales.x.ticks.color = '#333333'; // Kolor etykiet osi X w trybie jasnym
-        state.chartLine.options.scales.y.ticks.color = '#333333'; // Kolor etykiet osi Y w trybie jasnym
-        state.chartLine.options.plugins.legend.labels.color = '#333333'; // Kolor legendy w trybie jasnym
-    
-        // Debugowanie: Sprawdzamy, czy kolory zostały poprawnie ustawione
-        console.log("Kolory przed aktualizacją wykresu:", {
-            xGridColor: state.chartLine.options.scales.x.grid.color,
-            yGridColor: state.chartLine.options.scales.y.grid.color,
-            xTitleColor: state.chartLine.options.scales.x.title.color,
-            yTitleColor: state.chartLine.options.scales.y.title.color,
-            xTicksColor: state.chartLine.options.scales.x.ticks.color,
-            yTicksColor: state.chartLine.options.scales.y.ticks.color,
-            legendColor: state.chartLine.options.plugins.legend.labels.color
-        });
-    
-        // Aktualizujemy wykres, aby zastosować nowe kolory
+        state.chartLine.options.scales.x.grid.color = '#e0e0e0';
+        state.chartLine.options.scales.y.grid.color = '#e0e0e0';
+        state.chartLine.options.scales.x.grid.borderColor = '#333333';
+        state.chartLine.options.scales.y.grid.borderColor = '#333333';
+        state.chartLine.options.scales.x.title.color = '#333333';
+        state.chartLine.options.scales.y.title.color = '#333333';
+        state.chartLine.options.scales.x.ticks.color = '#333333';
+        state.chartLine.options.scales.y.ticks.color = '#333333';
+        state.chartLine.options.plugins.legend.labels.color = '#333333';
         state.chartLine.update();
     
-        // Dodajemy opóźnienie, aby upewnić się, że wykres jest w pełni wyrenderowany
-        setTimeout(() => {
-            // Generujemy obraz wykresu
+        requestAnimationFrame(() => {
             const lineChartImage = lineChartCanvas.toDataURL("image/png");
     
-            // Debugowanie: Sprawdzamy, czy obraz został wygenerowany
-            console.log("Wygenerowany obraz (pierwsze 50 znaków):", lineChartImage.substring(0, 50));
-    
-            // Przywracamy oryginalne kolory
             state.chartLine.options.scales.x.grid.color = originalColors.xGridColor;
             state.chartLine.options.scales.y.grid.color = originalColors.yGridColor;
             state.chartLine.options.scales.x.grid.borderColor = originalColors.xGridBorderColor;
@@ -2216,7 +2814,7 @@
             state.chartLine.options.scales.x.ticks.color = originalColors.xTicksColor;
             state.chartLine.options.scales.y.ticks.color = originalColors.yTicksColor;
             state.chartLine.options.plugins.legend.labels.color = originalColors.legendColor;
-            state.chartLine.update(); // Aktualizujemy wykres, aby przywrócić oryginalne kolory
+            state.chartLine.update();
     
             function getBase64ImageFromUrl(url) {
                 return new Promise((resolve, reject) => {
@@ -2238,14 +2836,14 @@
     
             const generateDoc = (logoBase64) => {
                 const hasStar = state.harmonogramData.some(wiersz => wiersz.changeApplied);
-                const starText = hasStar ? "★ - miejsce, w którym zmieniono oprocentowanie.\n" : "";
+                const starText = hasStar ? "★ Zmiana oprocentowania.\n" : "";
                 const baseText = "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym razie opłata będzie do wartości narosłych odsetek.";
                 const ikeIkzeText = state.isIkeIkzeMode ? "\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE." : "";
                 const footerNoteText = `${starText}${baseText}${ikeIkzeText}`;
     
                 const docDefinition = {
                     pageSize: 'A4',
-                    pageMargins: [20, 60, 20, 20],
+                    pageMargins: [14.17, 60, 14.17, 20],
                     defaultStyle: { font: 'Roboto' },
                     header: logoBase64 ? {
                         columns: [
@@ -2261,16 +2859,20 @@
                         {
                             table: {
                                 headerRows: 1,
-                                widths: headers.map(() => '*'),
+                                widths: columnWidths,
                                 body: [
-                                    headers.map(h => ({ text: h, style: 'tableHeader' })),
-                                    ...tableData.map(row => row.map(cell => ({ text: cell, style: 'tableCell' })))
+                                    headers.map(h => ({ text: h, style: 'tableHeader', noWrap: false })),
+                                    ...tableData.map(row => row.map(cell => ({ text: cell, style: 'tableCell', noWrap: false })))
                                 ]
                             },
                             layout: {
                                 fillColor: function (rowIndex) { return (rowIndex === 0) ? '#C2B280' : (rowIndex % 2 === 0 ? '#F5F5F5' : null); },
                                 hLineWidth: function () { return 0.5; },
-                                vLineWidth: function () { return 0.5; }
+                                vLineWidth: function () { return 0.5; },
+                                paddingLeft: function () { return 1; },
+                                paddingRight: function () { return 1; },
+                                paddingTop: function () { return 2; },
+                                paddingBottom: function () { return 2; }
                             },
                             margin: [0, 10, 0, 10]
                         },
@@ -2295,11 +2897,10 @@
             getBase64ImageFromUrl('cropped-logo-FB-1.png')
                 .then(logoBase64 => generateDoc(logoBase64))
                 .catch(error => {
-                    console.error("Błąd ładowania logo:", error);
-                    alert("Nie udało się załadować logo – PDF zostanie wygenerowany bez logo.");
+                    console.warn("Logo nie załadowane, generowanie PDF bez logo:", error);
                     generateDoc(null);
                 });
-        }, 100); // Opóźnienie 100ms, aby upewnić się, że wykres jest wyrenderowany
+        });
     }
 
     document.getElementById('siteLogo').addEventListener('click', () => {
