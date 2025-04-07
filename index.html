@@ -11,8 +11,194 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="logo-container">
+        <img src="cropped-logo-FB-1.png" id="siteLogo" alt="Finance Brothers Logo" class="logo d-block mx-auto">
+        <div class="zoom-controls">
+            <button id="zoomInBtn" class="btn btn-sm" aria-label="Powiększ">+</button>
+            <button id="zoomOutBtn" class="btn btn-sm" aria-label="Pomniejsz">-</button>
+            <button id="toggleDarkModeBtn" class="btn btn-sm" aria-label="Przełącz tryb ciemny">🌙</button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="form-section" id="formSection">
+            <div class="header-row">
+                <h4>Kalkulator Obligacji Skarbu Państwa</h4>
+            </div>
+            <div class="form-container">
+                <div class="form-wrapper">
+                    <form id="obligacjeForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="typObligacji" class="form-label">Typ obligacji*</label>
+                                <select class="form-control" id="typObligacji">
+                                    <option value="OTS" selected>3-miesięczne (OTS)</option>
+                                    <option value="ROR">12-miesięczne (ROR)</option>
+                                    <option value="DOR">24-miesięczne (DOR)</option>
+                                    <option value="TOS">3-letnie (TOS)</option>
+                                    <option value="COI">4-letnie (COI)</option>
+                                    <option value="EDO">10-letnie (EDO)</option>
+                                    <option value="ROS">6-letnie (ROS)</option>
+                                    <option value="ROD">12-letnie (ROD)</option>
+                                </select>
+                                <div class="sub-info"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="kwota" class="form-label">Kwota inwestycji</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="kwota" min="100" max="10000000" step="100" value="10000">
+                                    <span class="input-group-text">zł</span>
+                                </div>
+                                <input type="range" class="form-range" id="kwotaRange" min="100" max="10000000" step="100" value="10000">
+                                <div class="sub-info" id="iloscObligacji">Ilość obligacji: 100</div>
+                            </div>
+                            <div class="form-group" id="dynamicRateGroup">
+                                <label for="dynamicRate" class="form-label" id="dynamicRateLabel">Stopa Ref. NBP</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="dynamicRate" min="0" max="50" step="0.05" value="4.90">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <input type="range" class="form-range" id="dynamicRateRange" min="0" max="50" step="0.05" value="4.90">
+                                <div class="sub-info" id="dynamicRateInfo"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="okres" class="form-label">Okres inwestycji</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="okres" min="3" max="144" step="1" value="3" readonly>
+                                    <span class="input-group-text">mc-y</span>
+                                </div>
+                                <div class="sub-info" id="lata"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="oprocentowanie" class="form-label">Oprocentowanie</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="oprocentowanie" min="0.1" max="25" step="0.1" value="3" readonly>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="sub-info" id="oprocentowanieInfo"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div id="ikeIkzeContainer">
+                                <label class="checkbox-label" for="ikeIkzeBtn">
+                                    <input type="checkbox" id="ikeIkzeBtn">
+                                    <span class="checkbox-custom"></span>
+                                    <b>Inwestycje w IKE lub IKZE</b>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="variable-rate-container">
+                            <div class="checkbox-row" id="variableCheckboxRow">
+                                <label class="checkbox-label" id="inflacjaZmiennaLabel">
+                                    <input type="checkbox" id="inflacjaZmiennaBtn">
+                                    <span class="checkbox-custom"></span>
+                                    <b>Zmienna Inflacja</b>
+                                </label>
+                                <label class="checkbox-label" id="stopaZmiennaLabel">
+                                    <input type="checkbox" id="stopaZmiennaBtn">
+                                    <span class="checkbox-custom"></span>
+                                    <b>Zmienna Stopa Ref. NBP</b>
+                                </label>
+                            </div>
+                            <div class="variable-inputs" id="variableInputs">
+                                <div class="variable-inputs-wrapper" id="variableInputsWrapper"></div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="addVariableBtn" aria-label="Dodaj kolejne zmienne oprocentowanie">Dodaj kolejną zmianę</button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <button type="button" class="btn btn-primary" id="obliczBtn" aria-label="Oblicz wyniki inwestycji">Oblicz</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="opis-container">
+                <div class="obligacje-opis" id="obligacjeOpis"></div>
+            </div>
+            <div class="data-container">
+                <div class="data-info"><strong>Dane z dnia:</strong> <span class="data-date"><strong>01.04.2025r.</strong></span></div>
+            </div>
+        </div>
+        <div class="result-section" id="resultSection">
+            <button id="generatePdfBtn" class="btn btn-primary btn-sm" aria-label="Generuj PDF z wynikami">Generuj PDF</button>
+            <div class="result-header">
+                <h4 id="resultHeader">Podsumowanie wyników</h4>
+            </div>
+            <button class="btn btn-secondary mb-3" onclick="showForm()" aria-label="Powrót do edycji formularza">Powrót do edycji</button>
+            <div class="result-container">
+                <div class="result-wrapper-chart">
+                    <div class="chart-container">
+                        <div class="chart">
+                            <canvas id="obligacjeChart" aria-label="Wykres kołowy wyników inwestycji"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item" data-index="0">
+                                <div class="color-box" style="background-color: #28a745;" data-tooltip="" data-color="#28a745">
+                                    <span class="value" id="valueKapital">-</span>
+                                </div>
+                                <span class="legend-text" id="legendKapital">Kapitał</span>
+                            </div>
+                            <div class="legend-item" data-index="1">
+                                <div class="color-box" style="background-color: #007bff;" data-tooltip="" data-color="#007bff">
+                                    <span class="value" id="valueOdsetki">-</span>
+                                </div>
+                                <span class="legend-text" id="legendOdsetki">Odsetki</span>
+                            </div>
+                            <div class="legend-item" data-index="2">
+                                <div class="color-box" style="background-color: #dc3545;" data-tooltip="" data-color="#dc3545">
+                                    <span class="value" id="valuePodatek">-</span>
+                                </div>
+                                <span class="legend-text" id="legendPodatek">Podatek</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <span class="highlight yellow" data-hover="3 miesięcy" id="okresInwestycji">-</span>
+                        <span class="highlight green" data-hover="" id="zyskNetto">-</span>
+                    </div>
+                    <div class="obligacje-opis" id="obligacjeOpisPodsumowanie"></div>
+                </div>
+            </div>
+            <div class="harmonogram-container">
+                <div class="result-wrapper-harmonogram">
+                    <div class="harmonogram-chart-wrapper">
+                        <div class="harmonogram">
+                            <h5 class="btn-toggle" onclick="toggleHarmonogram('harmonogramContent')" aria-label="Przełącz widoczność harmonogramu odsetek">Harmonogram odsetek ▼</h5>
+                            <div id="harmonogramContent">
+                                <table class="table table-striped">
+                                    <thead id="harmonogramNaglowek">
+                                        <tr>
+                                            <th id="pierwszaKolumnaNaglowek">Rok</th>
+                                            <th>Wartość inwestycji</th>
+                                            <th>Oproc.</th>
+                                            <th>Odsetki</th>
+                                            <th>Suma odsetek</th>
+                                            <th>Podatek</th>
+                                            <th id="zyskKolumnaNaglowek">Zysk netto</th>
+                                            <th>Opłata za wykup</th>
+                                            <th id="kolumnaStopaInflacja">Inflacja</th>
+                                            <th>Suma netto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="harmonogramTabela"></tbody>
+                                </table>
+                                <div class="harmonogram-opis" id="harmonogramOpis"></div>
+                            </div>
+                        </div>
+                        <div class="chart-container-line">
+                            <div class="chart-line">
+                                <canvas id="obligacjeChartLine" aria-label="Wykres liniowy wartości inwestycji w czasie"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
 <style>
-    /* Zmienne CSS dla kolorów */
+    /* Z M I E N N E */
     :root {
         --primary-bg: #f5f6f5;
         --primary-text: #333333;
@@ -32,10 +218,10 @@
         --harmonogram-bg: #f9f9f9;
         --small-font-size: 0.7em;
         --border-radius: 5px;
-        --slider-thumb-color: #FFD700;
         --range-bg: #e5e5e5;
     }
-    
+
+    /* D A R K   M O D E */
     .dark-mode {
         --primary-bg: #2b2b2b;
         --primary-text: #e0e0e0;
@@ -51,18 +237,17 @@
         --input-group-bg: #666666;
         --range-track: #666666;
         --harmonogram-bg: #404040;
-        --slider-thumb-color: #FFD700;
         --range-bg: #333333;
         --accent-gradient-start-black: #a3945c;
     }
-    
-    /* Reset i style bazowe */
+
+    /* R E S E T   I   B A Z A */
     *,
     ::after,
     ::before {
         box-sizing: border-box;
     }
-    
+
     body {
         margin: 0;
         background-color: var(--primary-bg);
@@ -76,8 +261,8 @@
         -webkit-text-size-adjust: 100%;
         -webkit-tap-highlight-color: transparent;
     }
-    
-    /* Style dla kontenerów */
+
+    /* K O N T E N E R Y */
     .container,
     .container-fluid,
     .container-lg,
@@ -88,17 +273,27 @@
         --bs-gutter-x: 1.5rem;
         --bs-gutter-y: 0;
         width: 100%;
-        padding-right: calc(var(--bs-gutter-x) * 0.5);
-        padding-left: calc(var(--bs-gutter-x) * 0.5);
+        padding: 15px calc(var(--bs-gutter-x) * 0.5);
         margin: 30px auto 0;
         max-width: 1200px;
         background: var(--secondary-bg);
-        padding: 15px;
         border-radius: 10px;
-        box-shadow: 0 0 15px var(--shadow-color);
+        box-shadow: 0 4px 6px var(--shadow-color);
     }
-    
-    /* Logo i nagłówek */
+
+    .calculator-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: clamp(10px, 2vw, 20px);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* L O G O   I   N A G Ł Ó W E K */
     .logo-container {
         background-color: var(--logo-bg);
         padding: 15px;
@@ -118,7 +313,7 @@
         display: flex;
         gap: 5px;
     }
-    
+
     .logo,
     #siteLogo {
         max-width: 200px;
@@ -128,81 +323,67 @@
         margin-left: auto;
         margin-right: auto;
     }
-    
-    .header-row {
+
+    .header-row,
+    .result-header {
         display: flex;
         justify-content: center;
         align-items: center;
         margin-bottom: 15px;
         position: relative;
     }
-    
-    .header-row h4,
-    .result-header h4,
-    .result-wrapper-chart h5,
-    .result-wrapper-harmonogram h5 {
-        font-weight: 700;
-        margin: 0;
-        text-align: center;
-    }
-    
+
     .header-row h4,
     .result-header h4 {
+        font-weight: 700;
         font-size: 1.2em;
         flex: 1;
         text-align: center;
+        margin: 0;
     }
-    
+
     .result-wrapper-chart h5,
     .result-wrapper-harmonogram h5 {
+        font-weight: 700;
         font-size: 1em;
         margin-bottom: 10px;
+        text-align: center;
     }
-    
-    .result-header {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 20px;
-        position: relative;
-    }
-    
-    /* Style dla checkboxów */
+
+    /* C H E C K B O X Y */
     .checkbox-label {
         display: flex;
         align-items: center;
-        font-size: clamp(0.65em, 1vw, var(--small-font-size)); /* Skalowalna czcionka */
+        font-size: clamp(0.65em, 1vw, var(--small-font-size));
         cursor: pointer;
         position: relative;
-        margin-bottom: 10px;
         margin: 5px 0;
         justify-content: center;
     }
-    
+
     .checkbox-label input {
         position: absolute;
         opacity: 0;
         width: 0;
         height: 0;
     }
-    
+
     .checkbox-custom {
         width: 16px;
         height: 16px;
         border: 2px solid var(--border-color);
         background-color: var(--input-bg);
         margin-right: 5px;
-        display: inline-block;
-        position: relative;
         border-radius: 4px;
         transition: all 0.2s ease;
+        position: relative;
     }
-    
+
     .checkbox-label input:checked + .checkbox-custom {
         background-color: var(--accent-color);
         border-color: var(--accent-color);
     }
-    
+
     .checkbox-custom::after {
         content: "✔";
         position: absolute;
@@ -214,31 +395,31 @@
         opacity: 0;
         transition: opacity 0.2s ease;
     }
-    
+
     .checkbox-label input:checked + .checkbox-custom::after {
         opacity: 1;
     }
-    
+
     .checkbox-label.header-checkbox {
         position: static;
         top: auto;
         right: auto;
     }
-    
-    /* Style dla formularzy i sekcji wyników */
+
+    /* F O R M U L A R Z E   I   W Y N I K I */
     .form-section {
         display: block;
         padding: 10px;
         position: relative;
     }
-    
+
     .result-section {
         display: none;
         padding: 10px;
         max-width: 1200px;
         margin: 0 auto;
     }
-    
+
     .form-row,
     .checkbox-row,
     .fields-wrapper {
@@ -250,7 +431,7 @@
         flex-wrap: wrap;
         text-align: left;
     }
-    
+
     .form-group {
         flex: 1;
         min-width: 120px;
@@ -260,20 +441,20 @@
         align-items: center;
         justify-content: flex-start;
     }
-    
+
     #obligacjeForm .form-row:first-child {
         margin-bottom: 30px;
     }
-    
+
     #dynamicRateGroup {
-        width: 150px; 
-        min-width: 150px; 
+        width: 150px;
+        min-width: 150px;
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
-        margin-right: 15px; 
+        margin-right: 15px;
     }
-    
+
     .form-label,
     .variable-input-group .form-label {
         font-size: var(--small-font-size);
@@ -282,11 +463,9 @@
         text-align: left;
         width: 100%;
     }
-    
+
     .form-control,
-    .form-select,
-    .input-group-text,
-    .variable-input-group .form-control {
+    .form-select {
         height: 22px;
         font-size: var(--small-font-size);
         padding: 2px;
@@ -302,140 +481,91 @@
         justify-content: center;
     }
 
-    input.form-control:focus,
-    select.form-select:focus {
-        outline: none !important;
-        box-shadow: none !important;
-        border-color: var(--border-color) !important;
-        background: var(--input-bg) !important;
-        color: var(--primary-text) !important;
-    }
-    
-    input.form-control:active,
-    input.form-control:focus-visible,
-    select.form-select:active,
-    select.form-select:focus-visible {
-        outline: none !important;
-        box-shadow: none !important;
-        border-color: var(--border-color) !important;
-        background: var(--input-bg) !important;
-        color: var(--primary-text) !important;
-    }
-    
     .form-control:focus,
-    .form-select:focus,
-    .form-range:focus {
+    .form-select:focus {
         outline: none !important;
+        box-shadow: 0 0 4px var(--accent-color);
+        border-color: var(--border-color);
         background: var(--input-bg);
         color: var(--primary-text);
     }
-    
-    .form-range:focus::-webkit-slider-runnable-track {
-        background: var(--input-group-bg) !important;
-        box-shadow: none !important;
-    }
-    .form-range:focus::-moz-range-track {
-        background: var(--input-group-bg) !important;
-        box-shadow: none !important;
-    }
-    .form-range:focus::-ms-track {
-        background: var(--input-group-bg) !important;
-        box-shadow: none !important;
-    }
-    
-    .form-range:focus::-webkit-slider-thumb {
-        background: var(--accent-color);
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    .form-range:focus::-moz-range-thumb {
-        background: var(--accent-color);
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    .form-range:focus::-ms-thumb {
-        background: var(--accent-color);
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    
-    .form-control:focus,
-    .form-select:focus {
-        box-shadow: 0 0 4px var(--accent-color);
-    }
-    
+
     .input-group-text {
-        background: var(--input-group-bg);
+        height: 22px;
+        font-size: var(--small-font-size);
         padding: 2px 5px;
+        text-align: center;
+        background: var(--input-group-bg);
+        color: var(--primary-text);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        box-sizing: border-box;
+        line-height: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
-    
+
     .input-group {
         width: 150px;
         display: flex;
         justify-content: center;
     }
-    
+
     .form-select {
         max-width: 100px;
         appearance: none;
         background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQ0lEQVR42mNgwAfKy8Q/Y//+Ii//3jVAYQzsIFyQ0dOaWq992zxcnN5+9NmyZACV40DmGhPZtzwUAxhUaoLntdha0DqQbtz4E9DzN6XgI0P2VYFlQrUwoQDIgbChLE/0awXiwV5rhugPX6A8BSsYFDqU+rEFdkGZA7+G9HMqaAU6l+0w+NdJD7ADhzhR/4KDZnWOw0QKrVqYc1G+1Dczfx8DR0uv+QJqDRvQxdizFAQAwsy39EZhAAAwAAJ4+Q1XFlAAAAABJRU5ErkJggg==') no-repeat right 5px center;
         padding: 0 20px 0 5px;
         line-height: 22px;
-        text-align: center;
     }
 
     .form-select option {
         text-align: center;
     }
-    
+
     input[type="range"].form-range {
         margin-top: 5px;
         height: 6px;
-        background: var(--input-group-bg) !important; /* Nowa zmienna z wymuszeniem */
+        background: var(--input-group-bg);
         border: 2px solid var(--border-color);
         border-radius: var(--border-radius);
-        -webkit-appearance: none;
         appearance: none;
         width: 100%;
         margin-left: auto;
         margin-right: auto;
         outline: none;
     }
-    
-    /* Reset tła toru w przeglądarkach */
+
     input[type="range"].form-range::-webkit-slider-runnable-track {
-        background: var(--input-group-bg) !important; /* Tor w Chrome/Safari */
+        background: var(--input-group-bg);
         height: 6px;
         border-radius: var(--border-radius);
-        -webkit-appearance: none;
     }
     
     input[type="range"].form-range::-moz-range-track {
-        background: var(--input-group-bg) !important; /* Tor w Firefox */
+        background: var(--input-group-bg);
         height: 6px;
         border-radius: var(--border-radius);
     }
     
     input[type="range"].form-range::-ms-track {
-        background: var(--input-group-bg) !important; /* Tor w Edge/IE */
+        background: var(--input-group-bg);
         height: 6px;
         border-radius: var(--border-radius);
-        border: 2px solid var(--border-color);
-        color: transparent; /* Ukrywa domyślny tor w IE */
     }
-    
-    /* Style kciuka */
+
     input[type="range"].form-range::-webkit-slider-thumb {
-        background: var(--accent-gradient-start); /* Kolor z btn-primary */
+        background: var(--accent-gradient-start);
         width: 11px;
         height: 11px;
         border-radius: 50%;
         border: none;
         cursor: pointer;
-        -webkit-appearance: none;
-        transform: translateY(2px); /* Centrowanie */
+        appearance: none;
+        transform: translateY(2px);
     }
-    
+
     input[type="range"].form-range::-moz-range-thumb {
         background: var(--accent-gradient-start);
         width: 11px;
@@ -444,7 +574,7 @@
         border: none;
         cursor: pointer;
     }
-    
+
     input[type="range"].form-range::-ms-thumb {
         background: var(--accent-gradient-start);
         width: 11px;
@@ -453,17 +583,41 @@
         border: none;
         cursor: pointer;
     }
+
+    input[type="range"].form-range:focus::-webkit-slider-thumb {
+        outline: none;
+        box-shadow: 0 0 4px var(--accent-gradient-start);
+    }
     
-    /* Tryb ciemny dla kciuka */
+    input[type="range"].form-range:focus::-moz-range-thumb {
+        outline: none;
+        box-shadow: 0 0 4px var(--accent-gradient-start);
+    }
+    
+    input[type="range"].form-range:focus::-ms-thumb {
+        outline: none;
+        box-shadow: 0 0 4px var(--accent-gradient-start);
+    }
+
+    /* D A R K   M O D E   -   S P E C Y F I C Z N E */
+    .dark-mode input[type="range"].form-range::-webkit-slider-runnable-track {
+        background: var(--input-group-bg);
+    }
+    
+    .dark-mode input[type="range"].form-range::-moz-range-track {
+        background: var(--input-group-bg);
+    }
+    
+    .dark-mode input[type="range"].form-range::-ms-track {
+        background: var(--input-group-bg);
+    }
+    
     .dark-mode input[type="range"].form-range::-webkit-slider-thumb {
         background: var(--accent-gradient-start-black);
         transform: translateY(2px);
     }
-    
-    .dark-mode input[type="range"].form-range::-moz-range-thumb {
-        background: var(--accent-gradient-start-black);
-    }
-    
+
+    .dark-mode input[type="range"].form-range::-moz-range-thumb,
     .dark-mode input[type="range"].form-range::-ms-thumb {
         background: var(--accent-gradient-start-black);
     }
@@ -472,21 +626,69 @@
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         border: 1px solid #666666;
     }
-    
+
     .dark-mode .harmonogram th {
         border-bottom: 2px solid #666666;
     }
-    
+
     .dark-mode .harmonogram td {
         border-bottom: 1px solid #666666;
-        border-right: 1px solid rgba(var(--border-color-rgb, 245, 245, 245), 0.3);
+        border-right: 1px solid rgba(var(--border-color-rgb), 0.3);
     }
 
     .dark-mode .harmonogram td .star,
     .dark-mode #harmonogramOpis .star {
         color: #c2b280;
     }
+
+    .dark-mode .dropdown-btn {
+        border: 2px solid var(--accent-gradient-start);
+        background-size: cover;
+        background-position: center;
+        background-color: transparent;
+        padding: 2px;
+        background-clip: padding-box;
+    }
     
+    .dark-mode .zoom-controls button.dropdown-btn {
+        background: transparent !important;
+        border: 2px solid var(--accent-gradient-start) !important;
+        background-clip: padding-box;
+    }
+    
+    .dark-mode .zoom-controls button.dropdown-btn[data-lang="PL"] {
+        background-image: url('flag-pl.png') !important;
+    }
+    
+    .dark-mode .zoom-controls button.dropdown-btn[data-lang="EN"] {
+        background-image: url('flag-en.png') !important;
+    }
+    
+    .dark-mode .zoom-controls button.dropdown-btn[data-lang="UA"] {
+        background-image: url('flag-ua.png') !important;
+    }
+    
+    .dark-mode .zoom-controls button.dropdown-btn:hover {
+        border: 2px solid var(--accent-gradient-start) !important;
+        background: transparent !important;
+        background-size: cover;
+        background-position: center;
+        background-clip: padding-box;
+    }
+
+    .dark-mode .zoom-controls button.dropdown-btn[data-lang="PL"]:hover {
+        background-image: url('flag-pl.png') !important;
+    }
+    
+    .dark-mode .zoom-controls button.dropdown-btn[data-lang="EN"]:hover {
+        background-image: url('flag-en.png') !important;
+    }
+    
+    .dark-mode .zoom-controls button.dropdown-btn[data-lang="UA"]:hover {
+        background-image: url('flag-ua.png') !important;
+    }
+
+    /* O P I S Y   I   D A N E */
     .sub-info {
         font-size: 0.4em;
         margin-top: 2px;
@@ -494,14 +696,13 @@
         align-self: flex-start;
         width: 100%;
     }
-    
-    /* Opisy i dane */
+
     .opis-container {
         margin-top: 20px;
         text-align: center;
         margin-bottom: 10px;
     }
-    
+
     .obligacje-opis {
         font-size: 0.6em;
         text-align: center;
@@ -509,7 +710,7 @@
         margin: 10px auto 0;
         line-height: 1.4;
     }
-    
+
     .harmonogram-opis {
         font-size: clamp(0.2625em, 0.6125vw, 0.4125em);
         text-align: left;
@@ -523,28 +724,28 @@
     #harmonogramOpis {
         color: var(--primary-text);
     }
-    
+
     .harmonogram td .star,
     #harmonogramOpis .star {
         color: #8b7d47;
     }
-    
+
     .data-container {
         text-align: right;
         margin-top: 5px;
     }
-    
+
     .data-info,
     .data-date {
         font-size: 0.8em;
         color: var(--accent-color);
     }
-    
+
     .data-date {
         font-size: 0.9em;
     }
-    
-    /* Sekcja wyników */
+
+    /* W Y N I K I   I   H A R M O N O G R A M */
     .result-container,
     .form-container,
     .harmonogram-container {
@@ -554,7 +755,7 @@
         flex-wrap: wrap;
         position: relative;
     }
-    
+
     .harmonogram-container {
         margin-top: 20px;
         padding: clamp(2px, 2vw, 20px);
@@ -564,7 +765,7 @@
         margin-right: auto;
         box-sizing: border-box;
     }
-    
+
     .harmonogram-chart-wrapper {
         background-color: var(--harmonogram-bg);
         padding: clamp(2px, 2vw, 20px);
@@ -574,19 +775,85 @@
         margin: 0 auto;
         box-sizing: border-box;
     }
-    
+
     .result-wrapper-chart {
         width: 100%;
         max-width: 600px;
         margin: 0 auto;
     }
-    
+
     .result-wrapper-harmonogram {
         flex: 1;
         max-width: 1000px;
     }
-    
-    /* Style dla wykresów */
+
+    .harmonogram {
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        overflow-x: auto;
+    }
+
+    .harmonogram table {
+        margin: 0 auto;
+        width: 100%;
+        max-width: 100%;
+        display: table;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px var(--shadow-color);
+        background: var(--harmonogram-bg);
+        font-size: clamp(0.55em, 1.2vw, 0.8em);
+        table-layout: auto;
+    }
+
+    .harmonogram th,
+    .harmonogram td {
+        text-align: center;
+        white-space: normal;
+        word-break: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: clamp(0.3125em, 0.8125vw, 0.8125em);
+    }
+
+    .harmonogram th {
+        background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+        color: var(--primary-text);
+        padding: clamp(1px, 0.5vw, 12px);
+        vertical-align: middle;
+        font-weight: 500;
+        border-bottom: 2px solid var(--border-color);
+        line-height: 1.2;
+    }
+
+    .harmonogram td {
+        padding: clamp(1px, 0.5vw, 10px);
+        font-weight: 400;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--harmonogram-bg);
+        color: var(--primary-text);
+        border-right: 1px solid rgba(var(--border-color-rgb), 0.3);
+    }
+
+    .harmonogram th:last-child,
+    .harmonogram td:last-child {
+        border-right: none;
+    }
+
+    .harmonogram .btn-toggle {
+        cursor: pointer;
+        font-size: 0.65em;
+        text-decoration: underline;
+        margin-bottom: 25px;
+        position: relative;
+        color: var(--primary-text);
+    }
+
+    /* W Y K R E S Y */
     .chart-container {
         display: flex;
         justify-content: center;
@@ -595,7 +862,7 @@
         margin-bottom: 20px;
         position: relative;
     }
-    
+
     .chart {
         flex: 0 0 auto;
         width: 160px;
@@ -603,12 +870,12 @@
         position: relative;
         z-index: 25;
     }
-    
+
     .chart canvas {
         position: relative;
         z-index: 30;
     }
-    
+
     .chart-container-line {
         margin-top: 20px;
         width: 100%;
@@ -618,13 +885,13 @@
         margin-left: auto;
         margin-right: auto;
     }
-    
+
     .chart-line {
         width: 100%;
         height: 100%;
         font-size: clamp(0.3625em, 0.8125vw + 0.7px, 0.9125em);
     }
-    
+
     .chart-legend {
         flex: 0 0 auto;
         max-width: 200px;
@@ -633,7 +900,7 @@
         flex-direction: column;
         justify-content: center;
     }
-    
+
     .chart-legend .legend-item {
         display: flex;
         align-items: center;
@@ -643,14 +910,14 @@
         transition: transform 0.3s ease;
         padding-left: 8px;
     }
-    
+
     .chart-legend .legend-text {
         font-weight: bold;
         font-size: 14px;
         opacity: 1;
         transition: opacity 0.3s ease;
     }
-    
+
     .chart-legend .color-box {
         width: 130px;
         min-width: 130px;
@@ -666,13 +933,13 @@
         color: #fff;
         margin-right: 6px;
     }
-    
+
     .chart-legend .color-box .value {
         font-weight: bold;
         font-size: 10px;
         display: block;
     }
-    
+
     .color-box:hover::after,
     .legend-text:hover::after {
         content: attr(data-tooltip);
@@ -690,23 +957,23 @@
         line-height: normal;
         font-family: 'Montserrat', sans-serif;
     }
-    
+
     .legend-item[data-index="0"] .color-box:hover::after {
         background-color: #28a745;
         color: #000000;
     }
-    
+
     .legend-item[data-index="1"] .color-box:hover::after {
         background-color: #007bff;
         color: #ffffff;
     }
-    
+
     .legend-item[data-index="2"] .color-box:hover::after {
         background-color: #dc3545;
         color: #ffffff;
     }
-    
-    /* Stopka podsumowania */
+
+    /* S T O P K A   P O D S U M O W A N I A */
     .summary-footer {
         display: flex;
         justify-content: center;
@@ -724,38 +991,34 @@
         text-align: center;
         display: flex;
         justify-content: center;
-        align-items: center; 
+        align-items: center;
         width: 100%;
         max-width: 210px;
     }
-    
+
     .summary-footer .highlight {
         display: inline-block;
         width: clamp(200px, 20vw, 240px);
         max-width: 100%;
         margin: 2px 0;
         padding: clamp(5px, 1vw, 8px) clamp(8px, 2vw, 12px);
-        border-radius: 5px;
         font-weight: 500;
-        text-align: center;
-        background-color: var(--highlight-bg);
-        color: #fff;
         font-size: clamp(0.525em, 1.05vw, 0.825em);
     }
-    
+
     .highlight.yellow {
         background-color: var(--highlight-yellow);
     }
-    
+
     .highlight.green {
         background-color: var(--highlight-green);
     }
-    
+
     .highlight.yellow:hover,
     .highlight.green:hover {
         color: transparent;
     }
-    
+
     .highlight.yellow:hover::after,
     .highlight.green:hover::after {
         content: attr(data-hover);
@@ -771,124 +1034,70 @@
         justify-content: center;
         align-items: center;
         text-align: center;
-        
-    }
-    
-    /* Style dla harmonogramu */
-    .harmonogram {
-        padding: 0;
-        width: 100%;
-        max-width: clamp(98%, 100vw, 1000px);
-        margin: 0 auto;
-        overflow-x: auto;
-    }
-    
-    .harmonogram table {
-        margin: 0 auto;
-        width: 100%;
-        max-width: clamp(98%, 100vw, 1000px);
-        display: table;
-        border-collapse: separate;
-        border-spacing: 0;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 1px 3px var(--shadow-color);
-        background: var(--harmonogram-bg);
-        font-size: clamp(0.55em, 1.2vw, 0.8em);
-        table-layout: auto;
-    }
-    
-    .harmonogram th {
-        background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
-        color: var(--primary-text);
-        padding: clamp(1px, 0.5vw, 12px);
-        text-align: center;
-        vertical-align: middle;
-        font-weight: 500;
-        border-bottom: 2px solid var(--border-color);
-        white-space: normal;
-        word-break: normal;
-        line-height: 1.2;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        font-size: clamp(0.3125em, 0.8125vw, 0.8125em);
-    }
-    
-    .harmonogram td {
-        padding: clamp(1px, 0.5vw, 10px);
-        text-align: center;
-        font-weight: 400;
-        border-bottom: 1px solid var(--border-color);
-        background-color: var(--harmonogram-bg);
-        color: var(--primary-text);
-        white-space: normal;
-        word-break: normal;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        border-right: 1px solid rgba(var(--border-color-rgb, 102, 102, 102), 0.3);
-        font-size: clamp(0.3125em, 0.8125vw, 0.8125em);
-    }
-    
-    .harmonogram .btn-toggle {
-        cursor: pointer;
-        font-size: 0.65em;
-        text-decoration: underline;
-        margin-bottom: 25px;
-        position: relative;
-        color: var(--primary-text);
     }
 
-    .harmonogram th:last-child,
-    .harmonogram td:last-child {
-        border-right: none;
-    }
-    
-    .btn-toggle {
-        cursor: pointer;
-        font-size: 0.8em;
-        color: #007bff;
-        text-decoration: underline;
-        margin-bottom: 10px;
-    }
-    
-    /* Przyciski */
+    /* P R Z Y C I S K I */
     .btn-primary,
     .btn-secondary,
     #addVariableBtn,
+    #generatePdfBtn,
     .zoom-controls .btn {
-        background: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end));
-        border: none;
-        color: var(--primary-text);
-        font-size: 0.9em;
-        padding: 8px 20px;
-        width: auto;
-        margin: 25px auto 0;
-        display: block;
-        border-radius: 25px;
+        background: linear-gradient(135deg, var(--accent-gradient-start, #c2b280), var(--accent-gradient-end, #b0a070)) !important;
+        border: none !important;
+        color: var(--primary-text) !important;
         box-shadow: 0 4px 6px var(--shadow-color);
         transition: transform 0.2s ease, box-shadow 0.3s ease;
+        border-radius: 25px;
+        display: block;
+        margin: 0 auto;
+        transform: translateY(0);
     }
-    
+
     .btn-primary:hover,
     .btn-secondary:hover,
     #addVariableBtn:hover,
+    #generatePdfBtn:hover,
     .zoom-controls .btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 12px var(--shadow-color);
-        background: linear-gradient(135deg, var(--accent-gradient-end), var(--accent-gradient-start));
+        background: linear-gradient(135deg, var(--accent-gradient-end, #b0a070), var(--accent-gradient-start, #c2b280)) !important;
     }
-    
-    .btn-sm,
+
+    .dark-mode .btn-primary,
+    .dark-mode .btn-secondary,
+    .dark-mode #addVariableBtn,
+    .dark-mode #generatePdfBtn,
+    .dark-mode .zoom-controls .btn {
+        background: linear-gradient(135deg, var(--accent-gradient-start, #8b7d47), var(--accent-gradient-end, #70673b)) !important;
+        color: #ffffff !important;
+    }
+
+    .dark-mode .btn-primary:hover,
+    .dark-mode .btn-secondary:hover,
+    .dark-mode #addVariableBtn:hover,
+    .dark-mode #generatePdfBtn:hover,
+    .dark-mode .zoom-controls .btn:hover {
+        background: linear-gradient(135deg, var(--accent-gradient-end, #70673b), var(--accent-gradient-start, #8b7d47)) !important;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        font-size: 0.9em;
+        padding: 8px 20px;
+        margin: 25px auto 0;
+    }
+
     #addVariableBtn {
         font-size: var(--small-font-size);
         padding: 3px 10px;
-    }
-    
-    #addVariableBtn {
         border-radius: 15px;
-        margin: 0 auto;
     }
-    
+
+    #generatePdfBtn {
+        margin: 0 0 15px auto;
+        padding: 6px 15px;
+    }
+
     .zoom-controls .btn {
         padding: 2px 8px;
         width: 25px;
@@ -897,52 +1106,55 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        margin: 0;
     }
-    
-    #generatePdfBtn {
-        display: block;
-        margin: 0 0 15px auto; 
-        padding: 6px 15px;
+
+    .btn-toggle {
+        cursor: pointer;
+        font-size: 0.8em;
+        color: #007bff;
+        text-decoration: underline;
+        margin-bottom: 10px;
     }
-    
-    /* Pola dla zmiennych stóp */
+
+    /* Z M I E N N E   S T O P Y */
     .variable-rate-container {
         margin-top: 15px;
         text-align: center;
     }
-    
+
     .variable-inputs {
         margin-top: 10px;
     }
-    
+
     .variable-input-group {
         display: flex;
         flex-direction: column;
         margin-bottom: 10px;
         align-items: center;
     }
-    
+
     .variable-inputs-wrapper {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 10px;
     }
-    
+
     .variable-input-group .form-group {
         width: 150px;
         min-width: 0;
         max-width: none;
         flex: none;
     }
-    
+
     .variable-input-group .input-group {
         display: flex;
         align-items: center;
         max-width: 150px;
         width: 150px;
     }
-    
+
     .variable-input-group .btn-danger,
     .variable-input-group .btn-danger.remove-first-btn {
         font-size: var(--small-font-size);
@@ -954,12 +1166,12 @@
         border-radius: var(--border-radius);
         color: #fff;
     }
-    
+
     .variable-input-group .btn-danger:hover,
     .variable-input-group .btn-danger.remove-first-btn:hover {
         background: #c82333;
     }
-    
+
     .remove-btn-wrapper,
     .remove-first-btn-wrapper {
         display: flex;
@@ -968,144 +1180,27 @@
         align-self: center;
         width: 100%;
     }
-    
-    #harmonogramContent {
-        display: block;
-    }
 
-    .calculator-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 20px;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: clamp(10px, 2vw, 20px);
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    /* Styl dla kontenera dropdown */
-    .dropdown {
-        position: relative;
-        display: inline-block;
-    }
-    
-    /* Styl dla głównego przycisku */
-    .dropdown-btn {
-        padding: 2px 8px;
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid var(--accent-gradient-start) !important; /* Złote obramowanie */
-        box-shadow: 0 4px 6px var(--shadow-color); /* Stały cień */
-        background-size: cover !important;
-        background-position: center !important;
-        text-indent: -9999px; /* Ukrywa tekst "PL" */
-        background-color: transparent !important;
-    }
-    
-    /* Style dla flag w głównym przycisku */
-    .dropdown-btn[data-lang="PL"] {
-        background-image: url('flag-pl.png') !important;
-    }
-    
-    .dropdown-btn[data-lang="EN"] {
-        background-image: url('flag-en.png') !important;
-    }
-    
-    .dropdown-btn[data-lang="UA"] {
-        background-image: url('flag-ua.png') !important;
-    }
-    
-    /* Zachowanie właściwości przy najechaniu, bez nadpisywania flagi */
-    .dropdown-btn:hover {
-        border: 2px solid var(--accent-gradient-start) !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-color: transparent !important;
-        /* Usunięto background-image, aby flaga pozostała zgodna z data-lang */
-    }
-    
-    /* Styl dla menu rozwijanego - zwiększona specyficzność */
-    .dropdown .dropdown-menu {
-        display: none; /* Ukryte domyślnie */
-        position: absolute;
-        background: transparent !important;
-        background-color: transparent !important; /* Nadpisuje Bootstrap */
-        min-width: 25px;
-        z-index: 1;
-        padding: 5px 0; /* Lekki odstęp */
-        box-shadow: none !important; /* Usuwa cień */
-        border: none !important; /* Usuwa ewentualną ramkę */
-    }
-    
-    /* Pokazanie menu, gdy ma klasę show */
-    .dropdown .dropdown-menu.show {
-        display: block;
-    }
-    
-    /* Styl dla elementów w menu rozwijanym */
-    .dropdown-item {
-        display: block; /* Jeden pod drugim */
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        border: 2px solid var(--accent-gradient-start) !important; /* Złote obramowanie */
-        background-size: cover !important;
-        background-position: center !important;
-        text-indent: -9999px; /* Ukrywa tekst "EN", "UA" */
-        margin: 5px 0; /* Odstęp między elementami */
-        padding: 0; /* Usuwa padding */
-        background-color: transparent !important;
-    }
-    
-    /* Style dla flag w menu rozwijanym */
-    .dropdown-item[data-lang="PL"] {
-        background-image: url('flag-pl.png') !important;
-    }
-    
-    .dropdown-item[data-lang="EN"] {
-        background-image: url('flag-en.png') !important;
-    }
-    
-    .dropdown-item[data-lang="UA"] {
-        background-image: url('flag-ua.png') !important;
-    }
-    
-    /* Zachowanie wszystkich właściwości przy najechaniu na elementy menu */
-    .dropdown-item:hover {
-        border: 2px solid var(--accent-gradient-start) !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-color: transparent !important;
-    }
-    
     /* R E S P O N S Y W N O Ś Ć */
-    
     @media (max-width: 768px) {
         .calculator-container {
-            flex-direction: column; /* Zmiana na kolumnę */
-            padding: clamp(10px, 2vw, 15px); /* Lekko mniejszy padding */
+            flex-direction: column;
+            padding: clamp(10px, 2vw, 15px);
         }
     }
-   
+
     @media (max-width: 576px) {
         .header-row h4,
         .result-header h4 {
             font-size: 1em;
         }
-    
+
         .checkbox-label.header-checkbox {
             top: -15px;
             right: 5px;
         }
-    
+
         .summary-footer {
-            display: flex;
             flex-direction: row;
             flex-wrap: wrap;
             justify-content: center;
@@ -1113,12 +1208,11 @@
             text-align: center;
             width: auto;
         }
-    
+
         .summary-footer .highlight {
-            display: inline-block;
             margin: 2px 0;
         }
-    
+
         .form-row,
         .checkbox-row,
         .fields-wrapper,
@@ -1127,7 +1221,7 @@
             align-items: center;
             gap: 2px;
         }
-    
+
         .form-group,
         .input-group,
         #dynamicRateGroup {
@@ -1136,7 +1230,7 @@
             min-width: 200px;
             margin: 2px auto;
         }
-    
+
         .form-control,
         .form-select {
             height: 26px;
@@ -1144,49 +1238,48 @@
             padding: 4px 8px;
             line-height: 20px;
         }
-    
+
         .input-group-text {
             height: 26px;
             width: 70px;
             padding: 4px 8px;
             line-height: 20px;
         }
-    
+
         #typObligacji.form-control {
             text-align: center;
             text-align-last: center;
             width: 200px;
             height: 26px;
         }
-    
+
         .variable-input-group .input-group {
             max-width: 200px;
             min-width: 200px;
         }
-    
+
         .variable-input-group .form-group {
             width: 200px;
             max-width: 200px;
             min-width: 200px;
             margin: 2px auto;
         }
-    
+
         .variable-input-group .form-control {
             width: 130px;
             height: 26px;
             padding: 4px 8px;
             line-height: 20px;
         }
-    
+
         .variable-input-group .input-group-text {
             width: 70px;
             height: 26px;
             padding: 4px 8px;
             line-height: 20px;
         }
-    
+
         .variable-input-group .fields-wrapper {
-            display: flex;
             flex-wrap: nowrap;
             justify-content: center;
             align-items: center;
@@ -1195,31 +1288,41 @@
             min-width: 200px;
             gap: 2px;
         }
-    
+
         .variable-input-group .form-group:nth-child(1) .input-group,
         .variable-input-group .form-group:nth-child(2) .input-group {
             width: 200px;
             max-width: 200px;
             min-width: 200px;
         }
-    
+
         .variable-input-group .form-group:nth-child(1) .form-control,
         .variable-input-group .form-group:nth-child(2) .form-control {
             width: 130px;
         }
-    
+
         .btn-primary,
         #addVariableBtn,
         #generatePdfBtn {
-            width: auto;
             margin: 2.5px auto;
             padding: 6px 10px;
         }
-    
+
+        .btn-primary,
+        #addVariableBtn {
+            width: auto;
+        }
+
+        .zoom-controls .btn {
+            width: 30px;
+            height: 30px;
+            padding: 4px 10px;
+        }
+
         #generatePdfBtn {
             margin: 2.5px 0 2.5px auto;
         }
-    
+
         .chart-container {
             flex-direction: row;
             flex-wrap: wrap;
@@ -1227,40 +1330,40 @@
             align-items: center;
             gap: 10px;
         }
-    
+
         .chart {
             width: 120px;
             height: 120px;
         }
-    
+
         .chart-legend {
             max-width: 100%;
             align-items: center;
             margin-top: 10px;
         }
-    
+
         .chart-legend .legend-item {
             width: 100%;
             max-width: 200px;
             justify-content: flex-start;
             padding-left: 0;
         }
-    
+
         .chart-legend .legend-text {
             font-size: 12px;
         }
     }
-    
+
     @media (max-width: 480px) {
         body {
             margin: 0;
             padding: 0;
         }
-    
+
         .calculator-container {
             padding: 10px;
         }
-    
+
         .form-row,
         .checkbox-row,
         .fields-wrapper,
@@ -1268,18 +1371,14 @@
             display: block;
             text-align: center;
         }
-    
+
         .form-group,
         #dynamicRateGroup {
             display: block;
-            width: 200px;
-            max-width: 200px;
-            min-width: 200px;
             margin: 10px auto;
         }
-    
+
         .input-group {
-            width: 200px;
             margin: 0 auto;
         }
 
@@ -1291,11 +1390,11 @@
             gap: 8px;
         }
 
-         .chart {
+        .chart {
             width: 100px;
             height: 100px;
         }
-        
+
         .form-control,
         .form-select {
             height: 28px;
@@ -1303,110 +1402,104 @@
             padding: 4px 8px;
             line-height: 20px;
         }
-    
+
         .input-group-text {
             height: 28px;
             width: 70px;
             padding: 4px 8px;
             line-height: 20px;
         }
-    
+
         .form-range {
             height: 8px;
             width: 200px;
             margin: 5px auto 0;
         }
-    
+
         .form-range::-webkit-slider-thumb,
         .form-range::-moz-range-thumb,
         .form-range::-ms-thumb {
             width: 14px;
             height: 14px;
         }
-    
+
         .variable-input-group {
             display: block;
             width: 200px;
             margin: 15px auto;
         }
-    
+
         .variable-input-group .fields-wrapper {
             display: block;
             width: 200px;
         }
-    
+
         .variable-input-group .form-group {
-            width: 200px;
-            max-width: 200px;
-            min-width: 200px;
             margin: 10px auto;
         }
-    
+
         .variable-input-group .input-group {
-            width: 200px;
             margin: 0 auto;
         }
-    
+
         .variable-input-group .form-control {
             width: 130px;
             height: 28px;
             padding: 4px 8px;
             line-height: 20px;
         }
-    
+
         .variable-input-group .input-group-text {
             width: 70px;
             height: 28px;
             padding: 4px 8px;
             line-height: 20px;
         }
-    
+
         .variable-input-group .form-range {
             width: 200px;
             margin: 5px auto 0;
         }
-    
+
         #typObligacji.form-control {
             text-align: center;
             text-align-last: center;
             width: 200px;
             height: 28px;
         }
-    
+
         .btn-primary,
         #addVariableBtn,
         #generatePdfBtn {
-            width: auto;
             margin: 20px auto;
             padding: 6px 15px;
         }
-    
+
         #generatePdfBtn {
             margin: 20px 0 20px auto;
         }
-    
+
         .logo-container {
             display: flex !important;
             justify-content: flex-start !important;
             text-align: left !important;
             flex-wrap: wrap;
         }
-    
+
         .logo,
         #siteLogo {
             margin: 0 !important;
             padding: 10px 0;
             max-width: 150px;
         }
-    
+
         .zoom-controls {
             position: static;
             transform: none;
             margin-left: auto;
         }
-    
+
         .summary-footer {
-            display: flex;
             flex-direction: row;
             flex-wrap: wrap;
             justify-content: center;
@@ -1414,208 +1507,17 @@
             text-align: center;
             width: auto;
         }
-    
+
         .summary-footer .highlight {
-            display: inline-block;
-            margin: 2px 0; 
+            margin: 2px 0;
         }
     }
 </style>
-<div class="logo-container">
-    <img src="cropped-logo-FB-1.png" id="siteLogo" alt="Finance Brothers Logo" class="logo d-block mx-auto">
-    <div class="zoom-controls" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; gap: 5px;">
-        <button id="zoomInBtn" class="btn btn-sm" aria-label="Powiększ"> + </button>
-        <button id="zoomOutBtn" class="btn btn-sm" aria-label="Pomniejsz"> - </button>
-        <button id="toggleDarkModeBtn" class="btn btn-sm" aria-label="Przełącz tryb ciemny">🌙</button>
-        <!--
-        <div class="dropdown">
-            <button id="dropdownBtn" class="btn btn-sm dropdown-btn" data-lang="PL" aria-label="Otwórz dodatkowe opcje">PL</button>
-            <div class="dropdown-menu" id="dropdownMenu">
-                <button class="dropdown-item" data-lang="EN" aria-label="Język angielski">EN</button>
-                <button class="dropdown-item" data-lang="UA" aria-label="Język ukraiński">UA</button>
-            </div>
-        </div>
-        -->
-    </div>
-</div>
-<div class="container">
-    <div class="form-section" id="formSection">
-        <div class="header-row">
-            <h4>Kalkulator Obligacji Skarbu Państwa</h4>
-        </div>
-        <div class="form-container">
-            <div class="form-wrapper">
-                <form id="obligacjeForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="typObligacji" class="form-label">Typ obligacji*</label>
-                            <select class="form-control" id="typObligacji">
-                                <option value="OTS" selected>3-miesięczne (OTS)</option>
-                                <option value="ROR">12-miesięczne (ROR)</option>
-                                <option value="DOR">24-miesięczne (DOR)</option>
-                                <option value="TOS">3-letnie (TOS)</option>
-                                <option value="COI">4-letnie (COI)</option>
-                                <option value="EDO">10-letnie (EDO)</option>
-                                <option value="ROS">6-letnie (ROS)</option>
-                                <option value="ROD">12-letnie (ROD)</option>
-                            </select>
-                            <div class="sub-info"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="kwota" class="form-label">Kwota inwestycji</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="kwota" min="100" max="10000000" step="100" value="10000">
-                                <span class="input-group-text">zł</span>
-                            </div>
-                            <input type="range" class="form-range" id="kwotaRange" min="100" max="10000000" step="100" value="10000">
-                            <div class="sub-info" id="iloscObligacji">Ilość obligacji: 100</div>
-                        </div>
-                        <div class="form-group" id="dynamicRateGroup" style="display: none;">
-                            <label for="dynamicRate" class="form-label" id="dynamicRateLabel">Stopa Ref. NBP</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="dynamicRate" min="0" max="50" step="0.05" value="4.90">
-                                <span class="input-group-text">%</span>
-                            </div>
-                            <input type="range" class="form-range" id="dynamicRateRange" min="0" max="50" step="0.05" value="4.90">
-                            <div class="sub-info" id="dynamicRateInfo"></div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="okres" class="form-label">Okres inwestycji</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="okres" min="3" max="144" step="1" value="3" readonly>
-                                <span class="input-group-text">mc-y</span>
-                            </div>
-                            <div class="sub-info" id="lata"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="oprocentowanie" class="form-label">Oprocentowanie</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="oprocentowanie" min="0.1" max="25" step="0.1" value="3" readonly>
-                                <span class="input-group-text">%</span>
-                            </div>
-                            <div class="sub-info" id="oprocentowanieInfo"></div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div id="ikeIkzeContainer" style="display: none;">
-                            <label class="checkbox-label" for="ikeIkzeBtn">
-                                <input type="checkbox" id="ikeIkzeBtn">
-                                <span class="checkbox-custom"></span>
-                                <b>Inwestycje w IKE lub IKZE</b>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="variable-rate-container">
-                        <div class="checkbox-row" id="variableCheckboxRow">
-                            <label class="checkbox-label" id="inflacjaZmiennaLabel" for="inflacjaZmiennaBtn" style="display: none;">
-                                <input type="checkbox" id="inflacjaZmiennaBtn">
-                                <span class="checkbox-custom"></span>
-                                <b>Zmienna Inflacja</b>
-                            </label>
-                            <label class="checkbox-label" id="stopaZmiennaLabel" for="stopaZmiennaBtn" style="display: none;">
-                                <input type="checkbox" id="stopaZmiennaBtn">
-                                <span class="checkbox-custom"></span>
-                                <b>Zmienna Stopa Ref. NBP</b>
-                            </label>
-                        </div>
-                        <div class="variable-inputs" id="variableInputs" style="display: none;">
-                            <div class="variable-inputs-wrapper" id="variableInputsWrapper"></div>
-                            <button type="button" class="btn btn-secondary btn-sm" id="addVariableBtn" style="display: none;" aria-label="Dodaj kolejne zmienne oprocentowanie">Dodaj kolejną zmianę</button>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <button type="button" class="btn btn-primary" id="obliczBtn" style="margin: 25px auto 0;" aria-label="Oblicz wyniki inwestycji">Oblicz</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="opis-container">
-            <div class="obligacje-opis" id="obligacjeOpis"></div>
-        </div>
-        <div class="data-container">
-            <div class="data-info"><strong>Dane z dnia:</strong> <span class="data-date"><strong>01.03.2025r.</strong></span></div>
-        </div>
-    </div>
-    <div class="result-section" id="resultSection">
-        <button id="generatePdfBtn" class="btn btn-primary btn-sm" aria-label="Generuj PDF z wynikami">Generuj PDF</button>
-        <div class="result-header">
-            <h4 id="resultHeader">Podsumowanie wyników</h4>
-        </div>
-        <button class="btn btn-secondary mb-3" onclick="showForm()" aria-label="Powrót do edycji formularza">Powrót do edycji</button>
-        <div class="result-container">
-            <div class="result-wrapper-chart">
-                <div class="chart-container">
-                    <div class="chart">
-                        <canvas id="obligacjeChart" aria-label="Wykres kołowy wyników inwestycji"></canvas>
-                    </div>
-                    <div class="chart-legend">
-                        <div class="legend-item" data-index="0">
-                            <div class="color-box" style="background-color: #28a745;" data-tooltip="" data-color="#28a745">
-                                <span class="value" id="valueKapital">-</span>
-                            </div>
-                            <span class="legend-text" id="legendKapital">Kapitał</span>
-                        </div>
-                        <div class="legend-item" data-index="1">
-                            <div class="color-box" style="background-color: #007bff;" data-tooltip="" data-color="#007bff">
-                                <span class="value" id="valueOdsetki">-</span>
-                            </div>
-                            <span class="legend-text" id="legendOdsetki">Odsetki</span>
-                        </div>
-                        <div class="legend-item" data-index="2">
-                            <div class="color-box" style="background-color: #dc3545;" data-tooltip="" data-color="#dc3545">
-                                <span class="value" id="valuePodatek">-</span>
-                            </div>
-                            <span class="legend-text" id="legendPodatek">Podatek</span>
-                        </div>
-                    </div>
-                </div>
-               <div class="summary-footer">
-                    <span class="highlight yellow" data-hover="3 miesięcy" id="okresInwestycji">-</span>
-                    <span class="highlight green" data-hover="" id="zyskNetto">-</span>
-                </div>
-                <div class="obligacje-opis" id="obligacjeOpisPodsumowanie"></div>
-            </div>
-        </div>
-        <div class="harmonogram-container">
-            <div class="result-wrapper-harmonogram">
-                <div class="harmonogram-chart-wrapper">
-                    <div class="harmonogram">
-                        <h5 class="btn-toggle" onclick="toggleHarmonogram('harmonogramContent')" aria-label="Przełącz widoczność harmonogramu odsetek">Harmonogram odsetek ▼</h5>
-                        <div id="harmonogramContent">
-                            <table class="table table-striped">
-                                <thead id="harmonogramNaglowek">
-                                    <tr>
-                                        <th id="pierwszaKolumnaNaglowek">Rok</th>
-                                        <th>Wartość inwestycji</th>
-                                        <th>Oproc.</th>
-                                        <th>Odsetki</th>
-                                        <th>Suma odsetek</th>
-                                        <th>Podatek</th>
-                                        <th id="zyskKolumnaNaglowek">Zysk netto</th>
-                                        <th>Opłata za wykup</th>
-                                        <th id="kolumnaStopaInflacja">Inflacja</th>
-                                        <th>Suma netto</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="harmonogramTabela"></tbody>
-                            </table>
-                            <div class="harmonogram-opis" id="harmonogramOpis"></div>
-                        </div>
-                    </div>
-                    <div class="chart-container-line">
-                        <div class="chart-line">
-                            <canvas id="obligacjeChartLine" aria-label="Wykres liniowy wartości inwestycji w czasie"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
+    // D E F I N I C J E   Z M I E N N Y C H
+    
     const elements = {
         formSection: document.getElementById("formSection"),
         resultSection: document.getElementById("resultSection"),
@@ -1699,8 +1601,9 @@
         "OTS": "3-miesięcznych (OTS)", "ROR": "12-miesięcznych (ROR)", "DOR": "24-miesięcznych (DOR)", "TOS": "3-letnich (TOS)",
         "COI": "4-letnich (COI)", "EDO": "10-letnich (EDO)", "ROS": "6-letnich (ROS)", "ROD": "12-letnich (ROD)"
     };
-</script>
-<script>
+
+    // O B S Ł U G A   Z D A R Z E Ń
+    
     elements.dynamicRateRange.addEventListener("input", () => { 
         elements.dynamicRate.value = elements.dynamicRateRange.value; 
         const typ = elements.typObligacji.value;
@@ -1850,6 +1753,8 @@
     
         updateVariableInputs();
     }
+
+    // F U N K C J E   P O M O C N I C Z E
     
     function updateIloscObligacji() {
         const kwota = parseFloat(elements.kwota.value) || 0;
@@ -2198,6 +2103,8 @@
             }
         };
     }
+
+    // L O G I K A   O B L I C Z E Ń
     
     function obliczObligacje() {
         console.log("Starting obliczObligacje");
@@ -2359,7 +2266,6 @@
         const legendPodatek = document.querySelector('.result-wrapper-chart .legend-item[data-index="2"] .color-box');
         if (legendPodatek) legendPodatek.setAttribute('data-tooltip', `Podatek: ${state.isIkeIkzeMode ? "0,00 zł***" : podatekCalkowity.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " zł"}`);
 
-        // Ustawianie data-tooltip dla etykiet tekstowych w legendzie
         document.querySelector('#legendKapital').setAttribute('data-tooltip', 'Kapitał');
         document.querySelector('#legendOdsetki').setAttribute('data-tooltip', 'Odsetki');
         document.querySelector('#legendPodatek').setAttribute('data-tooltip', 'Podatek');
@@ -2574,9 +2480,6 @@
         console.log("ObliczObligacje completed");
     }
 
-    
-    
-    // Dodajemy plugin do ustawiania tła, ale nie rejestrujemy go globalnie
     const backgroundPlugin = {
         id: 'customBackground',
         beforeDraw: (chart, args, options) => {
@@ -2587,7 +2490,9 @@
             ctx.restore();
         }
     };
-        
+
+    // G E N E R O W A N I E   P L I K U   P D F
+    
     function generatePdf() {
         console.log("Starting generatePdf");
         if (typeof pdfMake === "undefined") {
@@ -2798,10 +2703,12 @@
         });
     }
 
+// F U N K C J A      Z O O M
+    
     document.getElementById('siteLogo').addEventListener('click', () => {
         window.open('https://finance-brothers.pl', '_blank');
     });
-    // Zoomowanie
+
     let currentZoom = 1;
     const zoomStep = 0.1;
     const minZoom = 0.5;
@@ -2826,6 +2733,8 @@
             updateZoom();
         }
     });
+
+    // D A R K     M O D E
     
     function toggleDarkMode() {
         const body = document.body;
@@ -2873,238 +2782,6 @@
     });
     
     initializeTheme();
-
-    // Dostępne języki
-    const languages = ['PL', 'EN', 'UA'];
-    let currentLanguage = 'PL'; // Domyślny język
-
-    const translations = {
-        PL: {
-            title: "Kalkulator Obligacji Skarbu Państwa",
-            calculateBtn: "Oblicz",
-            generatePdfBtn: "Generuj PDF",
-            returnBtn: "Powrót do edycji",
-            bondTypeLabel: "Typ obligacji*",
-            investmentAmountLabel: "Kwota inwestycji",
-            periodLabel: "Okres inwestycji",
-            interestRateLabel: "Oprocentowanie",
-            dynamicRateLabel: "Stopa Ref. NBP",
-            inflationLabel: "Inflacja",
-            variableInflationCheckbox: "Zmienna Inflacja",
-            variableRateCheckbox: "Zmienna Stopa Ref. NBP",
-            addVariableBtn: "Dodaj kolejną zmianę",
-            bondsCount: "Ilość obligacji",
-            summaryHeader: "Podsumowanie wyników",
-            capitalLegend: "Kapitał",
-            interestLegend: "Odsetki",
-            taxLegend: "Podatek",
-            investmentPeriod: "Okres inwestycji",
-            netProfit: "Zysk netto",
-            scheduleToggle: "Harmonogram odsetek ▼",
-            scheduleHeaderYear: "Rok",
-            scheduleHeaderMonth: "Miesiąc",
-            scheduleValue: "Wartość inwestycji",
-            scheduleInterest: "Oproc.",
-            scheduleEarnings: "Odsetki",
-            scheduleTotalEarnings: "Suma odsetek",
-            scheduleTax: "Podatek",
-            scheduleNetProfit: "Zysk netto",
-            scheduleRedemptionFee: "Opłata za wykup",
-            scheduleInflation: "Inflacja",
-            scheduleReferenceRate: "Stopa Ref. NBP",
-            scheduleTotalNet: "Suma netto",
-            dataInfo: "Dane z dnia:",
-            bondsDescriptions: {
-                OTS: "* <b>OTS (3-miesięczne) </b>: stałe oprocentowanie <b>3,00%</b> na okres <b>3-miesięcy</b>, wypłata odsetek nastąpi <b>przy wykupie</b> obligacji. Wcześniejszy odkup powoduje nienaliczenie odsetek, natomiast <b>nie ma opłat za wcześniejszy odkup</b>. Obligacje <b>OTS</b> są idealne dla <b>krótkoterminowych inwestycji</b>.",
-                ROR: "* <b>ROR (12-miesięczne) </b>: <b>oprocentowanie zmienne</b>, w pierwszym miesiącu <b>5,75%</b>, w pozostałych <b>11 miesiącach</b> oprocentowanie oparte na <b>stopie referencyjnej NBP + 0%</b>. Wypłata odsetek następuje <b>co miesiąc</b>, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <b>0,5%</b> wartości obligacji (<b>0,5 zł</b> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <b>ROR</b> przeznaczone są dla <b>krótko i średnioterminowych inwestorów</b>.",
-                // Dodaj resztę opisów z `opisyObligacji`...
-            }
-        },
-        EN: {
-            title: "State Treasury Bonds Calculator",
-            calculateBtn: "Calculate",
-            generatePdfBtn: "Generate PDF",
-            returnBtn: "Back to Edit",
-            bondTypeLabel: "Bond Type*",
-            investmentAmountLabel: "Investment Amount",
-            periodLabel: "Investment Period",
-            interestRateLabel: "Interest Rate",
-            dynamicRateLabel: "NBP Reference Rate",
-            inflationLabel: "Inflation",
-            variableInflationCheckbox: "Variable Inflation",
-            variableRateCheckbox: "Variable NBP Reference Rate",
-            addVariableBtn: "Add Another Change",
-            bondsCount: "Number of Bonds",
-            summaryHeader: "Summary of Results",
-            capitalLegend: "Capital",
-            interestLegend: "Interest",
-            taxLegend: "Tax",
-            investmentPeriod: "Investment Period",
-            netProfit: "Net Profit",
-            scheduleToggle: "Interest Schedule ▼",
-            scheduleHeaderYear: "Year",
-            scheduleHeaderMonth: "Month",
-            scheduleValue: "Investment Value",
-            scheduleInterest: "Interest",
-            scheduleEarnings: "Earnings",
-            scheduleTotalEarnings: "Total Earnings",
-            scheduleTax: "Tax",
-            scheduleNetProfit: "Net Profit",
-            scheduleRedemptionFee: "Redemption Fee",
-            scheduleInflation: "Inflation",
-            scheduleReferenceRate: "NBP Reference Rate",
-            scheduleTotalNet: "Total Net",
-            dataInfo: "Data as of:",
-            bondsDescriptions: {
-                OTS: "* <b>OTS (3-month) </b>: fixed interest rate of <b>3.00%</b> for a <b>3-month</b> period, interest paid <b>upon redemption</b>. Early redemption results in no interest accrual, but <b>there are no fees for early redemption</b>. <b>OTS</b> bonds are ideal for <b>short-term investments</b>.",
-                ROR: "* <b>ROR (12-month) </b>: <b>variable interest rate</b>, <b>5.75%</b> in the first month, in the remaining <b>11 months</b> based on the <b>NBP reference rate + 0%</b>. Interest is paid <b>monthly</b>, early redemption is possible but incurs a fee of <b>0.5%</b> of the bond value (<b>0.5 PLN</b> per bond) or up to accrued interest if lower, without loss of accrued interest. <b>ROR</b> bonds are suited for <b>short- and medium-term investors</b>.",
-                // Dodaj resztę tłumaczeń...
-            }
-        },
-        UA: {
-            title: "Калькулятор державних облігацій",
-            calculateBtn: "Розрахувати",
-            generatePdfBtn: "Згенерувати PDF",
-            returnBtn: "Повернутися до редагування",
-            bondTypeLabel: "Тип облігацій*",
-            investmentAmountLabel: "Сума інвестиції",
-            periodLabel: "Період інвестування",
-            interestRateLabel: "Відсоткова ставка",
-            dynamicRateLabel: "Референтна ставка НБП",
-            inflationLabel: "Інфляція",
-            variableInflationCheckbox: "Змінна інфляція",
-            variableRateCheckbox: "Змінна референтна ставка НБП",
-            addVariableBtn: "Додати ще одну зміну",
-            bondsCount: "Кількість облігацій",
-            summaryHeader: "Підсумок результатів",
-            capitalLegend: "Капітал",
-            interestLegend: "Відсотки",
-            taxLegend: "Податок",
-            investmentPeriod: "Період інвестування",
-            netProfit: "Чистий прибуток",
-            scheduleToggle: "Графік відсотків ▼",
-            scheduleHeaderYear: "Рік",
-            scheduleHeaderMonth: "Місяць",
-            scheduleValue: "Вартість інвестиції",
-            scheduleInterest: "Відсотки",
-            scheduleEarnings: "Заробіток",
-            scheduleTotalEarnings: "Загальний заробіток",
-            scheduleTax: "Податок",
-            scheduleNetProfit: "Чистий прибуток",
-            scheduleRedemptionFee: "Комісія за викуп",
-            scheduleInflation: "Інфляція",
-            scheduleReferenceRate: "Референтна ставка НБП",
-            scheduleTotalNet: "Загальна чиста сума",
-            dataInfo: "Дані станом на:",
-            bondsDescriptions: {
-                OTS: "* <b>OTS (3-місячні) </b>: фіксована відсоткова ставка <b>3,00%</b> на період <b>3 місяці</b>, виплата відсотків відбувається <b>при викупі</b>. Достроковий викуп призводить до ненарахування відсотків, але <b>немає комісії за достроковий викуп</b>. Облігації <b>OTS</b> ідеальні для <b>короткострокових інвестицій</b>.",
-                ROR: "* <b>ROR (12-місячні) </b>: <b>змінна відсоткова ставка</b>, у першому місяці <b>5,75%</b>, у решті <b>11 місяців</b> ставка базується на <b>референтній ставці НБП + 0%</b>. Виплата відсотків щомісяця, можливий достроковий викуп із комісією <b>0,5%</b> вартості облігації (<b>0,5 зл</b> за облігацію) або до нарахованих відсотків, якщо вони менші, без втрати нарахованих відсотків. Облігації <b>ROR</b> підходять для <b>коротко- та середньострокових інвесторів</b>.",
-                // Dodaj resztę tłumaczeń...
-            }
-        }
-    };
-    
-    // Funkcja aktualizująca UI
-    function updateLanguageUI(selectedLang) {
-        const dropdownBtn = document.getElementById('dropdownBtn');
-        const dropdownMenu = document.getElementById('dropdownMenu');
-    
-        dropdownBtn.setAttribute('data-lang', selectedLang);
-        currentLanguage = selectedLang;
-    
-        const otherLanguages = languages.filter(lang => lang !== selectedLang);
-        dropdownMenu.innerHTML = otherLanguages.map(lang => `
-            <button class="dropdown-item" data-lang="${lang}" aria-label="Język ${lang === 'PL' ? 'polski' : lang === 'EN' ? 'angielski' : 'ukraiński'}">${lang}</button>
-        `).join('');
-    
-        dropdownMenu.classList.remove('show');
-        changeLanguage(selectedLang); // Wywołanie nowej funkcji
-    }
-    
-    // Funkcja zmiany języka na stronie
-    function changeLanguage(lang) {
-        const t = translations[lang];
-
-        document.querySelector('.header-row h4').textContent = t.title;
-        document.querySelector('.result-header h4').textContent = t.summaryHeader;
-        document.querySelector('label[for="typObligacji"]').textContent = t.bondTypeLabel;
-        document.querySelector('label[for="kwota"]').textContent = t.investmentAmountLabel;
-        document.querySelector('label[for="okres"]').textContent = t.periodLabel;
-        document.querySelector('label[for="oprocentowanie"]').textContent = t.interestRateLabel;
-        document.querySelector('#dynamicRateLabel').textContent = ["ROR", "DOR"].includes(elements.typObligacji.value) ? t.dynamicRateLabel : t.inflationLabel;
-        
-        document.querySelector('#inflacjaZmiennaLabel b').textContent = t.variableInflationCheckbox;
-        document.querySelector('#stopaZmiennaLabel b').textContent = t.variableRateCheckbox;
-
-        elements.obliczBtn.textContent = t.calculateBtn;
-        elements.addVariableBtn.textContent = t.addVariableBtn;
-        elements.generatePdfBtn.textContent = t.generatePdfBtn;
-        document.querySelector('.result-section .btn-secondary').textContent = t.returnBtn;
-
-        document.getElementById('legendKapital').textContent = t.capitalLegend;
-        document.getElementById('legendOdsetki').textContent = t.interestLegend;
-        document.getElementById('legendPodatek').textContent = t.taxLegend;
-
-        const okresSpan = document.querySelector('.summary-footer .highlight.yellow');
-        const zyskSpan = document.querySelector('.summary-footer .highlight.green');
-        if (okresSpan) okresSpan.textContent = `${t.investmentPeriod}: ${state.lastFormData.okres || ''} ${["OTS", "DOR", "ROS", "ROD"].includes(elements.typObligacji.value) ? (lang === 'UA' ? 'місяці' : 'miesiące') : (lang === 'UA' ? 'місяців' : 'miesięcy')}`;
-        if (zyskSpan) zyskSpan.textContent = `${t.netProfit}: ${zyskSpan.textContent.split(': ')[1] || '-'}`;
-
-        const toggleBtn = document.querySelector('.harmonogram h5');
-        toggleBtn.textContent = toggleBtn.textContent.includes('▼') ? `${t.scheduleToggle}` : `${t.scheduleToggle.replace('▼', '►')}`;
-        const headers = document.querySelectorAll('#harmonogramNaglowek th');
-        headers[0].textContent = ["OTS", "ROR", "DOR"].includes(elements.typObligacji.value) ? t.scheduleHeaderMonth : t.scheduleHeaderYear;
-        headers[1].textContent = t.scheduleValue;
-        headers[2].textContent = t.scheduleInterest;
-        headers[3].textContent = t.scheduleEarnings;
-        headers[4].textContent = t.scheduleTotalEarnings;
-        headers[5].textContent = t.scheduleTax;
-        headers[6].textContent = state.isIkeIkzeMode ? t.scheduleNetProfit.replace("netto", "") : t.scheduleNetProfit;
-        headers[7].textContent = t.scheduleRedemptionFee;
-        if (headers[8]) headers[8].textContent = ["ROR", "DOR"].includes(elements.typObligacji.value) ? t.scheduleReferenceRate : t.scheduleInflation;
-        if (headers[9]) headers[9].textContent = t.scheduleTotalNet;
-
-        const typ = elements.typObligacji.value;
-        document.getElementById('obligacjeOpis').innerHTML = t.bondsDescriptions[typ] || '';
-        document.getElementById('obligacjeOpisPodsumowanie').innerHTML = t.bondsDescriptions[typ] || '';
-
-        document.querySelector('.data-info').innerHTML = `<strong>${t.dataInfo}</strong> <span class="data-date"><strong>01.03.2025</strong></span>`;
-
-        console.log(`Zmieniono język na: ${lang}`);
-    }
-    
-    // Inicjalizacja przy starcie
-    document.addEventListener('DOMContentLoaded', function() {
-        const dropdownBtn = document.getElementById('dropdownBtn');
-        const dropdownMenu = document.getElementById('dropdownMenu');
-    
-        // Przełączanie listy rozwijanej przy kliknięciu w główny przycisk
-        dropdownBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            dropdownMenu.classList.toggle('show');
-        });
-    
-        // Zamykanie listy rozwijanej po kliknięciu poza nią
-        document.addEventListener('click', function(e) {
-            const dropdown = document.querySelector('.dropdown');
-            if (!dropdown.contains(e.target)) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
-    
-        // Obsługa kliknięć w elementy listy rozwijanej
-        dropdownMenu.addEventListener('click', function(e) {
-            const target = e.target.closest('.dropdown-item');
-            if (target) {
-                const selectedLang = target.getAttribute('data-lang');
-                updateLanguageUI(selectedLang);
-                e.stopPropagation();
-            }
-        });
-    
-        // Inicjalizacja UI przy starcie
-        updateLanguageUI(currentLanguage);
-    });
     
 </script>
 </body>
