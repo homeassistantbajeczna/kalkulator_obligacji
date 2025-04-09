@@ -1614,26 +1614,8 @@
         const typ = elements.typObligacji.value;
         state.lastFormData.dynamicRates[typ] = parseFloat(elements.dynamicRate.value);
     });
-    
-    // Zaktualizowane zdarzenia dla kwota i kwotaRange
-    elements.kwotaRange.addEventListener("input", () => { 
-        let value = parseFloat(elements.kwotaRange.value);
-        if (value < 100) value = 100;
-        if (value > 10000000) value = 10000000;
-        elements.kwota.value = value;
-        elements.kwotaRange.value = value; // Synchronizacja suwaka
-        updateIloscObligacji();
-    });
-    
-    elements.kwota.addEventListener("input", () => { 
-        let value = parseFloat(elements.kwota.value) || 0; // Domyślnie 0, jeśli niepoprawna wartość
-        if (value < 100) value = 100;
-        if (value > 10000000) value = 10000000;
-        elements.kwota.value = value;
-        elements.kwotaRange.value = value; // Synchronizacja suwaka
-        updateIloscObligacji();
-    });
-    
+    elements.kwotaRange.addEventListener("input", () => { elements.kwota.value = elements.kwotaRange.value; updateIloscObligacji(); });
+    elements.kwota.addEventListener("input", () => { elements.kwotaRange.value = elements.kwota.value; updateIloscObligacji(); });
     elements.typObligacji.addEventListener("change", updateDynamicRateField);
     elements.ikeIkzeBtn.addEventListener("change", updateDynamicRateField);
     elements.inflacjaZmiennaBtn.addEventListener("change", () => { 
@@ -1642,12 +1624,6 @@
         if (!elements.inflacjaZmiennaBtn.checked) {
             state.variableInflation = [];
         } else {
-            const defaultValue = state.lastFormData.dynamicRates[typ] || 4.90;
-            state.variableInflation = [];
-            state.variableInflation.push({ value: defaultValue, period: 2 });
-        }
-        updateVariableInputs(); 
-    });
             // Pobieramy wartość z górnego panelu
             const defaultValue = state.lastFormData.dynamicRates[typ] || 4.90;
             state.variableInflation = [];
@@ -1662,6 +1638,7 @@
         if (!elements.stopaZmiennaBtn.checked) {
             state.variableReferenceRates = [];
         } else {
+            // Pobieramy wartość z górnego panelu
             const defaultValue = state.lastFormData.dynamicRates[typ] || 5.75;
             state.variableReferenceRates = [];
             state.variableReferenceRates.push({ value: defaultValue, period: 2 });
@@ -1779,7 +1756,6 @@
 
     // F U N K C J E   P O M O C N I C Z E
     
-    // Funkcja updateIloscObligacji pozostaje bez zmian
     function updateIloscObligacji() {
         const kwota = parseFloat(elements.kwota.value) || 0;
         const ilosc = Math.floor(kwota / 100);
