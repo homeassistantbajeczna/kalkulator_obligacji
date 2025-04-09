@@ -1764,56 +1764,37 @@
             dynamicRateGroup.style.display = "none";
         }
     
-        document.getElementById("inflacjaZmiennaLabel").style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
-        document.getElementById("stopaZmiennaLabel").style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
+        // Logika widoczności i wyłączania checkboxów "Zmienna Inflacja" i "Zmienna Stopa Ref. NBP"
+        const inflacjaZmiennaLabel = document.getElementById("inflacjaZmiennaLabel");
+        const stopaZmiennaLabel = document.getElementById("stopaZmiennaLabel");
+        inflacjaZmiennaLabel.style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
+        stopaZmiennaLabel.style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
     
-        // Reset zmiennych stóp referencyjnych NBP przy zmianie między ROR a DOR, jeśli przycisk "Zmienna stopa Ref. NBP" jest włączony
-        const isPreviousRORorDOR = previousTyp === "ROR" || previousTyp === "DOR";
-        const isCurrentRORorDOR = typ === "ROR" || typ === "DOR";
-        if (isPreviousRORorDOR && isCurrentRORorDOR && previousTyp !== typ && elements.stopaZmiennaBtn.checked) {
-            console.log(`Resetting variableReferenceRates: Changing from ${previousTyp} to ${typ}`);
-            const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 5.75;
-            state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
-            state.lastFormData.stopaZmienna = true; // Upewniamy się, że stan przycisku jest zachowany
-            console.log("New variableReferenceRates:", state.variableReferenceRates);
-        }
-    
-        // Reset zmiennej inflacji przy zmianie między COI, EDO, ROS, ROD, jeśli przycisk "Zmienna inflacja" jest włączony
-        const isPreviousInflationType = ["COI", "EDO", "ROS", "ROD"].includes(previousTyp);
-        const isCurrentInflationType = ["COI", "EDO", "ROS", "ROD"].includes(typ);
-        if (isPreviousInflationType && isCurrentInflationType && previousTyp !== typ && elements.inflacjaZmiennaBtn.checked) {
-            console.log(`Resetting variableInflation: Changing from ${previousTyp} to ${typ}`);
-            const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 4.90;
-            state.variableInflation = [{ value: defaultValue, period: 2 }];
-            state.lastFormData.inflacjaZmienna = true; // Upewniamy się, że stan przycisku jest zachowany
-            console.log("New variableInflation:", state.variableInflation);
-        }
-    
-        // Reset zmiennych, jeśli nowy typ obligacji nie obsługuje zmiennych stóp/inflacji
+        // Wyłączanie checkboxów i resetowanie ich stanu
         if (!["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-            if (state.variableInflation.length > 0) {
-                console.log(`Clearing variableInflation: New type ${typ} does not support variable inflation`);
-                state.variableInflation = [];
-                elements.inflacjaZmiennaBtn.checked = false;
-                state.lastFormData.inflacjaZmienna = false;
+            state.variableInflation = [];
+            elements.inflacjaZmiennaBtn.checked = false;
+            elements.inflacjaZmiennaBtn.disabled = true; // Wyłączamy checkbox
+            state.lastFormData.inflacjaZmienna = false;
+        } else {
+            elements.inflacjaZmiennaBtn.disabled = false; // Włączamy checkbox
+            if (elements.inflacjaZmiennaBtn.checked && state.variableInflation.length === 0) {
+                const defaultValue = state.lastFormData.dynamicRates[typ] || 4.90;
+                state.variableInflation = [{ value: defaultValue, period: 2 }];
             }
-        } else if (elements.inflacjaZmiennaBtn.checked && state.variableInflation.length === 0) {
-            console.log(`Initializing variableInflation for ${typ} as it was empty`);
-            const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 4.90;
-            state.variableInflation = [{ value: defaultValue, period: 2 }];
         }
     
         if (!["ROR", "DOR"].includes(typ)) {
-            if (state.variableReferenceRates.length > 0) {
-                console.log(`Clearing variableReferenceRates: New type ${typ} does not support variable rates`);
-                state.variableReferenceRates = [];
-                elements.stopaZmiennaBtn.checked = false;
-                state.lastFormData.stopaZmienna = false;
+            state.variableReferenceRates = [];
+            elements.stopaZmiennaBtn.checked = false;
+            elements.stopaZmiennaBtn.disabled = true; // Wyłączamy checkbox
+            state.lastFormData.stopaZmienna = false;
+        } else {
+            elements.stopaZmiennaBtn.disabled = false; // Włączamy checkbox
+            if (elements.stopaZmiennaBtn.checked && state.variableReferenceRates.length === 0) {
+                const defaultValue = state.lastFormData.dynamicRates[typ] || 5.75;
+                state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
             }
-        } else if (elements.stopaZmiennaBtn.checked && state.variableReferenceRates.length === 0) {
-            console.log(`Initializing variableReferenceRates for ${typ} as it was empty`);
-            const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 5.75;
-            state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
         }
     
         // Logika widoczności checkboxa IKE/IKZE
@@ -1823,14 +1804,14 @@
             ikeIkzeContainer.style.display = "block";
         } else {
             ikeIkzeContainer.style.display = "none";
-            elements.ikeIkzeBtn.checked = false; // Odznaczamy checkbox
-            state.isIkeIkzeMode = false; // Resetujemy stan
-            state.lastFormData.ikeIkze = false; // Aktualizujemy zapisany stan
+            elements.ikeIkzeBtn.checked = false;
+            state.isIkeIkzeMode = false;
+            state.lastFormData.ikeIkze = false;
         }
     
-        console.log("Before updateVariableInputs - variableReferenceRates:", state.variableReferenceRates, "variableInflation:", state.variableInflation);
         updateVariableInputs();
     }
+
     // F U N K C J E   P O M O C N I C Z E
     
     function updateIloscObligacji() {
@@ -1956,8 +1937,6 @@
         const config = obligacjeConfig[typ];
         const maxCykl = ["ROR", "DOR"].includes(typ) ? config.okres : config.okres / 12;
     
-        console.log(`updateVariableInputs called for ${typ} - isInflacjaZmienna: ${isInflacjaZmienna}, isStopaZmienna: ${isStopaZmienna}`);
-    
         if (isInflacjaZmienna || isStopaZmienna) {
             variableInputs.style.display = "block";
             addVariableBtn.style.display = "block";
@@ -1966,15 +1945,12 @@
             const maxChanges = maxVariableChanges[typ] || 0;
     
             // Pobieramy wartość z górnego panelu
-            const defaultValue = parseFloat(elements.dynamicRate.value) || (isInflacjaZmienna ? 4.90 : 5.75);
+            const defaultValue = state.lastFormData.dynamicRates[typ] || (isInflacjaZmienna ? 4.90 : 5.75);
             const defaultPeriod = 2;
     
             if (data.length === 0 && data.length < maxChanges) {
-                console.log(`Initializing data with default value: ${defaultValue}, period: ${defaultPeriod}`);
                 data.push({ value: defaultValue, period: defaultPeriod });
             }
-    
-            console.log(`Rendering ${data.length} rows for ${isInflacjaZmienna ? 'variableInflation' : 'variableReferenceRates'}:`, data);
     
             wrapper.innerHTML = "";
             const changes = isInflacjaZmienna ? state.variableInflation : state.variableReferenceRates;
