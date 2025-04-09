@@ -1943,6 +1943,8 @@
         const config = obligacjeConfig[typ];
         const maxCykl = ["ROR", "DOR"].includes(typ) ? config.okres : config.okres / 12;
     
+        console.log(`updateVariableInputs called for ${typ} - isInflacjaZmienna: ${isInflacjaZmienna}, isStopaZmienna: ${isStopaZmienna}`);
+    
         if (isInflacjaZmienna || isStopaZmienna) {
             variableInputs.style.display = "block";
             addVariableBtn.style.display = "block";
@@ -1951,12 +1953,15 @@
             const maxChanges = maxVariableChanges[typ] || 0;
     
             // Pobieramy wartość z górnego panelu
-            const defaultValue = state.lastFormData.dynamicRates[typ] || (isInflacjaZmienna ? 4.90 : 5.75);
+            const defaultValue = parseFloat(elements.dynamicRate.value) || (isInflacjaZmienna ? 4.90 : 5.75);
             const defaultPeriod = 2;
     
             if (data.length === 0 && data.length < maxChanges) {
+                console.log(`Initializing data with default value: ${defaultValue}, period: ${defaultPeriod}`);
                 data.push({ value: defaultValue, period: defaultPeriod });
             }
+    
+            console.log(`Rendering ${data.length} rows for ${isInflacjaZmienna ? 'variableInflation' : 'variableReferenceRates'}:`, data);
     
             wrapper.innerHTML = "";
             const changes = isInflacjaZmienna ? state.variableInflation : state.variableReferenceRates;
