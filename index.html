@@ -1902,7 +1902,6 @@
             const data = isInflacjaZmienna ? state.variableInflation : state.variableReferenceRates;
             const maxChanges = maxVariableChanges[typ] || 0;
     
-            // Pobieramy wartość z górnego panelu
             const defaultValue = state.lastFormData.dynamicRates[typ] || (isInflacjaZmienna ? 4.90 : 5.75);
             const defaultPeriod = 2;
     
@@ -1920,7 +1919,6 @@
                 const fieldsWrapper = document.createElement("div");
                 fieldsWrapper.className = "fields-wrapper";
     
-                // Ustalamy minimalną wartość okresu na podstawie poprzedniego wiersza, ale dla pierwszego wiersza min to 2
                 const minPeriod = index > 0 ? changes[index - 1].period + 1 : 2;
     
                 const cyklGroup = document.createElement("div");
@@ -1939,10 +1937,10 @@
                 rateGroup.innerHTML = `
                     <label class="form-label">${isInflacjaZmienna ? "Inflacja" : "Stopa Ref. NBP"}</label>
                     <div class="input-group">
-                        <input type="number" class="form-control variable-rate" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.value}">
+                        <input type="number" class="form-control variable-rate" min="0.1" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.value}">
                         <span class="input-group-text">%</span>
                     </div>
-                    <input type="range" class="form-range variable-rate-range" min="0" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.value}">
+                    <input type="range" class="form-range variable-rate-range" min="0.1" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.value}">
                 `;
     
                 fieldsWrapper.appendChild(cyklGroup);
@@ -1993,7 +1991,6 @@
     
                 cyklInput.addEventListener("input", () => {
                     let value = parseInt(cyklInput.value);
-                    // Sprawdzamy, czy wartość jest większa niż minimalny okres
                     if (value < minPeriod) {
                         value = minPeriod;
                         cyklInput.value = value;
@@ -2005,58 +2002,48 @@
                     cyklRange.value = value;
                     changes[index].period = value;
                     updateVariableData();
-                    // Aktualizujemy min dla kolejnych wierszy i usuwamy konflikty
                     updateVariableInputs();
                 });
     
                 cyklRange.addEventListener("input", () => {
                     let value = parseFloat(cyklRange.value);
-                    // Podczas przesuwania pokazujemy tylko wartości całkowite
                     cyklInput.value = Math.round(value);
                 });
     
                 cyklRange.addEventListener("change", () => {
                     let value = parseFloat(cyklRange.value);
-                    // Po zakończeniu przesuwania zaokrąglamy do najbliższej liczby całkowitej
                     value = Math.round(value);
-                    // Sprawdzamy, czy wartość jest większa niż minimalny okres
-                    if (value < minPeriod) {
-                        value = minPeriod;
-                    }
-                    if (value > maxCykl) {
-                        value = maxCykl;
-                    }
+                    if (value < minPeriod) value = minPeriod;
+                    if (value > maxCykl) value = maxCykl;
                     cyklRange.value = value;
                     cyklInput.value = value;
                     changes[index].period = value;
                     updateVariableData();
-                    // Aktualizujemy min dla kolejnych wierszy i usuwamy konflikty
                     updateVariableInputs();
                 });
     
                 rateInput.addEventListener("input", () => {
-                    let value = parseFloat(rateInput.value);
-                    if (value < 0 || value > (isInflacjaZmienna ? 50 : 20)) rateInput.value = Math.max(0, Math.min(isInflacjaZmienna ? 50 : 20, value));
-                    rateRange.value = rateInput.value;
-                    changes[index].value = parseFloat(rateInput.value);
+                    let value = parseFloat(rateInput.value) || 0;
+                    if (value < 0.1) value = 0.1; // Minimalna wartość 0,1
+                    if (value > (isInflacjaZmienna ? 50 : 20)) value = isInflacjaZmienna ? 50 : 20;
+                    rateInput.value = value.toFixed(isInflacjaZmienna ? 1 : 2); // Zachowaj precyzję
+                    rateRange.value = value;
+                    changes[index].value = value;
                     updateVariableData();
                 });
     
                 rateRange.addEventListener("input", () => {
-                    rateInput.value = rateRange.value;
-                    changes[index].value = parseFloat(rateRange.value);
+                    let value = parseFloat(rateRange.value);
+                    if (value < 0.1) value = 0.1; // Minimalna wartość 0,1
+                    rateInput.value = value.toFixed(isInflacjaZmienna ? 1 : 2); // Zachowaj precyzję
+                    changes[index].value = value;
                     updateVariableData();
                 });
             });
     
-            // Ustawiamy tekst przycisku
             addVariableBtn.textContent = "Dodaj kolejną zmianę";
-    
-            // Sprawdzamy, czy ostatni okres osiągnął maxCykl
             const lastChange = changes.length > 0 ? changes[changes.length - 1] : null;
             const isMaxPeriodReached = lastChange && lastChange.period >= maxCykl;
-    
-            // Ukrywamy przycisk, jeśli liczba zmian osiągnęła maxChanges lub ostatni okres osiągnął maxCykl
             addVariableBtn.style.display = (changes.length < maxChanges && !isMaxPeriodReached) ? "block" : "none";
         } else {
             variableInputs.style.display = "none";
@@ -2064,7 +2051,6 @@
             wrapper.innerHTML = "";
         }
     }
-
     function addVariableChange() {
         const typ = elements.typObligacji.value;
         const isInflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
