@@ -1604,14 +1604,21 @@
 
     // O B S Ł U G A   Z D A R Z E Ń
     elements.dynamicRateRange.addEventListener("input", () => { 
-        elements.dynamicRate.value = elements.dynamicRateRange.value; 
+        let value = parseFloat(elements.dynamicRateRange.value);
+        if (value < 0.1) value = 0.1; // Minimalna wartość 0,1
+        elements.dynamicRate.value = value;
+        elements.dynamicRateRange.value = value; // Synchronizacja suwaka
         const typ = elements.typObligacji.value;
-        state.lastFormData.dynamicRates[typ] = parseFloat(elements.dynamicRate.value);
+        state.lastFormData.dynamicRates[typ] = value;
     });
+    
     elements.dynamicRate.addEventListener("input", () => { 
-        elements.dynamicRateRange.value = elements.dynamicRate.value; 
+        let value = parseFloat(elements.dynamicRate.value) || 0;
+        if (value < 0.1) value = 0.1; // Minimalna wartość 0,1
+        elements.dynamicRate.value = value;
+        elements.dynamicRateRange.value = value; // Synchronizacja suwaka
         const typ = elements.typObligacji.value;
-        state.lastFormData.dynamicRates[typ] = parseFloat(elements.dynamicRate.value);
+        state.lastFormData.dynamicRates[typ] = value;
     });
     
     // Zaktualizowane zdarzenia dla kwota i kwotaRange
