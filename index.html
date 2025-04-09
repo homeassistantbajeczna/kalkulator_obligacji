@@ -1515,7 +1515,606 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // D E F I N I C J E   Z M I E N N Y C H
 
+    const elements = {
+        formSection: document.getElementById("formSection"),
+        resultSection: document.getElementById("resultSection"),
+        kwota: document.getElementById("kwota"),
+        kwotaRange: document.getElementById("kwotaRange"),
+        typObligacji: document.getElementById("typObligacji"),
+        dynamicRate: document.getElementById("dynamicRate"),
+        dynamicRateRange: document.getElementById("dynamicRateRange"),
+        okres: document.getElementById("okres"),
+        oprocentowanie: document.getElementById("oprocentowanie"),
+        ikeIkzeBtn: document.getElementById("ikeIkzeBtn"),
+        inflacjaZmiennaBtn: document.getElementById("inflacjaZmiennaBtn"),
+        stopaZmiennaBtn: document.getElementById("stopaZmiennaBtn"),
+        obliczBtn: document.getElementById("obliczBtn"),
+        addVariableBtn: document.getElementById("addVariableBtn"),
+        resultHeader: document.getElementById("resultHeader"),
+        obligacjeChart: document.getElementById("obligacjeChart"),
+        obligacjeChartLine: document.getElementById("obligacjeChartLine"),
+        generatePdfBtn: document.getElementById("generatePdfBtn")
+    };
+    
+    const state = {
+        chart: null,
+        chartLine: null,
+        harmonogramData: [],
+        isIkeIkzeMode: false,
+        variableInflation: [], // Tablica dla danych "Zmienna inflacja"
+        variableReferenceRates: [], // Tablica dla danych "Zmienne stopy referencyjne NBP"
+        lastFormData: {
+            kwota: 10000,
+            typObligacji: "OTS",
+            dynamicRates: {
+                "ROR": 5.75,
+                "DOR": 5.75,
+                "COI": 4.90,
+                "EDO": 4.90,
+                "ROS": 4.90,
+                "ROD": 4.90
+            },
+            okres: 3,
+            oprocentowanie: 3,
+            ikeIkze: false,
+            inflacjaZmienna: false,
+            stopaZmienna: false,
+        },
+        isCalculating: false
+    };
+    
+    const maxVariableChanges = {
+        "ROR": 11, // 12 miesięcy - 1 domyślny
+        "DOR": 23, // 24 miesiące - 1 domyślny
+        "COI": 3,  // 4 lata - 1 domyślny
+        "EDO": 9,  // 10 lat - 1 domyślny
+        "ROS": 5,  // 6 lat - 1 domyślny
+        "ROD": 11  // 12 lat - 1 domyślny
+    };
+    
+    const obligacjeConfig = {
+        "OTS": { okres: 3, oprocentowanie: 3.00, zmienne: false, kapitalizacja: false, oplataWykup: 0.00 },
+        "ROR": { okres: 12, oprocentowanie: 5.75, zmienne: true, marza: 0.00, kapitalizacja: false, oplataWykup: 0.005 },
+        "DOR": { okres: 24, oprocentowanie: 5.90, zmienne: true, marza: 0.15, kapitalizacja: false, oplataWykup: 0.007 },
+        "TOS": { okres: 36, oprocentowanie: 5.95, zmienne: false, kapitalizacja: true, oplataWykup: 0.01 },
+        "COI": { okres: 48, oprocentowanie: 6.30, zmienne: true, marza: 1.50, indeksowaneInflacja: true, kapitalizacja: false, oplataWykup: 0.02 },
+        "EDO": { okres: 120, oprocentowanie: 6.55, zmienne: true, marza: 2.00, indeksowaneInflacja: true, kapitalizacja: true, oplataWykup: 0.03 },
+        "ROS": { okres: 72, oprocentowanie: 6.50, zmienne: true, marza: 2.00, indeksowaneInflacja: true, kapitalizacja: true, oplataWykup: 0.02 },
+        "ROD": { okres: 144, oprocentowanie: 6.80, zmienne: true, marza: 2.50, indeksowaneInflacja: true, kapitalizacja: true, oplataWykup: 0.03 }
+    };
+    
+    const opisyObligacji = {
+        "OTS": "* <b>OTS (3-miesięczne) </b>: stałe oprocentowanie <b>3,00%</b> na okres <b>3-miesięcy</b>, wypłata odsetek nastąpi <b>przy wykupie</b> obligacji. Wcześniejszy odkup powoduje nienaliczenie odsetek, natomiast <b>nie ma opłat za wcześniejszy odkup</b>. Obligacje <b>OTS</b> są idealne dla <b>krótkoterminowych inwestycji</b>.",
+        "ROR": "* <b>ROR (12-miesięczne) </b>: <b>oprocentowanie zmienne</b>, w pierwszym miesiącu <b>5,75%</b>, w pozostałych <b>11 miesiącach</b> oprocentowanie oparte na <b>stopie referencyjnej NBP + 0%</b>. Wypłata odsetek następuje <b>co miesiąc</b>, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <b>0,5%</b> wartości obligacji (<b>0,5 zł</b> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <b>ROR</b> przeznaczone są dla <b>krótko i średnioterminowych inwestorów</b>.",
+        "DOR": "* <b>DOR (24-miesięczne) </b>: <b>oprocentowanie zmienne</b>, <b>5,90% w pierwszym miesiącu</b>, w pozostałych <b>23 miesiącach</b> oprocentowanie oparte na <b>stopie referencyjnej NBP + 0,15%</b>. Wypłata odsetek następuje <b>co miesiąc</b>, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <b>0,7%</b> wartości obligacji (<b>0,7 zł</b> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <b>DOR</b> przeznaczone są dla <b>średnioterminowych inwestorów</b>.",
+        "TOS": "* <b>TOS (3-letnie)</b>: <b>stałe oprocentowanie 5,95%</b> na okres <b>3-lat</b>, wypłata odsetek nastąpi <b>przy wykupie</b> obligacji po <b>3 latach</b> inwestycji. Wcześniejszy odkup wiąże się z opłatą w wysokości <b>1%</b> wartości obligacji (<b>1 zł</b> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <b>Roczna kapitalizacja odsetek</b> zwiększa efektywności inwestycji. Obligacje <b>TOS</b> przeznaczone dla <b>stabilnych średnioterminowych inwestycji</b>.",
+        "COI": "* <b>COI (4-letnie)</b>: obligacje <b>indeksowane inflacją</b>, <b>6,30% w pierwszym roku</b>, w kolejnych <b>3 latach</b> oprocentowanie wynosi <b>wartość inflacji + 1,50%</b>. Wypłata odsetek następuje <b>po każdym roku</b> inwestycji, jest możliwość wcześniejszego odkupu, niestety wiąże się to z opłatą w wysokości <b>2%</b> wartości obligacji (<b>2 zł</b> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. Obligacje <b>COI</b> są idealne dla <b>średnio i długoterminowych inwestycji</b> oraz dla <b>ochrony przed wzrostem inflacji</b>.",
+        "EDO": "* <b>EDO (10-letnie)</b>: obligacje <b>indeksowane inflacją</b>, <b>6,55% w pierwszym roku</b>, w kolejnych <b>9 latach</b> oprocentowanie wynosi <b>wartość inflacji + 2,00%</b>. Wypłata odsetek następuje <b>przy wykupie</b> obligacji po <b>10 latach inwestycji</b>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <b>3%</b> wartości obligacji (<b>3 zł</b> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <b>Roczna kapitalizacja odsetek</b> zwiększa efektywności inwestycji. Obligacje <b>EDO</b> są idealne dla <b>długoterminowych inwestycji</b> oraz dla <b>ochrony przed wzrostem inflacji</b>.",
+        "ROS": "* <b>ROS (6-letnie)</b>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <b>800+</b>. Obligacje <b>indeksowane inflacją</b>, <b>6,50% w pierwszym roku</b>, w kolejnych <b>5 latach</b> oprocentowanie wynosi <b>wartość inflacji + 2,00%</b>. Wypłata odsetek następuje <b>przy wykupie</b> obligacji po <b>6 latach inwestycji</b>. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <b>2%</b> wartości obligacji (<b>2 zł</b> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <b>Roczna kapitalizacja odsetek</b> zwiększa efektywności inwestycji. Obligacje <b>ROS</b> są idealne dla <b>rodzinnych inwestycji</b> oraz dla <b>ochrony przed wzrostem inflacji</b>.",
+        "ROD": "* <b>ROD (12-letnie) </b>: rodzinne obligacje przeznaczone są wyłącznie dla beneficjentów programu <b>800+</b>. Obligacje <b>indeksowane inflacją</b>, <b>6,80% w pierwszym roku</b>, w kolejnych <b>11 latach</b> oprocentowanie wynosi <b>wartość inflacji + 2,50%</b>. Wypłata odsetek następuje <b>przy wykupie</b> obligacji po <b>12 latach</b> inwestycji. Wcześniejszy odkup niestety wiąże się z opłatą w wysokości <b>3%</b> wartości obligacji (<b>3 zł</b> za każdą obligację) lub do wartości narosłych odsetek, gdy wartość narosłych odsetek jest mniejsza od wartości opłaty, nie powoduje utraty należnych odsetek. <b>Roczna kapitalizacja odsetek</b> zwiększa efektywności inwestycji. Obligacje <b>ROD</b> są idealne dla <b>długoterminowych rodzinnych inwestycji</b> oraz dla <b>ochrony przed wzrostem inflacji</b>."
+    };
+    
+    const nazwyObligacji = {
+        "OTS": "3-miesięcznych (OTS)", "ROR": "12-miesięcznych (ROR)", "DOR": "24-miesięcznych (DOR)", "TOS": "3-letnich (TOS)",
+        "COI": "4-letnich (COI)", "EDO": "10-letnich (EDO)", "ROS": "6-letnich (ROS)", "ROD": "12-letnich (ROD)"
+    };
+    
+    // O B S Ł U G A   Z D A R Z E Ń
+    
+    elements.dynamicRateRange.addEventListener("input", () => { 
+        let value = parseFloat(elements.dynamicRateRange.value);
+        const max = parseFloat(elements.dynamicRateRange.max);
+        if (value < 0.1) value = 0.1; // Minimum 0,1%
+        if (value > max) value = max;
+        elements.dynamicRate.value = value;
+        elements.dynamicRateRange.value = value; // Synchronizacja
+        const typ = elements.typObligacji.value;
+        state.lastFormData.dynamicRates[typ] = value;
+    });
+    
+    elements.dynamicRate.addEventListener("input", () => { 
+        let value = parseFloat(elements.dynamicRate.value) || 0;
+        const max = parseFloat(elements.dynamicRate.max);
+        if (value < 0.1) value = 0.1; // Minimum 0,1%
+        if (value > max) value = max;
+        elements.dynamicRate.value = value;
+        elements.dynamicRateRange.value = value; // Synchronizacja
+        const typ = elements.typObligacji.value;
+        state.lastFormData.dynamicRates[typ] = value;
+    });
+    
+    elements.kwotaRange.addEventListener("input", () => { 
+        let value = parseFloat(elements.kwotaRange.value);
+        if (value < 100) value = 100; // Minimum 100 zł
+        if (value > 10000000) value = 10000000; // Maksimum 10 000 000 zł
+        elements.kwota.value = value;
+        elements.kwotaRange.value = value; // Synchronizacja
+        updateIloscObligacji();
+    });
+    
+    elements.kwota.addEventListener("input", () => { 
+        let value = parseFloat(elements.kwota.value) || 0;
+        if (value < 100) value = 100; // Minimum 100 zł
+        if (value > 10000000) value = 10000000; // Maksimum 10 000 000 zł
+        elements.kwota.value = value;
+        elements.kwotaRange.value = value; // Synchronizacja
+        updateIloscObligacji();
+    });
+    
+    elements.typObligacji.addEventListener("change", updateDynamicRateField);
+    elements.ikeIkzeBtn.addEventListener("change", updateDynamicRateField);
+    elements.inflacjaZmiennaBtn.addEventListener("change", () => { 
+        state.lastFormData.inflacjaZmienna = elements.inflacjaZmiennaBtn.checked; 
+        const typ = elements.typObligacji.value;
+        if (!elements.inflacjaZmiennaBtn.checked) {
+            state.variableInflation = [];
+        } else {
+            const defaultValue = state.lastFormData.dynamicRates[typ] || 4.90;
+            state.variableInflation = [];
+            state.variableInflation.push({ value: Math.max(0.1, defaultValue), period: 2 }); // Min 0,1%
+        }
+        updateVariableInputs(); 
+    });
+    
+    elements.stopaZmiennaBtn.addEventListener("change", () => { 
+        state.lastFormData.stopaZmienna = elements.stopaZmiennaBtn.checked; 
+        const typ = elements.typObligacji.value;
+        if (!elements.stopaZmiennaBtn.checked) {
+            state.variableReferenceRates = [];
+        } else {
+            const defaultValue = state.lastFormData.dynamicRates[typ] || 5.75;
+            state.variableReferenceRates = [];
+            state.variableReferenceRates.push({ value: Math.max(0.1, defaultValue), period: 2 }); // Min 0,1%
+        }
+        updateVariableInputs(); 
+    });
+    
+    elements.obliczBtn.addEventListener("click", () => { console.log("Oblicz clicked"); obliczObligacje(); });
+    elements.addVariableBtn.addEventListener("click", () => { console.log("AddVariable clicked"); addVariableChange(); });
+    elements.generatePdfBtn.addEventListener("click", () => { console.log("GeneratePdf clicked"); generatePdf(); });
+    
+    function setDynamicRateField(label, value, step, max) {
+        const dynamicRateLabel = document.getElementById("dynamicRateLabel");
+        const dynamicRateInfo = document.getElementById("dynamicRateInfo");
+        dynamicRateLabel.textContent = label;
+        elements.dynamicRate.value = Math.max(0.1, value); // Ustawiamy min. 0,1%
+        elements.dynamicRateRange.value = Math.max(0.1, value);
+        elements.dynamicRate.step = step;
+        elements.dynamicRateRange.step = step;
+        elements.dynamicRate.min = 0.1; // Nowe minimum
+        elements.dynamicRateRange.min = 0.1; // Nowe minimum
+        elements.dynamicRate.max = max;
+        elements.dynamicRateRange.max = max;
+    }
+    
+    function updateDynamicRateField() {
+        state.isIkeIkzeMode = elements.ikeIkzeBtn.checked;
+        const select = elements.typObligacji;
+        const previousTyp = select.value;
+    
+        select.innerHTML = state.isIkeIkzeMode ? `
+            <option value="ROR">12-miesięczne (ROR)</option>
+            <option value="DOR">24-miesięczne (DOR)</option>
+            <option value="TOS" selected>3-letnie (TOS)</option>
+            <option value="COI">4-letnie (COI)</option>
+            <option value="EDO">10-letnie (EDO)</option>
+        ` : `
+            <option value="OTS" selected>3-miesięczne (OTS)</option>
+            <option value="ROR">12-miesięczne (ROR)</option>
+            <option value="DOR">24-miesięczne (DOR)</option>
+            <option value="TOS">3-letnie (TOS)</option>
+            <option value="COI">4-letnie (COI)</option>
+            <option value="EDO">10-letnie (EDO)</option>
+            <option value="ROS">6-letnie (ROS)</option>
+            <option value="ROD">12-letnich (ROD)</option>
+        `;
+    
+        const availableOptions = Array.from(select.options).map(opt => opt.value);
+        select.value = availableOptions.includes(previousTyp) ? previousTyp : (state.isIkeIkzeMode ? "TOS" : "OTS");
+    
+        const typ = select.value;
+        const config = obligacjeConfig[typ];
+    
+        elements.okres.value = config.okres;
+        const jednostkaOkresu = ["OTS", "DOR", "ROS", "ROD"].includes(typ) ? "miesiące" : "miesięcy";
+        const inputGroup = elements.okres.closest('.input-group');
+        const okresUnitElement = inputGroup ? inputGroup.querySelector('.input-group-text') : null;
+        if (okresUnitElement) {
+            okresUnitElement.textContent = jednostkaOkresu;
+        } else {
+            console.warn("Nie znaleziono elementu '.input-group-text' w obrębie '#okres'. Sprawdź strukturę HTML.");
+        }
+        elements.oprocentowanie.value = config.oprocentowanie;
+        updateLata();
+        updateOprocentowanieInfo();
+        updateOpisObligacji();
+    
+        const dynamicRateGroup = document.getElementById("dynamicRateGroup");
+        if (["ROR", "DOR"].includes(typ)) {
+            const stopaRefValue = Math.max(0.1, state.lastFormData.dynamicRates[typ] || 5.75); // Min 0,1%
+            setDynamicRateField("Stopa Ref. NBP", stopaRefValue, "0.05", "20");
+            dynamicRateGroup.style.display = "flex";
+        } else if (["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+            const inflacjaValue = Math.max(0.1, state.lastFormData.dynamicRates[typ] || 4.90); // Min 0,1%
+            setDynamicRateField("Inflacja", inflacjaValue, "0.1", "50");
+            dynamicRateGroup.style.display = "flex";
+        } else {
+            dynamicRateGroup.style.display = "none";
+        }
+    
+        document.getElementById("inflacjaZmiennaLabel").style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
+        document.getElementById("stopaZmiennaLabel").style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
+    
+        if (!["COI", "EDO", "ROS", "ROD"].includes(typ)) {
+            state.variableInflation = [];
+            elements.inflacjaZmiennaBtn.checked = false;
+            state.lastFormData.inflacjaZmienna = false;
+        } else if (elements.inflacjaZmiennaBtn.checked && state.variableInflation.length === 0) {
+            const defaultValue = Math.max(0.1, state.lastFormData.dynamicRates[typ] || 4.90); // Min 0,1%
+            state.variableInflation = [{ value: defaultValue, period: 2 }];
+        }
+    
+        if (!["ROR", "DOR"].includes(typ)) {
+            state.variableReferenceRates = [];
+            elements.stopaZmiennaBtn.checked = false;
+            state.lastFormData.stopaZmienna = false;
+        } else if (elements.stopaZmiennaBtn.checked && state.variableReferenceRates.length === 0) {
+            const defaultValue = Math.max(0.1, state.lastFormData.dynamicRates[typ] || 5.75); // Min 0,1%
+            state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
+        }
+    
+        const ikeIkzeContainer = document.getElementById("ikeIkzeContainer");
+        const allowedTypes = ["ROR", "DOR", "TOS", "COI", "EDO"];
+        if (allowedTypes.includes(typ)) {
+            ikeIkzeContainer.style.display = "block";
+        } else {
+            ikeIkzeContainer.style.display = "none";
+            elements.ikeIkzeBtn.checked = false;
+            state.isIkeIkzeMode = false;
+            state.lastFormData.ikeIkze = false;
+        }
+    
+        updateVariableInputs();
+    }
+    
+    // F U N K C J E   P O M O C N I C Z E
+    
+    function updateIloscObligacji() {
+        const kwota = parseFloat(elements.kwota.value) || 0;
+        const ilosc = Math.floor(kwota / 100);
+        const iloscElement = document.getElementById("iloscObligacji");
+        if (iloscElement) iloscElement.textContent = `Ilość obligacji: ${ilosc}`;
+        else console.warn("Element #iloscObligacji nie znaleziony.");
+    }
+    
+    function updateVariableData() {
+        const typ = elements.typObligacji.value;
+        const isInflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
+        const isStopaZmienna = elements.stopaZmiennaBtn.checked && ["ROR", "DOR"].includes(typ);
+        const changes = isInflacjaZmienna ? state.variableInflation : state.variableReferenceRates;
+        const maxCykl = ["ROR", "DOR"].includes(typ) ? obligacjeConfig[typ].okres : obligacjeConfig[typ].okres / 12;
+    
+        const inputs = document.querySelectorAll(".variable-input-group");
+        const newChanges = [];
+    
+        inputs.forEach((inputGroup, index) => {
+            const cyklInput = inputGroup.querySelector(".variable-cykl");
+            const rateInput = inputGroup.querySelector(".variable-rate");
+            let period = Math.round(parseFloat(cyklInput.value));
+            let value = parseFloat(rateInput.value);
+    
+            // Ograniczenie minimalnej wartości stopy/inflacji do 0,1%
+            if (value < 0.1) value = 0.1;
+            const maxValue = isInflacjaZmienna ? 50 : 20;
+            if (value > maxValue) value = maxValue;
+    
+            const minPeriod = index > 0 ? newChanges[index - 1].period + 1 : 2;
+            if (period < minPeriod) {
+                period = minPeriod;
+                cyklInput.value = period;
+                const cyklRange = inputGroup.querySelector(".variable-cykl-range");
+                cyklRange.value = period;
+            }
+            if (period > maxCykl) {
+                period = maxCykl;
+                cyklInput.value = period;
+                const cyklRange = inputGroup.querySelector(".variable-cykl-range");
+                cyklRange.value = period;
+            }
+    
+            newChanges.push({ period, value });
+        });
+    
+        for (let i = 0; i < newChanges.length; i++) {
+            const currentPeriod = newChanges[i].period;
+            for (let j = newChanges.length - 1; j > i; j--) {
+                if (newChanges[j].period <= currentPeriod) {
+                    newChanges.splice(j, 1);
+                }
+            }
+        }
+    
+        if (isInflacjaZmienna) {
+            state.variableInflation = newChanges;
+        } else {
+            state.variableReferenceRates = newChanges;
+        }
+    }
+    
+    function updateLata() {
+        const miesiace = parseInt(elements.okres.value) || 0;
+        const lata = (miesiace / 12).toFixed(0);
+        document.getElementById("lata").textContent = `Ilość lat: ${miesiace >= 12 ? lata : 0}`;
+    }
+    
+    function updateOprocentowanieInfo() {
+        const typ = elements.typObligacji.value;
+        const config = obligacjeConfig[typ];
+        let info = config.zmienne ? 
+            (config.indeksowaneInflacja ? 
+                `Pierwszy rok: ${config.oprocentowanie}%, kolejne: inflacja + ${config.marza}%` : 
+                `Pierwszy m-c: ${config.oprocentowanie}%, kolejne: stopa NBP + ${config.marza}%`) : 
+            `Stałe oprocentowanie: ${config.oprocentowanie}%`;
+        document.getElementById("oprocentowanieInfo").textContent = info;
+    }
+    
+    function updateOpisObligacji() {
+        const typ = elements.typObligacji.value;
+        const opis = opisyObligacji[typ] || "";
+        document.getElementById("obligacjeOpis").innerHTML = opis;
+        document.getElementById("obligacjeOpisPodsumowanie").innerHTML = opis;
+    }
+    
+    function toggleHarmonogram(sectionId) {
+        const content = document.getElementById(sectionId);
+        const toggleBtn = content.previousElementSibling;
+        content.style.display = content.style.display === "none" ? "block" : "none";
+        toggleBtn.textContent = content.style.display === "none" ? "Harmonogram odsetek ►" : "Harmonogram odsetek ▼";
+    }
+    
+    function showForm() {
+        elements.formSection.style.display = "block";
+        elements.resultSection.style.display = "none";
+    
+        elements.kwota.value = state.lastFormData.kwota;
+        elements.kwotaRange.value = state.lastFormData.kwota;
+        elements.okres.value = state.lastFormData.okres;
+        elements.oprocentowanie.value = state.lastFormData.oprocentowanie;
+        elements.ikeIkzeBtn.checked = state.lastFormData.ikeIkze;
+        state.isIkeIkzeMode = state.lastFormData.ikeIkze;
+        elements.typObligacji.value = state.lastFormData.typObligacji;
+        elements.inflacjaZmiennaBtn.checked = state.lastFormData.inflacjaZmienna || false;
+        elements.stopaZmiennaBtn.checked = state.lastFormData.stopaZmienna || false;
+    
+        updateDynamicRateField();
+        updateIloscObligacji();
+        updateLata();
+        updateOprocentowanieInfo();
+        updateOpisObligacji();
+        updateVariableInputs();
+    }
+    
+    function updateVariableInputs() {
+        const typ = elements.typObligacji.value;
+        const isInflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
+        const isStopaZmienna = elements.stopaZmiennaBtn.checked && ["ROR", "DOR"].includes(typ);
+        const variableInputs = document.getElementById("variableInputs");
+        const addVariableBtn = elements.addVariableBtn;
+        const wrapper = document.getElementById("variableInputsWrapper");
+        const config = obligacjeConfig[typ];
+        const maxCykl = ["ROR", "DOR"].includes(typ) ? config.okres : config.okres / 12;
+    
+        if (isInflacjaZmienna || isStopaZmienna) {
+            variableInputs.style.display = "block";
+            addVariableBtn.style.display = "block";
+    
+            const data = isInflacjaZmienna ? state.variableInflation : state.variableReferenceRates;
+            const maxChanges = maxVariableChanges[typ] || 0;
+    
+            const defaultValue = Math.max(0.1, state.lastFormData.dynamicRates[typ] || (isInflacjaZmienna ? 4.90 : 5.75)); // Min 0,1%
+            const defaultPeriod = 2;
+    
+            if (data.length === 0 && data.length < maxChanges) {
+                data.push({ value: defaultValue, period: defaultPeriod });
+            }
+    
+            wrapper.innerHTML = "";
+            const changes = isInflacjaZmienna ? state.variableInflation : state.variableReferenceRates;
+    
+            changes.forEach((change, index) => {
+                const inputGroup = document.createElement("div");
+                inputGroup.className = "variable-input-group";
+    
+                const fieldsWrapper = document.createElement("div");
+                fieldsWrapper.className = "fields-wrapper";
+    
+                const minPeriod = index > 0 ? changes[index - 1].period + 1 : 2;
+    
+                const cyklGroup = document.createElement("div");
+                cyklGroup.className = "form-group";
+                cyklGroup.innerHTML = `
+                    <label class="form-label">Od</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control variable-cykl" min="${minPeriod}" max="${maxCykl}" step="1" value="${change.period}">
+                        <span class="input-group-text">${["ROR", "DOR"].includes(typ) ? "miesiąca" : "roku"}</span>
+                    </div>
+                    <input type="range" class="form-range variable-cykl-range" min="${minPeriod}" max="${maxCykl}" step="0.01" value="${change.period}">
+                `;
+    
+                const rateGroup = document.createElement("div");
+                rateGroup.className = "form-group";
+                rateGroup.innerHTML = `
+                    <label class="form-label">${isInflacjaZmienna ? "Inflacja" : "Stopa Ref. NBP"}</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control variable-rate" min="0.1" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.value}">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <input type="range" class="form-range variable-rate-range" min="0.1" max="${isInflacjaZmienna ? 50 : 20}" step="${isInflacjaZmienna ? 0.1 : 0.05}" value="${change.value}">
+                `;
+    
+                fieldsWrapper.appendChild(cyklGroup);
+                fieldsWrapper.appendChild(rateGroup);
+                inputGroup.appendChild(fieldsWrapper);
+    
+                if (index === 0 && changes.length === 1) {
+                    const removeFirstBtnWrapper = document.createElement("div");
+                    removeFirstBtnWrapper.className = "remove-first-btn-wrapper";
+                    const removeFirstBtn = document.createElement("button");
+                    removeFirstBtn.className = "btn btn-danger btn-sm remove-first-btn";
+                    removeFirstBtn.textContent = "Usuń";
+                    removeFirstBtn.onclick = () => {
+                        if (isInflacjaZmienna) {
+                            state.variableInflation = [];
+                            elements.inflacjaZmiennaBtn.checked = false;
+                            state.lastFormData.inflacjaZmienna = false;
+                        } else {
+                            state.variableReferenceRates = [];
+                            elements.stopaZmiennaBtn.checked = false;
+                            state.lastFormData.stopaZmienna = false;
+                        }
+                        variableInputs.style.display = "none";
+                        addVariableBtn.style.display = "none";
+                        wrapper.innerHTML = "";
+                    };
+                    removeFirstBtnWrapper.appendChild(removeFirstBtn);
+                    inputGroup.appendChild(removeFirstBtnWrapper);
+                }
+    
+                if (index === changes.length - 1 && changes.length > 1) {
+                    const removeBtnWrapper = document.createElement("div");
+                    removeBtnWrapper.className = "remove-btn-wrapper";
+                    const removeBtn = document.createElement("button");
+                    removeBtn.className = "btn btn-danger btn-sm";
+                    removeBtn.textContent = "Usuń";
+                    removeBtn.onclick = () => removeVariableChange(index);
+                    removeBtnWrapper.appendChild(removeBtn);
+                    inputGroup.appendChild(removeBtnWrapper);
+                }
+    
+                wrapper.appendChild(inputGroup);
+    
+                const cyklInput = inputGroup.querySelector(".variable-cykl");
+                const cyklRange = inputGroup.querySelector(".variable-cykl-range");
+                const rateInput = inputGroup.querySelector(".variable-rate");
+                const rateRange = inputGroup.querySelector(".variable-rate-range");
+    
+                cyklInput.addEventListener("input", () => {
+                    let value = parseInt(cyklInput.value);
+                    if (value < minPeriod) {
+                        value = minPeriod;
+                        cyklInput.value = value;
+                    }
+                    if (value > maxCykl) {
+                        value = maxCykl;
+                        cyklInput.value = value;
+                    }
+                    cyklRange.value = value;
+                    changes[index].period = value;
+                    updateVariableData();
+                    updateVariableInputs();
+                });
+    
+                cyklRange.addEventListener("input", () => {
+                    let value = parseFloat(cyklRange.value);
+                    cyklInput.value = Math.round(value);
+                });
+    
+                cyklRange.addEventListener("change", () => {
+                    let value = parseFloat(cyklRange.value);
+                    value = Math.round(value);
+                    if (value < minPeriod) {
+                        value = minPeriod;
+                    }
+                    if (value > maxCykl) {
+                        value = maxCykl;
+                    }
+                    cyklRange.value = value;
+                    cyklInput.value = value;
+                    changes[index].period = value;
+                    updateVariableData();
+                    updateVariableInputs();
+                });
+    
+                rateInput.addEventListener("input", () => {
+                    let value = parseFloat(rateInput.value) || 0;
+                    const maxValue = isInflacjaZmienna ? 50 : 20;
+                    if (value < 0.1) value = 0.1; // Minimum 0,1%
+                    if (value > maxValue) value = maxValue;
+                    rateInput.value = value;
+                    rateRange.value = value;
+                    changes[index].value = value;
+                    updateVariableData();
+                });
+    
+                rateRange.addEventListener("input", () => {
+                    let value = parseFloat(rateRange.value);
+                    const maxValue = isInflacjaZmienna ? 50 : 20;
+                    if (value < 0.1) value = 0.1; // Minimum 0,1%
+                    if (value > maxValue) value = maxValue;
+                    rateInput.value = value;
+                    rateRange.value = value;
+                    changes[index].value = value;
+                    updateVariableData();
+                });
+            });
+    
+            addVariableBtn.textContent = "Dodaj kolejną zmianę";
+    
+            const lastChange = changes.length > 0 ? changes[changes.length - 1] : null;
+            const isMaxPeriodReached = lastChange && lastChange.period >= maxCykl;
+    
+            addVariableBtn.style.display = (changes.length < maxChanges && !isMaxPeriodReached) ? "block" : "none";
+        } else {
+            variableInputs.style.display = "none";
+            addVariableBtn.style.display = "none";
+            wrapper.innerHTML = "";
+        }
+    }
+    
+    function addVariableChange() {
+        const typ = elements.typObligacji.value;
+        const isInflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
+        const isStopaZmienna = elements.stopaZmiennaBtn.checked && ["ROR", "DOR"].includes(typ);
+        const changes = isInflacjaZmienna ? state.variableInflation : state.variableReferenceRates;
+        const maxuwe maxCykl = ["ROR", "DOR"].includes(typ) ? obligacjeConfig[typ].okres : obligacjeConfig[typ].okres / 12;
+        const maxChanges = maxVariableChanges[typ] || 0;
+    
+        if (!isInflacjaZmienna && !isStopaZmienna) return;
+    
+        const lastChange = changes.length > 0 ? changes[changes.length - 1] : null;
+        const isMaxPeriodReached = lastChange && lastChange.period >= maxCykl;
+    
+        if (changes.length >= maxChanges || isMaxPeriodReached) {
+            if (changes.length >= maxChanges) {
+                alert(`Osiągnięto maksymalną liczbę zmian dla obligacji ${typ} (${maxChanges}).`);
+            }
+            elements.addVariableBtn.style.display = "none";
+            return;
+        }
+    
+        const lastCykl = lastChange ? lastChange.period : 1;
+        const newCykl = Math.min(lastCykl + 1, maxCykl);
+        const newValue = Math.max(0.1, state.lastFormData.dynamicRates[typ] || (isInflacjaZmienna ? 4.90 : 5.75)); // Min 0,1%
+    
+        changes.push({ period: newCykl, value: newValue });
+        updateVariableInputs();
+    }
+    
+    function removeVariableChange(index) {
+        const typ = elements.typObligacji.value;
+        const isInflacjaZmienna = elements.inflacjaZmiennaBtn.checked && ["COI", "EDO", "ROS", "ROD"].includes(typ);
+        const changes = isInflacjaZmienna ? state.variableInflation : state.variableReferenceRates;
+        if (changes.length > 1) {
+            changes.splice(index, 1);
+            updateVariableInputs();
+        }
+    }
+    
+    updateDynamicRateField();
+    updateIloscObligacji();
+    
     if (typeof pdfMake !== "undefined" && typeof pdfMake.vfs !== "undefined") {
         pdfMake.fonts = {
             Roboto: {
@@ -2067,6 +2666,7 @@
                 const baseText = "** Opłata maksymalna za wcześniejszy wykup, jeżeli wartość narosłych odsetek jest większa od opłaty za wcześniejszy wykup, w przeciwnym razie opłata będzie do wartości narosłych odsetek.";
                 const ikeIkzeText = state.isIkeIkzeMode ? "\n*** Podatek wyniesie 0 zł po osiągnięciu wieku emerytalnego i 55 roku życia lub 60 roku życia w przypadku IKE oraz 10 % zryczałtowanego podatku po osiągnięciu 65 roku życia w przypadku IKZE." : "";
                 const footerNoteText = `${starText}${baseText}${ikeIkzeText}`;
+    
                 const docDefinition = {
                     pageSize: 'A4',
                     pageMargins: [40, 60, 40, 60],
@@ -2201,7 +2801,7 @@
     }
     
     Chart.register(backgroundPlugin);
-    
+        
 </script>
 </body>
 </html>
