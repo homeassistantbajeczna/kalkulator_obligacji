@@ -1767,6 +1767,19 @@
         document.getElementById("inflacjaZmiennaLabel").style.display = ["COI", "EDO", "ROS", "ROD"].includes(typ) ? "flex" : "none";
         document.getElementById("stopaZmiennaLabel").style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
     
+        // Reset zmiennych stóp referencyjnych NBP przy zmianie między ROR a DOR, jeśli przycisk "Zmienna stopa Ref. NBP" jest włączony
+        if (["ROR", "DOR"].includes(typ) && elements.stopaZmiennaBtn.checked && (previousTyp === "ROR" || previousTyp === "DOR") && previousTyp !== typ) {
+            const defaultValue = state.lastFormData.dynamicRates[typ] || 5.75;
+            state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
+        }
+    
+        // Reset zmiennej inflacji przy zmianie między COI, EDO, ROS, ROD, jeśli przycisk "Zmienna inflacja" jest włączony
+        if (["COI", "EDO", "ROS", "ROD"].includes(typ) && elements.inflacjaZmiennaBtn.checked && (["COI", "EDO", "ROS", "ROD"].includes(previousTyp)) && previousTyp !== typ) {
+            const defaultValue = state.lastFormData.dynamicRates[typ] || 4.90;
+            state.variableInflation = [{ value: defaultValue, period: 2 }];
+        }
+    
+        // Reset zmiennych, jeśli nowy typ obligacji nie obsługuje zmiennych stóp/inflacji
         if (!["COI", "EDO", "ROS", "ROD"].includes(typ)) {
             state.variableInflation = [];
             elements.inflacjaZmiennaBtn.checked = false;
