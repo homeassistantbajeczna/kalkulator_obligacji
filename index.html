@@ -1768,15 +1768,21 @@
         document.getElementById("stopaZmiennaLabel").style.display = ["ROR", "DOR"].includes(typ) ? "flex" : "none";
     
         // Reset zmiennych stóp referencyjnych NBP przy zmianie między ROR a DOR, jeśli przycisk "Zmienna stopa Ref. NBP" jest włączony
-        if (["ROR", "DOR"].includes(typ) && elements.stopaZmiennaBtn.checked && (previousTyp === "ROR" || previousTyp === "DOR") && previousTyp !== typ) {
-            const defaultValue = state.lastFormData.dynamicRates[typ] || 5.75;
+        const isPreviousRORorDOR = previousTyp === "ROR" || previousTyp === "DOR";
+        const isCurrentRORorDOR = typ === "ROR" || typ === "DOR";
+        if (isPreviousRORorDOR && isCurrentRORorDOR && previousTyp !== typ && elements.stopaZmiennaBtn.checked) {
+            const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 5.75;
             state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
+            state.lastFormData.stopaZmienna = true; // Upewniamy się, że stan przycisku jest zachowany
         }
     
         // Reset zmiennej inflacji przy zmianie między COI, EDO, ROS, ROD, jeśli przycisk "Zmienna inflacja" jest włączony
-        if (["COI", "EDO", "ROS", "ROD"].includes(typ) && elements.inflacjaZmiennaBtn.checked && (["COI", "EDO", "ROS", "ROD"].includes(previousTyp)) && previousTyp !== typ) {
-            const defaultValue = state.lastFormData.dynamicRates[typ] || 4.90;
+        const isPreviousInflationType = ["COI", "EDO", "ROS", "ROD"].includes(previousTyp);
+        const isCurrentInflationType = ["COI", "EDO", "ROS", "ROD"].includes(typ);
+        if (isPreviousInflationType && isCurrentInflationType && previousTyp !== typ && elements.inflacjaZmiennaBtn.checked) {
+            const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 4.90;
             state.variableInflation = [{ value: defaultValue, period: 2 }];
+            state.lastFormData.inflacjaZmienna = true; // Upewniamy się, że stan przycisku jest zachowany
         }
     
         // Reset zmiennych, jeśli nowy typ obligacji nie obsługuje zmiennych stóp/inflacji
@@ -1785,7 +1791,7 @@
             elements.inflacjaZmiennaBtn.checked = false;
             state.lastFormData.inflacjaZmienna = false;
         } else if (elements.inflacjaZmiennaBtn.checked && state.variableInflation.length === 0) {
-            const defaultValue = state.lastFormData.dynamicRates[typ] || 4.90;
+            const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 4.90;
             state.variableInflation = [{ value: defaultValue, period: 2 }];
         }
     
@@ -1794,7 +1800,7 @@
             elements.stopaZmiennaBtn.checked = false;
             state.lastFormData.stopaZmienna = false;
         } else if (elements.stopaZmiennaBtn.checked && state.variableReferenceRates.length === 0) {
-            const defaultValue = state.lastFormData.dynamicRates[typ] || 5.75;
+            const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 5.75;
             state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
         }
     
@@ -1812,7 +1818,6 @@
     
         updateVariableInputs();
     }
-
     // F U N K C J E   P O M O C N I C Z E
     
     function updateIloscObligacji() {
