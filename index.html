@@ -1771,35 +1771,47 @@
         const isPreviousRORorDOR = previousTyp === "ROR" || previousTyp === "DOR";
         const isCurrentRORorDOR = typ === "ROR" || typ === "DOR";
         if (isPreviousRORorDOR && isCurrentRORorDOR && previousTyp !== typ && elements.stopaZmiennaBtn.checked) {
+            console.log(`Resetting variableReferenceRates: Changing from ${previousTyp} to ${typ}`);
             const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 5.75;
             state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
             state.lastFormData.stopaZmienna = true; // Upewniamy się, że stan przycisku jest zachowany
+            console.log("New variableReferenceRates:", state.variableReferenceRates);
         }
     
         // Reset zmiennej inflacji przy zmianie między COI, EDO, ROS, ROD, jeśli przycisk "Zmienna inflacja" jest włączony
         const isPreviousInflationType = ["COI", "EDO", "ROS", "ROD"].includes(previousTyp);
         const isCurrentInflationType = ["COI", "EDO", "ROS", "ROD"].includes(typ);
         if (isPreviousInflationType && isCurrentInflationType && previousTyp !== typ && elements.inflacjaZmiennaBtn.checked) {
+            console.log(`Resetting variableInflation: Changing from ${previousTyp} to ${typ}`);
             const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 4.90;
             state.variableInflation = [{ value: defaultValue, period: 2 }];
             state.lastFormData.inflacjaZmienna = true; // Upewniamy się, że stan przycisku jest zachowany
+            console.log("New variableInflation:", state.variableInflation);
         }
     
         // Reset zmiennych, jeśli nowy typ obligacji nie obsługuje zmiennych stóp/inflacji
         if (!["COI", "EDO", "ROS", "ROD"].includes(typ)) {
-            state.variableInflation = [];
-            elements.inflacjaZmiennaBtn.checked = false;
-            state.lastFormData.inflacjaZmienna = false;
+            if (state.variableInflation.length > 0) {
+                console.log(`Clearing variableInflation: New type ${typ} does not support variable inflation`);
+                state.variableInflation = [];
+                elements.inflacjaZmiennaBtn.checked = false;
+                state.lastFormData.inflacjaZmienna = false;
+            }
         } else if (elements.inflacjaZmiennaBtn.checked && state.variableInflation.length === 0) {
+            console.log(`Initializing variableInflation for ${typ} as it was empty`);
             const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 4.90;
             state.variableInflation = [{ value: defaultValue, period: 2 }];
         }
     
         if (!["ROR", "DOR"].includes(typ)) {
-            state.variableReferenceRates = [];
-            elements.stopaZmiennaBtn.checked = false;
-            state.lastFormData.stopaZmienna = false;
+            if (state.variableReferenceRates.length > 0) {
+                console.log(`Clearing variableReferenceRates: New type ${typ} does not support variable rates`);
+                state.variableReferenceRates = [];
+                elements.stopaZmiennaBtn.checked = false;
+                state.lastFormData.stopaZmienna = false;
+            }
         } else if (elements.stopaZmiennaBtn.checked && state.variableReferenceRates.length === 0) {
+            console.log(`Initializing variableReferenceRates for ${typ} as it was empty`);
             const defaultValue = parseFloat(elements.dynamicRate.value) || state.lastFormData.dynamicRates[typ] || 5.75;
             state.variableReferenceRates = [{ value: defaultValue, period: 2 }];
         }
@@ -1816,6 +1828,7 @@
             state.lastFormData.ikeIkze = false; // Aktualizujemy zapisany stan
         }
     
+        console.log("Before updateVariableInputs - variableReferenceRates:", state.variableReferenceRates, "variableInflation:", state.variableInflation);
         updateVariableInputs();
     }
     // F U N K C J E   P O M O C N I C Z E
